@@ -1,0 +1,1436 @@
+{% load i18n %}
+<div class="card route-card shadow-sm border-0 hover-shadow transition-all position-relative route-card-full"
+     style="width: 320px; height: 450px; display: flex; flex-direction: column; overflow: hidden;">
+  <a href="{% url 'route_detail' route.id %}" class="route-card-link position-absolute top-0 start-0 w-100 h-100"
+     style="z-index: 1; text-decoration: none;"></a>
+  <div class="route-image-container position-relative overflow-hidden rounded-top"
+      style="height: 180px; flex-shrink: 0;">
+    {% if route.photos.count > 0 %}
+      <div id="routeCarousel{{ route.id }}" class="carousel slide h-100" data-bs-ride="carousel" onclick="event.preventDefault();">
+        <div class="carousel-inner h-100">
+          {% for photo in route.photos.all %}
+          <div class="carousel-item h-100 {% if forloop.first %}active{% endif %}">
+            <img src="{{ photo.image.url }}" class="d-block w-100 h-100" alt="{{ route.name }}" style="object-fit: cover;">
+          </div>
+          {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#routeCarousel{{ route.id }}" data-bs-slide="prev" onclick="event.stopPropagation();">
+          <span class="carousel-control-prev-icon bg-dark rounded-circle p-2"></span>
+          <span class="visually-hidden">{% trans "Previous" %}</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#routeCarousel{{ route.id }}" data-bs-slide="next" onclick="event.stopPropagation();">
+          <span class="carousel-control-next-icon bg-dark rounded-circle p-2"></span>
+          <span class="visually-hidden">{% trans "Next" %}</span>
+        </button>
+      </div>
+    {% else %}
+      <div class="route-image-placeholder w-100 h-100 bg-gradient-neutral text-dark d-flex align-items-center justify-content-center">
+        <div class="placeholder-content text-center">
+          <i class="fas fa-route fa-3x mb-3 opacity-50"></i>
+          <p class="small mb-0 opacity-50">{% trans "No photo added" %}</p>
+        </div>
+      </div>
+    {% endif %}
+    <div class="image-overlay position-absolute bottom-0 start-0 w-100"
+         style="height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 100%); z-index: 2;"></div>
+    <div class="position-absolute top-0 start-0 m-3 d-flex flex-column gap-2" style="z-index: 3;">
+      <span class="badge bg-white bg-opacity-95 text-dark border-0 shadow-sm badge-hover">
+        <i class="fas fa-{% if route.route_type == 'walking' %}walking text-success{% elif route.route_type == 'driving' %}car text-primary{% else %}bicycle text-warning{% endif %} me-1"></i>
+        {{ route.get_route_type_display }}
+      </span>
+      {% if not route.is_active %}
+      <span class="badge bg-dark bg-opacity-80 text-white border-0 shadow-sm">
+        <i class="fas fa-pause-circle me-1"></i>{% trans "Inactive" %}
+      </span>
+      {% endif %}
+    </div>
+    <div class="position-absolute top-0 end-0 m-3" style="z-index: 3;">
+      {% if user.is_authenticated %}
+      <button type="button"
+              class="btn btn-sm {% if route.id in user_favorites_ids %}btn-danger{% else %}btn-light bg-white bg-opacity-95{% endif %} rounded-circle shadow-sm favorite-btn hover-scale"
+              style="width: 36px; height: 36px; border: 1px solid #e9ecef;"
+              data-route-id="{{ route.id }}"
+              data-is-favorite="{% if route.id in user_favorites_ids %}true{% else %}false{% endif %}"
+              onclick="toggleFavoriteCard(this, event);"
+              aria-label="{% if route.id in user_favorites_ids %}{% trans 'Remove from favorites' %}{% else %}{% trans 'Add to favorites' %}{% endif %}"
+              title="{% if route.id in user_favorites_ids %}{% trans 'In favorites' %}{% else %}{% trans 'Add to favorites' %}{% endif %}">
+        <i class="{% if route.id in user_favorites_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+      </button>
+      {% endif %}
+    </div>
+    <div class="position-absolute bottom-0 end-0 m-3 d-flex align-items-center gap-2" style="z-index: 3;">
+      {% if route.photos.count > 1 %}
+      <div class="photo-count">
+        <span class="badge bg-dark bg-opacity-75 text-white border-0 shadow-sm">
+          <i class="fas fa-images me-1"></i>{{ route.photos.count }}
+        </span>
+      </div>
+      {% endif %}
+      {% with average_rating=route.get_average_rating %}
+        {% if average_rating and average_rating > 0 %}
+        <div class="d-flex align-items-center bg-dark bg-opacity-60 rounded-pill px-2 py-1">
+          <i class="fas fa-star text-warning me-1 small"></i>
+          <small class="fw-bold text-white">{{ average_rating|floatformat:1 }}</small>
+        </div>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+  <div class="card-body d-flex flex-column p-3 position-relative" style="z-index: 2; flex: 1 1 auto; min-height: 0; overflow: hidden;">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <h5 class="card-title fw-bold text-dark mb-0 line-clamp-2 pe-4" style="flex: 1; min-width: 0;">
+        {{ route.name }}
+      </h5>
+      <div class="dropdown route-menu-dropdown position-relative" style="z-index: 1050;">
+        <button class="btn btn-sm btn-light rounded-circle hover-scale route-action-btn position-relative"
+                type="button"
+                data-bs-toggle="dropdown"
+                style="width: 32px; height: 32px; border: 1px solid #e9ecef; z-index: 1051;"
+                onclick="event.stopPropagation(); event.preventDefault();">
+          <i class="fas fa-ellipsis-v text-muted"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="z-index: 1100; min-width: 200px;">
+          <li>
+            <a class="dropdown-item d-flex align-items-center py-2"
+               href="{% url 'route_detail' route.id %}"
+               onclick="event.stopPropagation();">
+              <i class="fas fa-eye text-muted me-2"></i>
+              <span>{% trans "View" %}</span>
+            </a>
+          </li>
+          {% if request.user == route.author %}
+          <li>
+            <a class="dropdown-item d-flex align-items-center py-2"
+               href="{% url 'edit_route' route.id %}"
+               onclick="event.stopPropagation();">
+              <i class="fas fa-edit text-muted me-2"></i>
+              <span>{% trans "Edit" %}</span>
+            </a>
+          </li>
+          <li><hr class="dropdown-divider my-1"></li>
+          <li>
+            <a class="dropdown-item d-flex align-items-center py-2 {% if route.is_active %}text-warning{% else %}text-success{% endif %}"
+               href="{% url 'toggle_route_active' route.id %}"
+               onclick="event.stopPropagation();">
+              <i class="fas fa-power-off me-2"></i>
+              <span>{% if route.is_active %}{% trans "Deactivate" %}{% else %}{% trans "Activate" %}{% endif %}</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+    <div class="mb-2 flex-grow-1" style="overflow: hidden; position: relative; min-height: 0;">
+      <p class="card-text text-muted mb-0 small line-clamp-3" style="max-height: 72px; overflow: hidden;">
+        {{ route.short_description|default:route.description|default:"No description"|truncatewords:25 }}
+      </p>
+    </div>
+    <div class="mb-2" style="flex-shrink: 0;">
+      {% if route.mood %}
+      <span class="badge bg-light text-dark border me-1 mb-1 px-2 py-1 rounded-pill small">
+        <i class="fas fa-smile me-1 text-muted"></i>{{ route.get_mood_display }}
+      </span>
+      {% endif %}
+      {% if route.theme %}
+      <span class="badge bg-light text-dark border me-1 mb-1 px-2 py-1 rounded-pill small">
+        <i class="fas fa-tag me-1 text-muted"></i>{{ route.get_theme_display }}
+      </span>
+      {% endif %}
+      {% if route.is_elderly_friendly %}
+      <span class="badge bg-light text-dark border me-1 mb-1 px-2 py-1 rounded-pill small">
+        <i class="fas fa-wheelchair me-1 text-muted"></i>{% trans "For seniors" %}
+      </span>
+      {% endif %}
+      {% if route.has_audio_guide %}
+      <span class="badge bg-light text-dark border me-1 mb-1 px-2 py-1 rounded-pill small">
+        <i class="fas fa-headphones me-1 text-muted"></i>{% trans "Audio guide" %}
+      </span>
+      {% endif %}
+    </div>
+    {% if user.is_authenticated and user != route.author and user in route.shared_with.all %}
+    <div style="flex-shrink: 0; margin-bottom: 8px;">
+      <span class="badge bg-info bg-opacity-10 text-info border-0 shadow-sm">
+        <i class="fas fa-user-friends me-1"></i>{% trans "Shared with you" %}
+      </span>
+    </div>
+    {% endif %}
+    <div class="position-relative" style="flex-shrink: 0; margin-bottom: 8px; z-index: 100;">
+      <div class="dropup">
+        <button class="btn btn-outline-white w-100 d-flex align-items-center justify-content-center py-2 dropdown-toggle share-btn"
+                type="button"
+                data-bs-toggle="dropdown"
+                style="border-color: #e9ecef; position: relative; z-index: 101; font-size: 0.85rem;"
+                onclick="event.stopPropagation();">
+          <i class="fas fa-share-alt me-2 text-muted"></i>
+          <span>{% trans "Share" %}</span>
+        </button>
+        <ul class="dropdown-menu w-100 shadow border-0 p-2" style="z-index: 1200; min-width: 250px;">
+          <li>
+            <button class="dropdown-item d-flex align-items-center py-2 rounded share-option"
+                    onclick="shareByLink({{ route.id }}); event.stopPropagation();">
+              <div class="share-icon-container bg-primary bg-opacity-10 rounded-circle me-3 d-flex align-items-center justify-content-center"
+                   style="width: 32px; height: 32px;">
+                <i class="fas fa-link text-primary"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="fw-semibold small">{% trans "Copy link" %}</div>
+                <small class="text-muted d-none d-sm-block">{% trans "Send route link" %}</small>
+              </div>
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item d-flex align-items-center py-2 rounded share-option"
+                    onclick="showQRCode({{ route.id }}, '{{ route.name|escapejs }}'); event.stopPropagation();">
+              <div class="share-icon-container bg-success bg-opacity-10 rounded-circle me-3 d-flex align-items-center justify-content-center"
+                   style="width: 32px; height: 32px;">
+                <i class="fas fa-qrcode text-success"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="fw-semibold small">{% trans "QR code" %}</div>
+                <small class="text-muted d-none d-sm-block">{% trans "Show route QR code" %}</small>
+              </div>
+            </button>
+          </li>
+          {% if request.user.is_authenticated %}
+          <li>
+            <button class="dropdown-item d-flex align-items-center py-2 rounded share-option"
+                    onclick="shareWithFriend({{ route.id }}); event.stopPropagation();">
+              <div class="share-icon-container bg-info bg-opacity-10 rounded-circle me-3 d-flex align-items-center justify-content-center"
+                   style="width: 32px; height: 32px;">
+                <i class="fas fa-user-friends text-info"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="fw-semibold small">{% trans "Send to friend" %}</div>
+                <small class="text-muted d-none d-sm-block">{% trans "Share with friends" %}</small>
+              </div>
+            </button>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center border-top pt-2"
+         style="flex-shrink: 0; margin-top: auto; padding-top: 8px;">
+      <div class="d-flex gap-2 gap-md-3 text-muted small flex-wrap">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-route me-1 text-muted"></i>
+          <span>{{ route.total_distance|floatformat:1 }} {% trans "km" %}</span>
+        </div>
+        <div class="d-flex align-items-center">
+          <i class="fas fa-clock me-1 text-muted"></i>
+          <span class="duration-display">
+            {% if route.duration_display %}
+              {{ route.duration_display }}
+            {% elif route.duration_minutes %}
+              {% if route.duration_minutes >= 1440 %}
+                {% widthratio route.duration_minutes 1440 1 as days %}
+                {{ days|floatformat:0 }} {% trans "d" %}
+              {% elif route.duration_minutes >= 60 %}
+                {% widthratio route.duration_minutes 60 1 as hours %}
+                {{ hours|floatformat:0 }} {% trans "h" %}
+              {% else %}
+                {{ route.duration_minutes }} {% trans "min" %}
+              {% endif %}
+            {% else %}
+              {% trans "Not specified" %}
+            {% endif %}
+          </span>
+        </div>
+        <div class="d-flex align-items-center">
+          <i class="fas fa-map-marker-alt me-1 text-muted"></i>
+          <span>{{ route.points.count }}</span>
+        </div>
+      </div>
+      <div class="text-muted small ms-2">
+        <i class="fas fa-calendar me-1"></i>
+        <span>{{ route.created_at|date:"d.m.Y" }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="card-hover-overlay position-absolute top-0 start-0 w-100 h-100 bg-light bg-opacity-0 transition-all rounded"
+       style="pointer-events: none; z-index: 1;"></div>
+</div>
+
+<!-- Модальные окна -->
+<div class="modal fade" id="qrCodeModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h6 class="modal-title">{% trans "Route QR code" %}</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="qrCodeContainer" class="mb-3"></div>
+        <p class="text-muted small mb-0">{% trans "Scan to quickly access the route" %}</p>
+        <div class="mt-3" id="qrCodeActions"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="shareWithFriendModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h6 class="modal-title">{% trans "Send route to a friend" %}</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label small text-muted">{% trans "Select a friend" %}</label>
+          <select class="form-select" id="friendSelect">
+            <option value="">{% trans "Choose from the list..." %}</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small text-muted">{% trans "Add a message (optional)" %}</label>
+          <textarea class="form-control" id="friendMessage" rows="3" placeholder="{% trans 'e.g. Check out this interesting route!' %}"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
+        <button type="button" class="btn btn-primary" onclick="sendToFriend()">{% trans "Send" %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="shareWithUserModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h6 class="modal-title">{% trans "Grant route access" %}</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label small text-muted">{% trans "User email" %}</label>
+          <input type="email" class="form-control" id="userEmail" placeholder="{% trans 'Enter user email' %}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label small text-muted">{% trans "Access level" %}</label>
+          <select class="form-select" id="accessLevel">
+            <option value="view">{% trans "View only" %}</option>
+            <option value="edit">{% trans "Edit" %}</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
+        <button type="button" class="btn btn-dark" onclick="grantAccess()">{% trans "Grant access" %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.route-card-full {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 1px solid #f8f9fa;
+  width: 100%;
+  max-width: 400px;
+}
+.route-card-full:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+  border-color: #e9ecef;
+}
+.route-image-container {
+  flex-shrink: 0;
+  position: relative;
+}
+.route-image-container img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+.carousel {
+  height: 100%;
+}
+.carousel-inner {
+  height: 100%;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+}
+.carousel-item {
+  height: 100%;
+}
+.carousel-control-prev,
+.carousel-control-next {
+  width: 40px;
+  height: 40px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.route-image-container:hover .carousel-control-prev,
+.route-image-container:hover .carousel-control-next {
+  opacity: 1;
+}
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  background: rgba(0,0,0,0.7);
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  width: 20px;
+  height: 20px;
+}
+.route-image-placeholder {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+.badge-hover {
+  transition: all 0.2s ease;
+}
+.badge-hover:hover {
+  transform: translateY(-1px);
+}
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hover-scale {
+  transition: transform 0.2s ease;
+}
+.hover-scale:hover {
+  transform: scale(1.1);
+}
+.favorite-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  border: 1px solid #e9ecef !important;
+  background: white !important;
+  line-height: 1 !important;
+  transition: all 0.2s ease;
+  z-index: 3;
+  position: relative;
+}
+.favorite-btn:hover {
+  transform: scale(1.1);
+}
+.favorite-btn.btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+  border-color: #bd2130 !important;
+  color: white !important;
+}
+.favorite-btn.btn-danger:hover {
+  background: linear-gradient(135deg, #c82333 0%, #bd2130 100%) !important;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+.favorite-btn.btn-light:hover {
+  background: white !important;
+  border-color: #dee2e6 !important;
+  color: #495057;
+}
+.favorite-btn i {
+  font-size: 1.1rem;
+  margin: 0 !important;
+  display: block;
+  line-height: 1;
+}
+.favorite-btn:hover i {
+  transform: scale(1.2);
+}
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.3); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+.favorite-btn.added i {
+  animation: heartBeat 0.6s ease;
+}
+.favorite-btn::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+.favorite-btn:hover::after {
+  opacity: 1;
+  visibility: visible;
+  bottom: -35px;
+}
+.route-menu-dropdown {
+  position: relative !important;
+  z-index: 1050 !important;
+}
+.route-menu-dropdown .dropdown-menu {
+  z-index: 1100 !important;
+  position: absolute !important;
+}
+.route-action-btn {
+  position: relative;
+  z-index: 1051 !important;
+}
+.dropup {
+  z-index: 100 !important;
+}
+.dropup .dropdown-menu {
+  z-index: 1200 !important;
+  position: absolute !important;
+}
+.share-btn {
+  position: relative;
+  z-index: 101 !important;
+}
+.route-card-full .card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.route-card-full .flex-grow-1 {
+  flex: 1;
+  min-height: 0;
+}
+.share-btn {
+  transition: all 0.2s ease;
+  background: white;
+}
+.share-btn:hover {
+  background: #f8f9fa;
+  border-color: #dee2e6 !important;
+}
+.share-option {
+  transition: all 0.2s ease;
+  border: none !important;
+}
+.share-option:hover {
+  background-color: #f8f9fa !important;
+}
+.share-icon-container {
+  transition: transform 0.2s ease;
+}
+.share-option:hover .share-icon-container {
+  transform: scale(1.1);
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.route-card-full {
+  animation: fadeInUp 0.4s ease-out;
+}
+@media (max-width: 1400px) {
+  .route-card-full {
+    width: 300px;
+    height: 430px;
+  }
+  .route-image-container {
+    height: 170px;
+  }
+  .favorite-btn {
+    width: 34px !important;
+    height: 34px !important;
+  }
+  .share-icon-container {
+    width: 28px !important;
+    height: 28px !important;
+  }
+}
+@media (max-width: 1200px) {
+  .route-card-full {
+    width: 280px;
+    height: 420px;
+  }
+  .route-image-container {
+    height: 160px;
+  }
+  .favorite-btn {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}
+@media (max-width: 992px) {
+  .route-card-full {
+    width: 100%;
+    height: 400px;
+    max-width: 350px;
+    margin: 0 auto;
+  }
+  .route-image-container {
+    height: 150px;
+  }
+  .share-icon-container {
+    margin-right: 0.5rem !important;
+  }
+}
+@media (max-width: 768px) {
+  .route-card-full {
+    height: 380px;
+    max-width: 320px;
+  }
+  .route-image-container {
+    height: 140px;
+  }
+  .carousel-control-prev,
+  .carousel-control-next {
+    opacity: 0.7;
+    width: 35px;
+    height: 35px;
+  }
+  .favorite-btn::after {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+  .share-btn {
+    font-size: 0.8rem !important;
+    padding: 0.4rem 0.5rem !important;
+  }
+}
+@media (max-width: 576px) {
+  .route-card-full {
+    width: 100%;
+    height: 360px;
+    max-width: 100%;
+  }
+  .route-image-container {
+    height: 130px;
+  }
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 30px;
+    height: 30px;
+  }
+  .favorite-btn {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  .favorite-btn::after {
+    display: none;
+  }
+  .share-icon-container {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .dropdown-menu .small {
+    font-size: 0.75rem !important;
+  }
+}
+.row > [class*='col-'] {
+  display: flex;
+}
+.route-card-full {
+  flex: 1;
+}
+.route-card-link {
+  z-index: 1;
+}
+.route-image-container * {
+  z-index: 3;
+}
+.card-body {
+  z-index: 2;
+}
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+.friend-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+.friend-option:hover {
+  background-color: #f8f9fa;
+}
+.friend-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+}
+.friend-info {
+  flex: 1;
+}
+.friend-name {
+  font-weight: 500;
+  font-size: 14px;
+}
+.friend-username {
+  font-size: 12px;
+  color: #6c757d;
+}
+.toast-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  max-width: 300px;
+  word-wrap: break-word;
+  animation: slideInRight 0.3s ease-out;
+}
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.toast-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+.toast-error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+.toast-info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+.toast-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+</style>
+
+<script>
+// Функция для переключения избранного через AJAX (для карточек)
+async function toggleFavoriteCard(button, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+    }
+    
+    const routeId = button.dataset.routeId;
+    const isFavorite = button.dataset.isFavorite === 'true';
+    
+    // Сохраняем текущую позицию скролла
+    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // Показываем спиннер
+    const icon = button.querySelector('i');
+    const originalIcon = icon.className;
+    icon.className = 'fas fa-spinner fa-spin';
+    button.disabled = true;
+    
+    try {
+        // Используем правильный URL из ваших URL паттернов
+        const url = `/interactions/favorite/${routeId}/`;
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Обновляем состояние кнопки
+        if (data.success) {
+            const newIsFavorite = data.is_favorite;
+            
+            // Обновляем внешний вид кнопки
+            if (newIsFavorite) {
+                button.classList.remove('btn-light');
+                button.classList.add('btn-danger');
+                button.dataset.isFavorite = 'true';
+                icon.className = 'fas fa-heart';
+                button.setAttribute('aria-label', 'Удалить из избранного');
+                button.setAttribute('title', 'В избранном');
+                button.classList.add('added');
+                
+                // Показываем уведомление
+                showToast('Маршрут добавлен в избранное', 'success');
+            } else {
+                button.classList.remove('btn-danger');
+                button.classList.add('btn-light');
+                button.dataset.isFavorite = 'false';
+                icon.className = 'far fa-heart';
+                button.setAttribute('aria-label', 'Добавить в избранное');
+                button.setAttribute('title', 'В избранное');
+                
+                // Показываем уведомление
+                showToast('Маршрут удален из избранного', 'info');
+            }
+            
+            // Убираем класс анимации через 1 секунду
+            setTimeout(() => {
+                button.classList.remove('added');
+            }, 1000);
+            
+        } else {
+            throw new Error(data.error || 'Unknown error');
+        }
+        
+    } catch (error) {
+        console.error('Error toggling favorite:', error);
+        showToast('Ошибка при обновлении избранного', 'error');
+        icon.className = originalIcon; // Возвращаем оригинальную иконку
+        
+        // Если AJAX не сработал, пробуем отправить форму старым способом
+        try {
+            // Создаем скрытую форму и отправляем
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/interactions/favorite/${routeId}/`;
+            form.style.display = 'none';
+            
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = getCSRFToken();
+            
+            form.appendChild(csrfInput);
+            document.body.appendChild(form);
+            form.submit();
+        } catch (fallbackError) {
+            console.error('Fallback also failed:', fallbackError);
+        }
+    } finally {
+        button.disabled = false;
+        // Возвращаем фокус, чтобы предотвратить скролл
+        button.blur();
+        // Возвращаем скролл на исходную позицию
+        setTimeout(() => {
+            window.scrollTo({
+                top: scrollPosition,
+                behavior: 'instant'
+            });
+        }, 0);
+    }
+    
+    // Возвращаем false для предотвращения любого другого поведения
+    return false;
+}
+
+// Глобальный обработчик для предотвращения скролла
+(function() {
+    let scrollPosition = 0;
+    
+    // Сохраняем позицию скролла перед кликом на кнопку избранного
+    document.addEventListener('mousedown', function(e) {
+        if (e.target.closest('.favorite-btn')) {
+            scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+        }
+    }, true);
+    
+    // Восстанавливаем позицию скролла после клика
+    document.addEventListener('mouseup', function(e) {
+        if (e.target.closest('.favorite-btn')) {
+            setTimeout(() => {
+                window.scrollTo({
+                    top: scrollPosition,
+                    behavior: 'instant'
+                });
+            }, 0);
+        }
+    }, true);
+    
+    // Для мобильных устройств
+    document.addEventListener('touchstart', function(e) {
+        if (e.target.closest('.favorite-btn')) {
+            scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+        }
+    }, true);
+    
+    document.addEventListener('touchend', function(e) {
+        if (e.target.closest('.favorite-btn')) {
+            setTimeout(() => {
+                window.scrollTo({
+                    top: scrollPosition,
+                    behavior: 'instant'
+                });
+            }, 0);
+        }
+    }, true);
+})();
+
+// Функция для копирования ссылки
+function shareByLink(routeId) {
+    const routeUrl = `/routes/${routeId}/`;
+    const fullUrl = window.location.origin + routeUrl;
+    
+    navigator.clipboard.writeText(fullUrl).then(function() {
+        showToast('Ссылка скопирована в буфер обмена', 'success');
+    }).catch(function() {
+        // Fallback для старых браузеров
+        const tempInput = document.createElement('input');
+        tempInput.value = fullUrl;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        showToast('Ссылка скопирована в буфер обмена', 'success');
+    });
+}
+
+// Функция для показа QR кода
+function showQRCode(routeId, routeName) {
+    // Показываем загрузку
+    const container = document.getElementById('qrCodeContainer');
+    const actionsContainer = document.getElementById('qrCodeActions');
+    container.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Генерация QR кода...</p>
+        </div>
+    `;
+    actionsContainer.innerHTML = '';
+    
+    // Генерируем QR код через наш бэкенд
+    fetch(`/routes/${routeId}/generate-qr/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            container.innerHTML = '';
+            
+            const qrImage = document.createElement('img');
+            qrImage.src = data.qr_url;
+            qrImage.alt = `QR код для маршрута: ${routeName}`;
+            qrImage.className = 'img-fluid rounded shadow-sm';
+            qrImage.style.maxWidth = '100%';
+            qrImage.style.maxHeight = '200px';
+            
+            container.appendChild(qrImage);
+            
+            // Добавляем кнопки действий
+            actionsContainer.innerHTML = `
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="/routes/${routeId}/qr-code/" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-expand me-1"></i> Полная страница
+                    </a>
+                    <button onclick="downloadQRCode('${data.qr_url}', '${routeName.replace(/'/g, "\\'")}')" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-download me-1"></i> Скачать
+                    </button>
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${data.error || 'Ошибка генерации QR кода'}
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Ошибка соединения с сервером
+            </div>
+        `;
+    });
+    
+    // Показываем модальное окно
+    const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
+    modal.show();
+}
+
+// Функция для скачивания QR кода
+function downloadQRCode(qrUrl, routeName) {
+    const link = document.createElement('a');
+    link.href = qrUrl;
+    link.download = `qr_code_${routeName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Функция для открытия модального окна отправки другу
+function shareWithFriend(routeId) {
+    document.getElementById('shareWithFriendModal').dataset.routeId = routeId;
+    
+    // Сброс формы
+    document.getElementById('friendSelect').value = '';
+    document.getElementById('friendMessage').value = '';
+    
+    // Загружаем список друзей
+    loadFriendsList(routeId);
+    
+    const modal = new bootstrap.Modal(document.getElementById('shareWithFriendModal'));
+    modal.show();
+}
+
+// Функция для загрузки списка друзей
+function loadFriendsList(routeId) {
+    const friendSelect = document.getElementById('friendSelect');
+    
+    // Показываем загрузку
+    friendSelect.innerHTML = '<option value="">Загрузка друзей...</option>';
+    
+    // Используем правильный URL
+    fetch('/routes/api/friends/', {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Friends data:', data); // Для отладки
+        
+        if (data.success && data.friends && data.friends.length > 0) {
+            friendSelect.innerHTML = '<option value="">Выберите друга из списка...</option>';
+            
+            data.friends.forEach(friend => {
+                const option = document.createElement('option');
+                option.value = friend.id;
+                const displayName = friend.first_name && friend.last_name 
+                    ? `${friend.first_name} ${friend.last_name}` 
+                    : friend.username;
+                option.textContent = displayName;
+                option.setAttribute('data-username', friend.username);
+                friendSelect.appendChild(option);
+            });
+        } else {
+            friendSelect.innerHTML = '<option value="">У вас пока нет друзей</option>';
+            
+            // Добавляем информационное сообщение
+            const infoOption = document.createElement('option');
+            infoOption.disabled = true;
+            if (data.error) {
+                infoOption.textContent = `⚠️ ${data.error}`;
+            } else {
+                infoOption.textContent = '⚠️ Список друзей пуст';
+            }
+            friendSelect.appendChild(infoOption);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading friends:', error);
+        friendSelect.innerHTML = '<option value="">Ошибка загрузки друзей</option>';
+        
+        const errorOption = document.createElement('option');
+        errorOption.disabled = true;
+        errorOption.textContent = '⚠️ Не удалось загрузить список друзей';
+        friendSelect.appendChild(errorOption);
+        
+        showToast('Ошибка загрузки списка друзей', 'error');
+    });
+}
+
+// Функция для отправки маршрута другу
+function sendToFriend() {
+    const routeId = document.getElementById('shareWithFriendModal').dataset.routeId;
+    const friendId = document.getElementById('friendSelect').value;
+    const message = document.getElementById('friendMessage').value.trim();
+    
+    if (!friendId) {
+        showToast('Выберите друга', 'error');
+        return;
+    }
+    
+    // Показываем индикатор загрузки
+    const submitBtn = document.querySelector('#shareWithFriendModal .btn-primary');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Отправка...';
+    submitBtn.disabled = true;
+    
+    fetch(`/routes/${routeId}/send-to-friend/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            friend_id: friendId,
+            message: message
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('shareWithFriendModal'));
+            modal.hide();
+        } else {
+            showToast('Ошибка: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Произошла ошибка при отправке', 'error');
+    })
+    .finally(() => {
+        // Восстанавливаем кнопку
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
+// Функция для открытия модального окна предоставления доступа
+function shareWithUser(routeId) {
+    document.getElementById('shareWithUserModal').dataset.routeId = routeId;
+    
+    // Сброс формы
+    document.getElementById('userEmail').value = '';
+    document.getElementById('accessLevel').value = 'view';
+    
+    const modal = new bootstrap.Modal(document.getElementById('shareWithUserModal'));
+    modal.show();
+}
+
+// Функция для предоставления доступа
+function grantAccess() {
+    const routeId = document.getElementById('shareWithUserModal').dataset.routeId;
+    const userEmail = document.getElementById('userEmail').value.trim();
+    const accessLevel = document.getElementById('accessLevel').value;
+    
+    if (!userEmail) {
+        showToast('Введите email пользователя', 'error');
+        return;
+    }
+    
+    if (!validateEmail(userEmail)) {
+        showToast('Введите корректный email', 'error');
+        return;
+    }
+    
+    // Показываем индикатор загрузки
+    const submitBtn = document.querySelector('#shareWithUserModal .btn-dark');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Отправка...';
+    submitBtn.disabled = true;
+    
+    fetch(`/routes/${routeId}/share-access/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            email: userEmail,
+            access_level: accessLevel
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('shareWithUserModal'));
+            modal.hide();
+        } else {
+            showToast('Ошибка: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Произошла ошибка при отправке', 'error');
+    })
+    .finally(() => {
+        // Восстанавливаем кнопку
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
+// Вспомогательные функции
+function showToast(message, type) {
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.className = 'position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+    
+    const toastId = 'toast-' + Date.now();
+    const toast = document.createElement('div');
+    toast.id = toastId;
+    
+    // Определяем цвет и иконку в зависимости от типа
+    let bgClass, iconClass;
+    switch(type) {
+        case 'success':
+            bgClass = 'bg-success';
+            iconClass = 'fa-check-circle';
+            break;
+        case 'error':
+            bgClass = 'bg-danger';
+            iconClass = 'fa-exclamation-circle';
+            break;
+        case 'info':
+            bgClass = 'bg-info';
+            iconClass = 'fa-info-circle';
+            break;
+        case 'warning':
+            bgClass = 'bg-warning';
+            iconClass = 'fa-exclamation-triangle';
+            break;
+        default:
+            bgClass = 'bg-info';
+            iconClass = 'fa-info-circle';
+    }
+    
+    toast.className = `toast align-items-center text-white ${bgClass} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas ${iconClass} me-2"></i>
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+    bsToast.show();
+    
+    toast.addEventListener('hidden.bs.toast', () => {
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+        }
+    });
+}
+
+function getCSRFToken() {
+    // Пробуем разные способы найти CSRF токен
+    let csrfToken = '';
+    
+    // 1. Ищем input с именем csrfmiddlewaretoken
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) {
+        csrfToken = csrfInput.value;
+    }
+    
+    // 2. Ищем meta тег с csrf-token
+    if (!csrfToken) {
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        if (csrfMeta) {
+            csrfToken = csrfMeta.getAttribute('content');
+        }
+    }
+    
+    // 3. Ищем в cookies
+    if (!csrfToken) {
+        const cookieMatch = document.cookie.match(/csrftoken=([^;]+)/);
+        if (cookieMatch) {
+            csrfToken = cookieMatch[1];
+        }
+    }
+    
+    return csrfToken;
+}
+
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Исправление для корректного отображения времени
+function formatDuration(minutes) {
+    if (!minutes || minutes === 0) return '0 мин';
+    
+    if (minutes >= 1440) {
+        const days = Math.floor(minutes / 1440);
+        return days + ' д';
+    } else if (minutes >= 60) {
+        const hours = Math.floor(minutes / 60);
+        return hours + ' ч';
+    } else {
+        return minutes + ' мин';
+    }
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    // Форматируем время для всех карточек
+    document.querySelectorAll('.duration-display').forEach(element => {
+        const minutes = parseInt(element.dataset.minutes);
+        if (!isNaN(minutes)) {
+            element.textContent = formatDuration(minutes);
+        }
+    });
+    
+    // Инициализация каруселей
+    document.querySelectorAll('.carousel').forEach(carousel => {
+        carousel.addEventListener('slide.bs.carousel', function(e) {
+            e.stopPropagation();
+        });
+    });
+    
+    // Добавляем эффект при наведении на кнопки избранного
+    document.querySelectorAll('.favorite-btn').forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('btn-danger')) {
+                this.querySelector('i').style.color = '#dc3545';
+            }
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            if (!this.classList.contains('btn-danger')) {
+                this.querySelector('i').style.color = '';
+            }
+        });
+        
+        // Предотвращаем фокус
+        button.addEventListener('focus', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.blur();
+        });
+    });
+    
+    // Обработчик для ссылок карточек
+    document.querySelectorAll('.route-card-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (e.target.closest('.favorite-btn') || 
+                e.target.closest('.route-action-btn') || 
+                e.target.closest('.dropdown-toggle')) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
+            }
+        });
+    });
+    
+    // Закрытие dropdown при клике вне
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                const dropdown = menu.closest('.dropdown');
+                if (dropdown) {
+                    const btn = dropdown.querySelector('[data-bs-toggle="dropdown"]');
+                    if (btn) {
+                        bootstrap.Dropdown.getInstance(btn)?.hide();
+                    }
+                }
+            });
+        }
+    });
+    
+    // Особый обработчик для меню действий (три точки)
+    document.querySelectorAll('.route-action-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            
+            const dropdown = this.nextElementSibling;
+            if (dropdown && dropdown.classList.contains('dropdown-menu')) {
+                const isShown = dropdown.classList.contains('show');
+                
+                // Закрываем все другие dropdown
+                document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                    if (menu !== dropdown) {
+                        const otherBtn = menu.previousElementSibling;
+                        if (otherBtn && otherBtn.matches('[data-bs-toggle="dropdown"]')) {
+                            bootstrap.Dropdown.getInstance(otherBtn)?.hide();
+                        }
+                    }
+                });
+                
+                // Открываем/закрываем текущий dropdown
+                if (!isShown) {
+                    const bsDropdown = new bootstrap.Dropdown(this);
+                    bsDropdown.show();
+                }
+            }
+        });
+    });
+});
+
+// Предотвращаем стандартное поведение для элементов управления каруселью
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.carousel-control-prev') || 
+        e.target.closest('.carousel-control-next') ||
+        e.target.closest('.carousel-indicator')) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+    }
+});
+
+// Управление закрытием dropdown меню при клике на другие элементы
+document.addEventListener('click', function(e) {
+    // Закрываем меню действий, если клик не на нем
+    if (!e.target.closest('.route-action-btn') && !e.target.closest('.route-menu-dropdown .dropdown-menu')) {
+        document.querySelectorAll('.route-menu-dropdown .dropdown-menu.show').forEach(menu => {
+            const btn = menu.previousElementSibling;
+            if (btn && btn.matches('[data-bs-toggle="dropdown"]')) {
+                bootstrap.Dropdown.getInstance(btn)?.hide();
+            }
+        });
+    }
+    
+    // Закрываем меню поделиться, если клик не на нем
+    if (!e.target.closest('.share-btn') && !e.target.closest('.dropup .dropdown-menu')) {
+        document.querySelectorAll('.dropup .dropdown-menu.show').forEach(menu => {
+            const btn = menu.previousElementSibling;
+            if (btn && btn.matches('[data-bs-toggle="dropdown"]')) {
+                bootstrap.Dropdown.getInstance(btn)?.hide();
+            }
+        });
+    }
+});
+</script>

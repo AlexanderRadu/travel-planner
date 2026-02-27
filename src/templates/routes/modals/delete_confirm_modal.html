@@ -1,0 +1,25 @@
+{% load i18n %}
+<div class="modal fade" id="delete-confirm-modal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-body text-center py-4">
+        <div class="warning-icon mb-3">
+          <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+               style="width: 80px; height: 80px;">
+            <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+          </div>
+        </div>
+        <h5 class="fw-bold text-dark mb-2">{% trans "Delete point?" %}</h5>
+        <p class="text-muted mb-3">
+          {% trans "Point" %} "<span id='delete-point-name' class='fw-semibold text-dark'>...</span>" {% trans "will be removed from the route." %}
+        </p>
+        <div class="d-flex gap-2 justify-content-center">
+          <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
+          <button type="button" id="confirm-delete-btn" class="btn btn-danger px-4">
+            <i class="fas fa-trash me-2"></i>{% trans "Delete" %}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

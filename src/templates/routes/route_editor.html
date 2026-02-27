@@ -1,0 +1,2223 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<div class="route-editor-container">
+    <div class="container-fluid h-100">
+        <div class="row g-0 h-100">
+            <div class="col-lg-4 h-100">
+                <div class="left-panel-wrapper h-100 position-relative">
+                    <div class="left-panel-scrollable h-100 overflow-y-auto">
+                        <div class="card shadow-sm border-0 m-3">
+                            <div class="card-body">
+                                <input type="hidden" id="route-id" value="{{ route.id }}">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% if route %}{% url 'route_detail' route.id %}{% else %}{% url 'my_routes' %}{% endif %}" 
+                                       class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </a>
+                                    <h5 class="card-title mb-0 fw-bold text-dark text-center flex-grow-1 mx-2">
+                                        {% if route %}{% trans "Edit Route" %}{% else %}{% trans "Create Route" %}{% endif %}
+                                    </h5>
+                                    <button id="save-btn" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-save me-1"></i>{% trans "Save" %}
+                                    </button>
+                                </div>
+
+                                <div class="search-bar position-relative mb-3 d-flex gap-2">
+                                    <div class="position-relative flex-grow-1">
+                                        <input type="text" id="search-place" class="form-control form-control-sm" 
+                                               placeholder="{% trans 'Search places...' %}" style="border-radius: 20px;">
+                                        <div id="search-suggestions" class="search-suggestions"></div>
+                                    </div>
+                                    <button id="search-btn" class="btn btn-primary btn-sm rounded-pill">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+
+                                <div class="d-flex gap-2 justify-content-between mb-3">
+                                    <div class="btn-group">
+                                        <button id="undo-btn" class="btn btn-outline-secondary btn-sm" disabled>
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                        <button id="redo-btn" class="btn btn-outline-secondary btn-sm" disabled>
+                                            <i class="fas fa-redo"></i>
+                                        </button>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button id="style-toggle" class="btn btn-outline-secondary btn-sm rounded-pill">
+                                            <i class="fas fa-satellite me-1"></i>{% trans "Satellite" %}
+                                        </button>
+                                        <button id="locate-me" class="btn btn-outline-primary btn-sm rounded-pill">
+                                            <i class="fas fa-location-arrow"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="route-stats mb-3">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body py-2 px-3">
+                                            <div class="d-flex justify-content-between text-center">
+                                                <div>
+                                                    <div class="h6 mb-0 fw-bold text-dark" id="total-distance">0 km</div>
+                                                    <div class="small text-muted">{% trans "Distance" %}</div>
+                                                </div>
+                                                <div>
+                                                    <div class="h6 mb-0 fw-bold text-dark" id="points-count-display">0</div>
+                                                    <div class="small text-muted">{% trans "Points" %}</div>
+                                                </div>
+                                                <div>
+                                                    <div class="h6 mb-0 fw-bold text-dark" id="estimated-time">-</div>
+                                                    <div class="small text-muted">{% trans "Time" %}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button id="optimize-btn" class="btn btn-outline-success btn-sm flex-fill">
+                                        <i class="fas fa-magic me-1"></i>{% trans "Optimize" %}
+                                    </button>
+                                    <button id="reset-route" class="btn btn-outline-danger btn-sm" 
+                                            data-bs-toggle="tooltip" title="{% trans 'Clear route' %}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm border-0 m-3">
+                            <div class="card-header bg-white border-0">
+                                <h5 class="card-title mb-0 fw-bold text-dark">
+                                    <i class="fas fa-info-circle text-primary me-2"></i>
+                                    {% trans "Basic Information" %}
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <input type="hidden" id="route_type" value="walking">
+                                <input type="hidden" id="total_distance" value="0">
+                                <input type="hidden" id="duration_minutes" value="0">
+                                <input type="hidden" id="is_active" value="true">
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">{% trans "Route Name" %} *</label>
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <input type="text" class="form-control form-control-lg border-0 bg-light flex-grow-1" id="name" 
+                                               placeholder="{% trans 'Enter route name' %}" required
+                                               style="border-radius: 12px; padding: 12px 16px;">
+                                        {% if route %}
+                                        <button type="button" class="btn btn-outline-danger btn-lg" 
+                                                data-bs-toggle="modal" data-bs-target="#deleteRouteModal"
+                                                title="{% trans 'Delete route' %}" style="border-radius: 12px; padding: 12px 16px;">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">{% trans "Short Description" %}</label>
+                                    <textarea class="form-control border-0 bg-light" id="short_description" rows="3" 
+                                              placeholder="{% trans 'Brief description of your route...' %}"
+                                              style="border-radius: 12px; padding: 12px 16px; resize: none;"></textarea>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">{% trans "Full Route Description" %}</label>
+                                    <textarea class="form-control border-0 bg-light" id="description" rows="5" 
+                                              placeholder="{% trans 'Detailed description of your route...' %}"
+                                              style="border-radius: 12px; padding: 12px 16px; resize: none;"></textarea>
+                                </div>
+
+                                <div class="route-params mb-4">
+                                    <h6 class="fw-bold text-dark mb-3">{% trans "Route Parameters" %}</h6>
+                                    
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label small fw-semibold text-muted">{% trans "Route Type" %}</label>
+                                            <div class="btn-group w-100" role="group">
+                                                <button type="button" class="btn btn-outline-primary route-type-btn active" data-type="walking">
+                                                    <i class="fas fa-walking me-1"></i>{% trans "Walking" %}
+                                                </button>
+                                                <button type="button" class="btn btn-outline-primary route-type-btn" data-type="driving">
+                                                    <i class="fas fa-car me-1"></i>{% trans "Car" %}
+                                                </button>
+                                                <button type="button" class="btn btn-outline-primary route-type-btn" data-type="cycling">
+                                                    <i class="fas fa-bicycle me-1"></i>{% trans "Bicycle" %}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label class="form-label small fw-semibold text-muted">{% trans "Completion Time" %}</label>
+                                            <input type="text" class="form-control border-0 bg-light" id="duration_display" 
+                                                   placeholder="{% trans 'e.g., 2-3 hours, 1 day, 30 minutes' %}"
+                                                   style="border-radius: 12px; padding: 8px 16px;">
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label class="form-label small fw-semibold text-muted">{% trans "Privacy" %}</label>
+                                            <select class="form-select border-0 bg-light" id="privacy" style="border-radius: 12px; padding: 8px 16px;">
+                                                <option value="public">🌍 {% trans "Public" %}</option>
+                                                <option value="private">🔒 {% trans "Private" %}</option>
+                                                <option value="link">🔗 {% trans "By Link" %}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="additional-settings mb-4">
+                                    <h6 class="fw-bold text-dark mb-3">{% trans "Features" %}</h6>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="has_audio_guide">
+                                                <label class="form-check-label small fw-medium" for="has_audio_guide">
+                                                    <i class="fas fa-headphones me-1"></i>{% trans "Audio Guide" %}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="is_elderly_friendly">
+                                                <label class="form-check-label small fw-medium" for="is_elderly_friendly">
+                                                    <i class="fas fa-wheelchair me-1"></i>{% trans "Elderly Friendly" %}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="is_child_friendly">
+                                                <label class="form-check-label small fw-medium" for="is_child_friendly">
+                                                    <i class="fas fa-baby me-1"></i>{% trans "Child Friendly" %}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm border-0 m-3">
+                            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0 fw-bold text-dark">
+                                    <i class="fas fa-images text-primary me-2"></i>
+                                    {% trans "Route Photos" %}
+                                </h5>
+                                <span class="badge bg-primary bg-opacity-10 text-primary">{% trans "Up to 10 photos" %}</span>
+                            </div>
+                            <div class="card-body">
+                                <div id="existing-photos-data" style="display: none;">
+                                    {% if route and route.photos.all %}
+                                        {% for photo in route.photos.all|dictsort:"order" %}
+                                            <div class="existing-photo-data"
+                                                 data-photo-id="{{ photo.id }}"
+                                                 data-image-url="{{ photo.image.url }}"
+                                                 data-caption="{{ photo.caption|default:'' }}"
+                                                 data-is-main="{% if photo.is_main %}true{% else %}false{% endif %}"
+                                                 data-order="{{ photo.order }}">
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="route-photos-section">
+                                    <label class="form-label fw-semibold small text-muted mb-3 d-block">
+                                        {% trans "Upload photos. Click ⭐ to set as main photo" %}
+                                    </label>
+                                    
+                                    <div class="additional-photos-grid">
+                                        {% if route and route.photos.all %}
+                                            {% for photo in route.photos.all|dictsort:"order" %}
+                                                <div class="additional-photo-item existing-photo{% if photo.is_main %} main-photo-selected{% endif %}" 
+                                                     data-photo-id="{{ photo.id }}"
+                                                     data-order="{{ photo.order }}">
+                                                    <img src="{{ photo.image.url }}" 
+                                                         class="w-100 h-100"
+                                                         data-caption="{{ photo.caption|default:'' }}"
+                                                         data-is-main="{% if photo.is_main %}true{% else %}false{% endif %}">
+                                                    
+                                                    <div class="photo-controls-top">
+                                                        <button type="button" 
+                                                                onclick="makeMainRoutePhoto(this)"
+                                                                title="{% trans 'Set as main' %}">
+                                                            <i class="fas fa-star {% if photo.is_main %}text-warning{% else %}text-light{% endif %}"></i>
+                                                        </button>
+                                                        <button type="button" class="photo-remove-btn" 
+                                                                onclick="removeAdditionalRoutePhoto(this, '{{ photo.id }}')"
+                                                                title="{% trans 'Delete' %}">
+                                                            <i class="fas fa-times text-danger"></i>
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <div class="photo-controls-bottom">
+                                                        <button type="button" 
+                                                                onclick="moveRoutePhotoUp(this)"
+                                                                title="{% trans 'Move up' %}">
+                                                            <i class="fas fa-arrow-up"></i>
+                                                        </button>
+                                                        <button type="button" 
+                                                                onclick="moveRoutePhotoDown(this)"
+                                                                title="{% trans 'Move down' %}">
+                                                            <i class="fas fa-arrow-down"></i>
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <div class="photo-order-badge">{{ forloop.counter }}</div>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        
+                                        <div class="additional-photo-upload"
+                                             onclick="document.getElementById('route-photos-input').click()">
+                                            <input type="file" id="route-photos-input" class="d-none" accept="image/*" multiple>
+                                            <i class="fas fa-plus-circle fa-2x text-muted mb-2"></i>
+                                            <div class="small text-muted fw-medium">{% trans "Add Photo" %}</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-3 pt-3 border-top">
+                                        <div class="alert alert-info bg-primary bg-opacity-10 border-primary border-opacity-25 small mb-0">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            {% trans "Main photo is marked with a gold star ⭐" %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm border-0 m-3 mb-4">
+                            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0 fw-bold text-dark">
+                                    <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                    {% trans "Route Points" %}
+                                    <span class="badge bg-primary rounded-pill ms-2" id="points-count">0</span>
+                                </h5>
+                                <button id="add-waypoint-btn" class="btn btn-sm btn-primary rounded-pill">
+                                    <i class="fas fa-plus me-1"></i>{% trans "Add" %}
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="points-list" class="points-list">
+                                    <div class="empty-state text-center py-5" id="empty-points-state">
+                                        <div class="empty-icon mb-3">
+                                            <i class="fas fa-map-marked-alt fa-3x text-muted opacity-50"></i>
+                                        </div>
+                                        <h6 class="text-muted fw-medium mb-2">{% trans "No route points yet" %}</h6>
+                                        <p class="text-muted small mb-0">{% trans "Click on the map to add points" %}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8 h-100 position-relative">
+                <div class="map-container h-100">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body p-0 position-relative h-100">
+                            <div id="map" class="route-editor-map h-100"></div>
+
+                            <div id="route-loading" class="position-absolute top-50 start-50 translate-middle" style="display: none;">
+                                <div class="bg-white rounded-3 p-4 shadow-lg text-center">
+                                    <div class="spinner-border text-primary mb-3" role="status"></div>
+                                    <div class="fw-medium text-dark">{% trans "Building route..." %}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'routes/modals/delete_route_modal.html' %}
+{% include 'routes/modals/delete_confirm_modal.html' %}
+{% include 'routes/modals/point_editor_modal.html' %}
+{% include 'routes/modals/reset_confirm_modal.html' %}
+
+<style>
+.route-editor-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.left-panel-wrapper {
+    background: transparent;
+}
+
+.left-panel-scrollable {
+    height: 100%;
+    padding-bottom: 2rem;
+    overflow-y: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.map-container {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.route-editor-map {
+    border-radius: 0;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+#map {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1;
+}
+
+.leaflet-container {
+    position: absolute !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.points-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.point-item {
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    background: white;
+    margin: 0.75rem;
+    overflow: hidden;
+}
+
+.point-item:hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    border-color: #3b82f6;
+}
+
+.point-item.active {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%);
+    border-color: #3b82f6;
+}
+
+.point-header {
+    padding: 1rem;
+    border-bottom: 1px solid #f8f9fa;
+    background: white;
+    cursor: pointer;
+}
+
+.point-content {
+    padding: 1rem;
+}
+
+.point-marker {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: white;
+    flex-shrink: 0;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.marker-start { background: linear-gradient(135deg, #10b981, #34d399); }
+.marker-end { background: linear-gradient(135deg, #ef4444, #f87171); }
+.marker-waypoint { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+
+.point-title {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+    font-size: 1rem;
+}
+
+.point-description {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.point-photos-section {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+    display: block !important;
+}
+
+.point-photos-section h6 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.point-photos-section h6 i {
+    margin-right: 0.5rem;
+    color: #6b7280;
+}
+
+.point-photos-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    margin-top: 0.5rem;
+}
+
+.point-photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    cursor: pointer;
+}
+
+.point-photo-item:hover {
+    transform: translateY(-3px) scale(1.05);
+    border-color: #3b82f6;
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.2);
+    z-index: 5;
+}
+
+.point-photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.point-photo-item:hover img {
+    transform: scale(1.1);
+}
+
+.point-photo-main-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 22px;
+    height: 22px;
+    background: #f59e0b;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+.photo-actions-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 15;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.point-photo-item:hover .photo-actions-btn {
+    opacity: 1;
+}
+
+.photo-actions-btn:hover {
+    background: white;
+    transform: scale(1.1);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.photo-actions-btn i {
+    font-size: 12px;
+    color: #3b82f6;
+}
+
+.point-photo-item.main-photo {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+@keyframes pulseNewPhoto {
+    0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+}
+
+.point-photo-item.new-photo {
+    animation: pulseNewPhoto 2s;
+}
+
+.point-add-photo {
+    aspect-ratio: 1;
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f9fafb;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.point-add-photo:hover {
+    border-color: #3b82f6;
+    background: #f0f4ff;
+    color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+.point-add-photo i {
+    font-size: 20px;
+    margin-bottom: 6px;
+}
+
+.point-add-photo .small {
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.view-all-photos-btn {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.view-all-photos-btn:hover {
+    background: #e9ecef;
+    border-color: #3b82f6;
+    color: #3b82f6;
+    transform: translateY(-1px);
+}
+
+.view-all-photos-btn i {
+    margin-right: 0.25rem;
+    font-size: 0.75rem;
+}
+
+.point-photo-preview {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    position: relative;
+    cursor: pointer;
+    margin-right: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.point-photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.point-photo-preview:hover {
+    border-color: #3b82f6;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.main-photo-indicator {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 22px;
+    height: 22px;
+    background: #f59e0b;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 2;
+}
+
+.photo-count-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 3;
+}
+
+.route-photos-section {
+    margin-top: 0.5rem;
+}
+
+.additional-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 12px;
+    margin-top: 0.5rem;
+}
+
+.additional-photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #f8f9fa;
+}
+
+.additional-photo-item:hover {
+    transform: translateY(-3px) scale(1.05);
+    border-color: #3b82f6;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+    z-index: 10;
+}
+
+.additional-photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.additional-photo-item:hover img {
+    transform: scale(1.1);
+}
+
+.additional-photo-item.main-photo-selected {
+    border: 3px solid #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1), 0 6px 20px rgba(245, 158, 11, 0.25);
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1), 0 6px 20px rgba(245, 158, 11, 0.25);
+    }
+    to {
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2), 0 8px 25px rgba(245, 158, 11, 0.3);
+    }
+}
+
+.photo-order-badge {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    width: 22px;
+    height: 22px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.9;
+    z-index: 5;
+}
+
+.photo-controls-top {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+    z-index: 20;
+}
+
+.additional-photo-item:hover .photo-controls-top {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.photo-controls-top button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+}
+
+.photo-controls-top button:hover {
+    transform: scale(1.1);
+    background: white;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.photo-controls-top button i {
+    font-size: 11px;
+}
+
+.photo-controls-top button i.fa-star.text-warning {
+    color: #f59e0b !important;
+}
+
+.photo-controls-top button i.fa-star.text-light {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.photo-controls-top button:hover i.fa-star.text-light {
+    color: #f59e0b !important;
+}
+
+.photo-controls-bottom {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.3s ease;
+    z-index: 20;
+}
+
+.additional-photo-item:hover .photo-controls-bottom {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.photo-controls-bottom button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+}
+
+.photo-controls-bottom button:hover {
+    transform: scale(1.1);
+    background: white;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.photo-controls-bottom button i {
+    font-size: 11px;
+}
+
+.additional-photo-upload {
+    aspect-ratio: 1;
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    background: #f9fafb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #6b7280;
+}
+
+.additional-photo-upload:hover {
+    border-color: #3b82f6;
+    background: #f0f4ff;
+    color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.additional-photo-upload i {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.additional-photo-upload .small {
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    padding: 0 4px;
+}
+
+.point-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.point-actions .btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.point-address {
+    font-size: 0.85rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+}
+
+.point-address i {
+    font-size: 12px;
+    margin-right: 4px;
+}
+
+.point-item {
+    animation: fadeInUp 0.3s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.delete-options .form-check {
+    padding-left: 2rem;
+}
+
+.delete-options .form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+    margin-left: -2rem;
+}
+
+.delete-options .form-check-input:checked {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.confirmation-section input {
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.confirmation-section input:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+#confirmDeleteBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#confirmDeleteBtn:not(:disabled):hover {
+    background-color: #bb2d3b;
+    border-color: #b02a37;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+@media (max-width: 768px) {
+    .additional-photos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+    }
+    
+    .point-photos-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 8px;
+    }
+    
+    .point-photo-preview {
+        width: 60px;
+        height: 60px;
+        margin-right: 0.75rem;
+    }
+    
+    .photo-count-badge {
+        width: 20px;
+        height: 20px;
+        font-size: 9px;
+    }
+    
+    .main-photo-indicator {
+        width: 20px;
+        height: 20px;
+        font-size: 9px;
+    }
+    
+    .photo-actions-btn {
+        width: 26px;
+        height: 26px;
+    }
+    
+    .map-container {
+        position: relative;
+        height: 50vh;
+    }
+    
+    .left-panel-scrollable {
+        height: auto;
+        max-height: 50vh;
+    }
+    
+    .point-marker {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 576px) {
+    .additional-photos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 8px;
+    }
+    
+    .point-photos-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 6px;
+    }
+    
+    .point-photo-preview {
+        width: 50px;
+        height: 50px;
+        margin-right: 0.5rem;
+    }
+    
+    .photo-count-badge {
+        width: 18px;
+        height: 18px;
+        font-size: 8px;
+    }
+    
+    .main-photo-indicator {
+        width: 18px;
+        height: 18px;
+        font-size: 8px;
+    }
+    
+    .photo-actions-btn {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .point-marker {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    
+    .point-title {
+        font-size: 0.9rem;
+    }
+    
+    .point-description {
+        font-size: 0.8rem;
+    }
+}
+
+.empty-state {
+    color: #6c757d;
+    padding: 3rem 2rem;
+}
+
+.empty-icon {
+    opacity: 0.7;
+}
+
+.left-panel-scrollable::-webkit-scrollbar {
+    width: 8px;
+}
+
+.left-panel-scrollable::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.left-panel-scrollable::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.left-panel-scrollable::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+{% if route_data_json %}
+    window.routeData = {{ route_data_json|safe }};
+{% else %}
+    window.routeData = null;
+{% endif %}
+
+window.routeEditor = {
+    currentRouteId: {{ route.id }}
+};
+
+let removedExistingPhotos = new Set();
+let newPhotoFiles = [];
+window.mainPhotoToSet = null;
+window.routeSaveUrl = '{% if route %}/routes/api/routes/{{ route.id }}/{% else %}/routes/api/routes/{% endif %}';
+
+window.removedPointPhotoIds = new Set();
+window.newPointPhotoFiles = [];
+window.pointMainPhotoToSet = null;
+window.currentPointId = null;
+
+window.routePoints = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.routeData) {
+        populateFormData();
+        if (window.routeData.points && window.routeData.points.length > 0) {
+            window.routePoints = window.routeData.points;
+            updatePointsList(window.routePoints);
+        }
+    }
+    
+    setupPhotoUploadHandlers();
+    setupRouteTypeButtons();
+    
+    const saveBtn = document.getElementById('save-btn');
+    if (saveBtn && typeof routeEditor?.saveRoute === 'function') {
+        saveBtn.addEventListener('click', () => routeEditor.saveRoute());
+    }
+    
+    setupDeleteModal();
+    
+    updatePhotoOrderNumbers();
+});
+
+function setupDeleteModal() {
+    const confirmInput = document.getElementById('confirmRouteName');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    const routeName = document.getElementById('routeNameToDelete').textContent;
+    const confirmError = document.getElementById('confirmError');
+    
+    if (!confirmInput || !confirmBtn) return;
+    
+    confirmInput.addEventListener('input', function() {
+        const isMatch = this.value.trim() === routeName;
+        confirmBtn.disabled = !isMatch;
+        
+        if (this.value.trim() && !isMatch) {
+            this.classList.add('is-invalid');
+            confirmError.style.display = 'block';
+        } else {
+            this.classList.remove('is-invalid');
+            confirmError.style.display = 'none';
+        }
+    });
+    
+    confirmBtn.addEventListener('click', deleteRoute);
+}
+
+async function deleteRoute() {
+    const deleteAllData = document.getElementById('deleteAllData').checked;
+    const clearCache = document.getElementById('clearCache').checked;
+    const routeId = '{{ route.id }}';
+    
+    try {
+        showLoading('{% trans "Deleting route..." %}');
+        
+        const response = await fetch(`/routes/api/routes/${routeId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({
+                delete_all_data: deleteAllData,
+                clear_cache: clearCache
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('{% trans "Route deleted successfully" %}', 'success');
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteRouteModal'));
+            modal.hide();
+            
+            setTimeout(() => {
+                window.location.href = '/routes/my/';
+            }, 1500);
+        } else {
+            throw new Error(data.error || '{% trans "Error deleting route" %}');
+        }
+    } catch (error) {
+        showToast(error.message, 'danger');
+    } finally {
+        hideLoading();
+    }
+}
+
+function createPointListItem(pointData) {
+    const pointId = pointData.id || pointData.tempId || 'point-' + Date.now();
+    const pointNumber = pointData.order || 1;
+    const pointName = pointData.name || `{% trans "Point" %} ${pointNumber}`;
+    const pointDescription = pointData.description || '';
+    const pointAddress = pointData.address || '';
+    const pointCategory = pointData.category || '';
+    
+    const pointPhotos = pointData.photos || [];
+    
+    const mainPhoto = pointPhotos.find(p => p.is_main);
+    
+    const previewPhoto = mainPhoto || (pointPhotos.length > 0 ? pointPhotos[0] : null);
+    
+    const pointItem = document.createElement('div');
+    pointItem.className = 'point-item';
+    pointItem.dataset.pointId = pointId;
+    pointItem.dataset.lat = pointData.lat || '';
+    pointItem.dataset.lng = pointData.lng || '';
+    
+    let markerClass = 'marker-waypoint';
+    let markerText = pointNumber;
+    
+    if (pointData.is_start) {
+        markerClass = 'marker-start';
+    } else if (pointData.is_end) {
+        markerClass = 'marker-end';
+    }
+    
+    let photoPreviewHtml = '';
+    if (previewPhoto) {
+        const photoUrl = getPhotoUrl(previewPhoto);
+        
+        photoPreviewHtml = `
+            <div class="point-photo-preview position-relative me-3" 
+                 onclick="showPointPhotoActions('${pointId}', ${pointPhotos.indexOf(previewPhoto)})"
+                 title="{% trans 'Click to manage photos' %}">
+                <img src="${photoUrl}" 
+                     alt="{% trans 'Point photo' %}">
+                
+                ${previewPhoto.is_main ? `
+                    <div class="main-photo-indicator" title="{% trans 'Main photo' %}">
+                        <i class="fas fa-star"></i>
+                    </div>
+                ` : ''}
+                
+                ${pointPhotos.length > 1 ? `
+                    <div class="photo-count-badge" title="${pointPhotos.length - 1} {% trans 'additional photos' %}">
+                        +${pointPhotos.length - 1}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+    
+    let photosGalleryHtml = '';
+    if (pointPhotos.length > 0) {
+        photosGalleryHtml = `
+            <div class="point-photos-section">
+                <h6>
+                    <i class="fas fa-images"></i>
+                    {% trans "Point Photos" %}
+                    <span class="badge bg-primary bg-opacity-10 text-primary ms-2">${pointPhotos.length}</span>
+                </h6>
+                <div class="point-photos-gallery">
+                    ${pointPhotos.map((photo, index) => {
+                        const photoUrl = getPhotoUrl(photo);
+                        const isMain = photo.is_main || false;
+                        
+                        return `
+                            <div class="point-photo-item ${isMain ? 'main-photo' : ''}" 
+                                 onclick="showPointPhotoActions('${pointId}', ${index})">
+                                <img src="${photoUrl}" 
+                                     alt="${photo.caption || '{% trans "Point photo" %}'}"
+                                     class="w-100 h-100 object-fit-cover">
+                                ${isMain ? `
+                                    <div class="point-photo-main-badge">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                ` : ''}
+                                <div class="photo-actions-btn" onclick="event.stopPropagation(); showPointPhotoActions('${pointId}', ${index})">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                    <div class="point-add-photo" onclick="addPointPhotos('${pointId}')">
+                        <i class="fas fa-plus"></i>
+                        <div class="small">{% trans "Add" %}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        photosGalleryHtml = `
+            <div class="point-photos-section">
+                <h6>
+                    <i class="fas fa-images"></i>
+                    {% trans "Point Photos" %}
+                </h6>
+                <div class="point-photos-gallery">
+                    <div class="point-add-photo" onclick="addPointPhotos('${pointId}')">
+                        <i class="fas fa-plus"></i>
+                        <div class="small">{% trans "Add Photo" %}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    pointItem.innerHTML = `
+        <div class="point-header d-flex align-items-center p-3">
+            ${photoPreviewHtml}
+            
+            <div class="point-marker ${markerClass} me-3">
+                ${markerText}
+            </div>
+            
+            <div class="flex-grow-1">
+                <div class="point-title d-flex align-items-center">
+                    ${pointName}
+                    ${pointCategory ? `<span class="badge bg-light text-dark ms-2">${pointCategory}</span>` : ''}
+                </div>
+                ${pointAddress ? `
+                    <div class="point-address small text-muted mt-1">
+                        <i class="fas fa-location-dot me-1"></i>${pointAddress}
+                    </div>
+                ` : ''}
+                ${pointDescription ? `
+                    <div class="point-description small text-muted mt-2">
+                        ${pointDescription.substring(0, 100)}${pointDescription.length > 100 ? '...' : ''}
+                    </div>
+                ` : ''}
+            </div>
+            
+            <div class="point-actions ms-3">
+                <button class="btn btn-sm btn-outline-secondary edit-point-btn" 
+                        onclick="editPoint('${pointId}')"
+                        title="{% trans 'Edit' %}">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger delete-point-btn ms-1"
+                        onclick="deletePoint('${pointId}')"
+                        title="{% trans 'Delete' %}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="point-content">
+            ${photosGalleryHtml}
+        </div>
+    `;
+    
+    return pointItem;
+}
+
+function getPhotoUrl(photo) {
+    if (!photo) return '/static/images/default-photo.jpg';
+    
+    if (photo.url) return photo.url;
+    if (photo.image) return photo.image;
+    if (photo.image_url) return photo.image_url;
+    if (photo instanceof File) {
+        return URL.createObjectURL(photo);
+    }
+    
+    if (photo.image && typeof photo.image === 'object') {
+        if (photo.image.url) return photo.image.url;
+    }
+    
+    return '/static/images/default-photo.jpg';
+}
+
+function showPointPhotoActions(pointId, photoIndex) {
+    const point = getPointById(pointId);
+    if (!point || !point.photos || photoIndex >= point.photos.length) {
+        return;
+    }
+    
+    const photo = point.photos[photoIndex];
+    
+    const actionsMenu = document.createElement('div');
+    actionsMenu.className = 'photo-actions-menu';
+    actionsMenu.innerHTML = `
+        <div class="d-flex flex-column gap-2 p-2">
+            <button class="btn btn-sm btn-outline-primary" onclick="makePointPhotoMain('${pointId}', ${photoIndex})">
+                <i class="fas fa-star me-1"></i>{% trans "Set as main" %}
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deletePointPhoto('${pointId}', ${photoIndex})">
+                <i class="fas fa-trash-alt me-1"></i>{% trans "Delete" %}
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="this.closest('.photo-actions-menu').remove()">
+                <i class="fas fa-times me-1"></i>{% trans "Close" %}
+            </button>
+        </div>
+    `;
+    
+    actionsMenu.style.cssText = `
+        position: absolute;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+        min-width: 180px;
+    `;
+    
+    const pointItem = document.querySelector(`[data-point-id="${pointId}"]`);
+    if (pointItem) {
+        const photoItems = pointItem.querySelectorAll('.point-photo-item');
+        if (photoItems[photoIndex]) {
+            const rect = photoItems[photoIndex].getBoundingClientRect();
+            actionsMenu.style.top = `${rect.bottom + 5}px`;
+            actionsMenu.style.left = `${rect.left}px`;
+            
+            const oldMenu = document.querySelector('.photo-actions-menu');
+            if (oldMenu) oldMenu.remove();
+            
+            document.body.appendChild(actionsMenu);
+            
+            setTimeout(() => {
+                const closeHandler = (e) => {
+                    if (!actionsMenu.contains(e.target) && !photoItems[photoIndex].contains(e.target)) {
+                        actionsMenu.remove();
+                        document.removeEventListener('click', closeHandler);
+                    }
+                };
+                document.addEventListener('click', closeHandler);
+            }, 0);
+        }
+    }
+}
+
+function makePointPhotoMain(pointId, photoIndex) {
+    const point = getPointById(pointId);
+    if (!point || !point.photos || photoIndex >= point.photos.length) {
+        showToast('{% trans "Photo not found" %}', 'warning');
+        return;
+    }
+    
+    point.photos.forEach(p => {
+        p.is_main = false;
+    });
+    
+    point.photos[photoIndex].is_main = true;
+    
+    const pointIndex = window.routePoints.findIndex(p => 
+        p.id === point.id || p.tempId === point.id
+    );
+    if (pointIndex !== -1) {
+        window.routePoints[pointIndex] = point;
+    }
+    
+    updatePointsList(window.routePoints);
+    
+    const menu = document.querySelector('.photo-actions-menu');
+    if (menu) menu.remove();
+    
+    showToast('{% trans "Photo set as main for point" %}', 'success');
+}
+
+function deletePointPhoto(pointId, photoIndex) {
+    const point = getPointById(pointId);
+    if (!point || !point.photos || photoIndex >= point.photos.length) {
+        showToast('{% trans "Photo not found" %}', 'warning');
+        return;
+    }
+    
+    if (!confirm('{% trans "Delete this photo?" %}')) return;
+    
+    const photo = point.photos[photoIndex];
+    const photoId = photo.id;
+    
+    if (photoId && typeof photoId === 'number') {
+        window.removedPointPhotoIds.add(photoId);
+    }
+    
+    point.photos.splice(photoIndex, 1);
+    
+    const pointIndex = window.routePoints.findIndex(p => 
+        p.id === point.id || p.tempId === point.id
+    );
+    if (pointIndex !== -1) {
+        window.routePoints[pointIndex] = point;
+    }
+    
+    updatePointsList(window.routePoints);
+    
+    const menu = document.querySelector('.photo-actions-menu');
+    if (menu) menu.remove();
+    
+    showToast('{% trans "Photo deleted" %}', 'success');
+}
+
+function addPointPhotos(pointId) {
+    const point = getPointById(pointId);
+    if (!point) return;
+    
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+    input.style.display = 'none';
+    
+    input.onchange = function(e) {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+        
+        Array.from(files).forEach((file, index) => {
+            if (!validateImageFile(file)) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const newPhoto = {
+                    tempId: 'point-photo-' + Date.now() + '-' + index,
+                    url: e.target.result,
+                    caption: '',
+                    is_main: point.photos.length === 0,
+                    isNew: true,
+                    file: file
+                };
+                
+                if (!point.photos) point.photos = [];
+                point.photos.push(newPhoto);
+                newPointPhotoFiles.push(newPhoto);
+                
+                const pointIndex = window.routePoints.findIndex(p => 
+                    p.id === point.id || p.tempId === point.id
+                );
+                if (pointIndex !== -1) {
+                    window.routePoints[pointIndex] = point;
+                }
+                
+                updatePointsList(window.routePoints);
+                showToast('{% trans "Photo added" %}', 'success');
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        input.remove();
+    };
+    
+    document.body.appendChild(input);
+    input.click();
+}
+
+function populateFormData() {
+    if (!window.routeData) return;
+    
+    document.getElementById('name').value = window.routeData.name || '';
+    document.getElementById('short_description').value = window.routeData.short_description || '';
+    document.getElementById('description').value = window.routeData.description || '';
+    document.getElementById('duration_display').value = window.routeData.duration_display || '';
+    document.getElementById('privacy').value = window.routeData.privacy || 'public';
+    
+    if (window.routeData.has_audio_guide) {
+        document.getElementById('has_audio_guide').checked = true;
+    }
+    if (window.routeData.is_elderly_friendly) {
+        document.getElementById('is_elderly_friendly').checked = true;
+    }
+    if (window.routeData.is_child_friendly) {
+        document.getElementById('is_child_friendly').checked = true;
+    }
+    
+    if (window.routeData.route_type) {
+        document.querySelectorAll('.route-type-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.type === window.routeData.route_type) {
+                btn.classList.add('active');
+            }
+        });
+    }
+}
+
+function setupRouteTypeButtons() {
+    document.querySelectorAll('.route-type-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.route-type-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+}
+
+function setupPhotoUploadHandlers() {
+    const photosInput = document.getElementById('route-photos-input');
+    if (photosInput) {
+        photosInput.addEventListener('change', handlePhotosUpload);
+    }
+}
+
+function updatePhotoOrderNumbers() {
+    const photoItems = document.querySelectorAll('.additional-photo-item:not(.additional-photo-upload)');
+    photoItems.forEach((item, index) => {
+        const orderBadge = item.querySelector('.photo-order-badge');
+        if (orderBadge) {
+            orderBadge.textContent = index + 1;
+        } else {
+            const badge = document.createElement('div');
+            badge.className = 'photo-order-badge';
+            badge.textContent = index + 1;
+            item.appendChild(badge);
+        }
+        item.dataset.order = index;
+    });
+}
+
+function handlePhotosUpload(e) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    const grid = document.querySelector('.additional-photos-grid');
+    if (!grid) return;
+    
+    const existingCount = grid.querySelectorAll('.additional-photo-item:not(.additional-photo-upload)').length;
+    const uploadButton = grid.querySelector('.additional-photo-upload');
+    
+    if (existingCount + files.length > 10) {
+        showToast('{% trans "Maximum 10 photos can be uploaded" %}', 'warning');
+        e.target.value = '';
+        return;
+    }
+    
+    Array.from(files).forEach((file, index) => {
+        if (!validateImageFile(file)) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const photoId = 'new-' + Date.now() + '-' + index + '-' + Math.random().toString(36).substr(2, 9);
+            
+            const photoItem = document.createElement('div');
+            photoItem.className = 'additional-photo-item new-photo';
+            photoItem.dataset.photoId = photoId;
+            photoItem.dataset.order = existingCount + index;
+            photoItem.innerHTML = `
+                <img src="${e.target.result}" class="w-100 h-100 object-fit-cover">
+                <div class="photo-controls-top">
+                    <button type="button" 
+                            onclick="makeMainRoutePhoto(this)"
+                            title="{% trans 'Set as main' %}">
+                        <i class="fas fa-star text-light"></i>
+                    </button>
+                    <button type="button" class="photo-remove-btn" 
+                            onclick="removeAdditionalRoutePhoto(this, '${photoId}')"
+                            title="{% trans 'Delete' %}">
+                        <i class="fas fa-times text-danger"></i>
+                    </button>
+                </div>
+                <div class="photo-controls-bottom">
+                    <button type="button" 
+                            onclick="moveRoutePhotoUp(this)"
+                            title="{% trans 'Move up' %}">
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                    <button type="button" 
+                            onclick="moveRoutePhotoDown(this)"
+                            title="{% trans 'Move down' %}">
+                        <i class="fas fa-arrow-down"></i>
+                    </button>
+                </div>
+                <div class="photo-order-badge">${existingCount + index + 1}</div>
+            `;
+            
+            file.previewId = photoId;
+            newPhotoFiles.push(file);
+            
+            if (uploadButton) {
+                grid.insertBefore(photoItem, uploadButton);
+            } else {
+                grid.appendChild(photoItem);
+            }
+            
+            updatePhotoOrderNumbers();
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    e.target.value = '';
+}
+
+function collectRoutePhotosData() {
+    const photosData = {
+        main_photo_id: null,
+        additional_photo_ids: [],
+        captions: {},
+        photo_order: {},
+        new_photos: [],
+        removed_photos: Array.from(removedExistingPhotos)
+    };
+    
+    const allPhotoItems = document.querySelectorAll('.additional-photos-grid .additional-photo-item:not(.additional-photo-upload)');
+    
+    let mainPhotoFound = false;
+    let photoOrder = 1;
+    
+    allPhotoItems.forEach((item, index) => {
+        const photoId = item.dataset.photoId;
+        if (!photoId) return;
+        
+        const isMainByClass = item.classList.contains('main-photo-selected');
+        const isMainById = window.mainPhotoToSet === photoId;
+        const isMain = isMainByClass || isMainById;
+        
+        if (isMain && !mainPhotoFound) {
+            mainPhotoFound = true;
+            
+            if (photoId.startsWith('new-')) {
+                photosData.main_photo_id = 'new';
+            } else {
+                const photoIdInt = parseInt(photoId);
+                if (!isNaN(photoIdInt)) {
+                    photosData.main_photo_id = photoIdInt;
+                }
+            }
+        }
+        
+        if (!photoId.startsWith('new-')) {
+            const photoIdInt = parseInt(photoId);
+            if (!isNaN(photoIdInt) && removedExistingPhotos.has(photoIdInt)) {
+                return;
+            }
+        }
+        
+        if (isMain && photoId.startsWith('new-')) {
+            const file = newPhotoFiles.find(f => f.previewId === photoId);
+            if (file) {
+                photosData.new_photos.unshift(file);
+                photosData.photo_order['main'] = photoOrder;
+            }
+        } else if (!photoId.startsWith('new-')) {
+            const photoIdInt = parseInt(photoId);
+            if (!isNaN(photoIdInt)) {
+                if (photosData.main_photo_id !== photoIdInt) {
+                    photosData.additional_photo_ids.push(photoIdInt);
+                    photosData.photo_order[photoIdInt] = photoOrder;
+                }
+            }
+        } else if (photoId.startsWith('new-')) {
+            const file = newPhotoFiles.find(f => f.previewId === photoId);
+            if (file) {
+                photosData.new_photos.push(file);
+                photosData.photo_order[photoId] = photoOrder;
+            }
+        }
+        
+        const img = item.querySelector('img');
+        if (img && img.dataset.caption) {
+            photosData.captions[photoId] = img.dataset.caption;
+        }
+        
+        photoOrder++;
+    });
+    
+    if (!mainPhotoFound && allPhotoItems.length > 0) {
+        const firstItem = allPhotoItems[0];
+        const firstPhotoId = firstItem.dataset.photoId;
+        
+        if (firstPhotoId) {
+            if (firstPhotoId.startsWith('new-')) {
+                photosData.main_photo_id = 'new';
+            } else {
+                const firstPhotoIdInt = parseInt(firstPhotoId);
+                if (!isNaN(firstPhotoIdInt)) {
+                    photosData.main_photo_id = firstPhotoIdInt;
+                }
+            }
+        }
+    }
+    
+    return photosData;
+}
+
+function getRouteFormData() {
+    const formData = new FormData();
+    
+    formData.append('name', document.getElementById('name').value || '{% trans "Untitled" %}');
+    formData.append('short_description', document.getElementById('short_description').value || '');
+    formData.append('description', document.getElementById('description').value || '');
+    formData.append('privacy', document.getElementById('privacy').value || 'public');
+    
+    const routeTypeBtn = document.querySelector('.route-type-btn.active');
+    formData.append('route_type', routeTypeBtn ? routeTypeBtn.dataset.type : 'walking');
+    
+    formData.append('duration_display', document.getElementById('duration_display').value || '');
+    formData.append('has_audio_guide', document.getElementById('has_audio_guide').checked);
+    formData.append('is_elderly_friendly', document.getElementById('is_elderly_friendly').checked);
+    formData.append('is_child_friendly', document.getElementById('is_child_friendly').checked);
+    
+    formData.append('total_distance', document.getElementById('total_distance').value || 0);
+    formData.append('duration_minutes', document.getElementById('duration_minutes').value || 0);
+    formData.append('is_active', document.getElementById('is_active').value || 'true');
+    
+    const photosData = collectRoutePhotosData();
+    formData.append('photos_data', JSON.stringify(photosData));
+    
+    photosData.new_photos.forEach((file, index) => {
+        if (file && file instanceof File) {
+            formData.append(`photo_${index}`, file);
+        }
+    });
+    
+    if (photosData.removed_photos && photosData.removed_photos.length > 0) {
+        formData.append('removed_photos', JSON.stringify(photosData.removed_photos));
+    }
+    
+    const routeData = {
+        waypoints: window.routePoints.map(point => ({
+            id: point.id,
+            name: point.name || `{% trans "Point" %} ${point.order || 1}`,
+            description: point.description || '',
+            address: point.address || '',
+            lat: point.lat || 0,
+            lng: point.lng || 0,
+            category: point.category || '',
+            hint_author: point.hint_author || '',
+            tags: point.tags || [],
+            photos: point.photos || [],
+            order: point.order || 1,
+            is_start: point.is_start || false,
+            is_end: point.is_end || false
+        })),
+        total_distance: parseFloat(document.getElementById('total_distance')?.value || 0),
+        duration_minutes: parseFloat(document.getElementById('duration_minutes')?.value || 0),
+        removed_point_photo_ids: Array.from(window.removedPointPhotoIds || [])
+    };
+    
+    formData.append('route_data', JSON.stringify(routeData));
+    
+    return formData;
+}
+
+function makeMainRoutePhoto(button) {
+    const photoItem = button.closest('.additional-photo-item');
+    if (!photoItem) return;
+    
+    const photoId = photoItem.dataset.photoId;
+    if (!photoId) return;
+    
+    window.mainPhotoToSet = photoId;
+    
+    document.querySelectorAll('.additional-photo-item').forEach(item => {
+        item.classList.remove('main-photo-selected');
+        const starIcon = item.querySelector('.photo-controls-top button i.fa-star');
+        if (starIcon) {
+            starIcon.className = 'fas fa-star text-light';
+        }
+    });
+    
+    photoItem.classList.add('main-photo-selected');
+    const starIcon = photoItem.querySelector('.photo-controls-top button i.fa-star');
+    if (starIcon) {
+        starIcon.className = 'fas fa-star text-warning';
+    }
+    
+    showToast('{% trans "Photo selected as main" %}', 'success');
+}
+
+function removeAdditionalRoutePhoto(button, photoId = null) {
+    const photoItem = button.closest('.additional-photo-item');
+    if (photoItem) {
+        if (photoId && !photoId.startsWith('new-')) {
+            const idInt = parseInt(photoId);
+            if (!isNaN(idInt)) {
+                removedExistingPhotos.add(idInt);
+            }
+        }
+        
+        if (photoId && photoId.startsWith('new-')) {
+            const index = newPhotoFiles.findIndex(file => 
+                file.previewId === photoId
+            );
+            if (index !== -1) {
+                newPhotoFiles.splice(index, 1);
+            }
+        }
+        
+        if (photoItem.classList.contains('main-photo-selected')) {
+            window.mainPhotoToSet = null;
+        }
+        
+        photoItem.remove();
+        updatePhotoOrderNumbers();
+    }
+}
+
+function validateImageFile(file) {
+    if (!file.type.startsWith('image/')) {
+        showToast('{% trans "Please select only images" %}', 'warning');
+        return false;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('{% trans "File size should not exceed 5MB" %}', 'warning');
+        return false;
+    }
+    
+    return true;
+}
+
+function moveRoutePhotoUp(button) {
+    const photoItem = button.closest('.additional-photo-item');
+    if (!photoItem) return;
+    
+    const prevItem = photoItem.previousElementSibling;
+    if (prevItem && !prevItem.classList.contains('additional-photo-upload')) {
+        photoItem.parentNode.insertBefore(photoItem, prevItem);
+        updatePhotoOrderNumbers();
+    }
+}
+
+function moveRoutePhotoDown(button) {
+    const photoItem = button.closest('.additional-photo-item');
+    if (!photoItem) return;
+    
+    const nextItem = photoItem.nextElementSibling;
+    if (nextItem && !nextItem.classList.contains('additional-photo-upload')) {
+        photoItem.parentNode.insertBefore(nextItem, photoItem);
+        updatePhotoOrderNumbers();
+    }
+}
+
+function updatePointsList(points) {
+    const pointsList = document.getElementById('points-list');
+    const emptyState = document.getElementById('empty-points-state');
+    
+    if (!pointsList) return;
+    
+    pointsList.innerHTML = '';
+    
+    if (!points || points.length === 0) {
+        const emptyClone = emptyState.cloneNode(true);
+        emptyClone.id = 'empty-points-state-active';
+        pointsList.appendChild(emptyClone);
+        document.getElementById('points-count').textContent = '0';
+        document.getElementById('points-count-display').textContent = '0';
+        return;
+    }
+    
+    const sortedPoints = [...points].sort((a, b) => {
+        const orderA = a.order || (a.is_start ? 0 : (a.is_end ? points.length - 1 : 1));
+        const orderB = b.order || (b.is_start ? 0 : (b.is_end ? points.length - 1 : 1));
+        return orderA - orderB;
+    });
+    
+    sortedPoints.forEach((point, index) => {
+        point.order = index + 1;
+        
+        if (index === 0 && !point.is_end) {
+            point.is_start = true;
+            point.is_end = false;
+        } else if (index === sortedPoints.length - 1 && !point.is_start) {
+            point.is_end = true;
+            point.is_start = false;
+        } else {
+            point.is_start = false;
+            point.is_end = false;
+        }
+        
+        const pointItem = createPointListItem(point);
+        pointsList.appendChild(pointItem);
+    });
+    
+    const count = sortedPoints.length;
+    document.getElementById('points-count').textContent = count;
+    document.getElementById('points-count-display').textContent = count;
+}
+
+function getPointById(pointId) {
+    return window.routePoints.find(point => 
+        point.id === pointId || point.tempId === pointId
+    );
+}
+
+function addNewPoint(pointData) {
+    if (!pointData.id && !pointData.tempId) {
+        pointData.tempId = 'point-' + Date.now();
+    }
+    
+    window.routePoints.push(pointData);
+    updatePointsList(window.routePoints);
+    updateRouteStats();
+    
+    showToast('{% trans "Point added" %}', 'success');
+}
+
+function editPoint(pointId) {
+    const point = getPointById(pointId);
+    if (!point) return;
+    
+    if (typeof window.openPointEditor === 'function') {
+        window.openPointEditor(point);
+    } else {
+        showToast('{% trans "Point editing function unavailable" %}', 'warning');
+    }
+}
+
+function deletePoint(pointId) {
+    if (!confirm('{% trans "Delete this route point?" %}')) return;
+    
+    const pointIndex = window.routePoints.findIndex(point => 
+        point.id === pointId || point.tempId === pointId
+    );
+    
+    if (pointIndex !== -1) {
+        window.routePoints.splice(pointIndex, 1);
+        updatePointsList(window.routePoints);
+        updateRouteStats();
+        
+        showToast('{% trans "Point deleted" %}', 'success');
+    }
+}
+
+function updateRouteStats() {
+    const distance = window.routePoints.reduce((total, point, index) => {
+        if (index === 0) return 0;
+        const prevPoint = window.routePoints[index - 1];
+        const latDiff = point.lat - prevPoint.lat;
+        const lngDiff = point.lng - prevPoint.lng;
+        return total + Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 111;
+    }, 0);
+    
+    const pointsCount = window.routePoints.length;
+    
+    const totalDistanceElement = document.getElementById('total-distance');
+    const pointsCountElement = document.getElementById('points-count-display');
+    
+    if (totalDistanceElement) {
+        totalDistanceElement.textContent = distance.toFixed(1) + ' km';
+    }
+    
+    if (pointsCountElement) {
+        pointsCountElement.textContent = pointsCount;
+    }
+    
+    const totalDistanceHidden = document.getElementById('total_distance');
+    const durationMinutesHidden = document.getElementById('duration_minutes');
+    
+    if (totalDistanceHidden) {
+        totalDistanceHidden.value = distance.toFixed(1);
+    }
+    
+    if (durationMinutesHidden) {
+        const durationMinutes = distance * 5;
+        durationMinutesHidden.value = durationMinutes.toFixed(0);
+        
+        const estimatedTimeElement = document.getElementById('estimated-time');
+        if (estimatedTimeElement) {
+            if (durationMinutes < 60) {
+                estimatedTimeElement.textContent = Math.ceil(durationMinutes) + ' min';
+            } else {
+                const hours = Math.floor(durationMinutes / 60);
+                const minutes = Math.ceil(durationMinutes % 60);
+                estimatedTimeElement.textContent = hours + ' h ' + minutes + ' min';
+            }
+        }
+    }
+}
+
+function getCSRFToken() {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+    return cookieValue || '';
+}
+
+function showLoading(message = '{% trans "Loading..." %}') {
+    const loadingDiv = document.getElementById('route-loading');
+    if (loadingDiv) {
+        loadingDiv.querySelector('.fw-medium').textContent = message;
+        loadingDiv.style.display = 'block';
+    }
+}
+
+function hideLoading() {
+    const loadingDiv = document.getElementById('route-loading');
+    if (loadingDiv) {
+        loadingDiv.style.display = 'none';
+    }
+}
+
+function showToast(message, type = 'info', duration = 3000) {
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 300px;
+        `;
+        document.body.appendChild(toastContainer);
+    }
+    
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        word-wrap: break-word;
+        animation: slideIn 0.3s ease-out;
+        transform-origin: top right;
+    `;
+    
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+    `;
+    document.head.appendChild(styleSheet);
+    
+    const colors = {
+        'success': '#10b981',
+        'warning': '#f59e0b', 
+        'danger': '#ef4444',
+        'info': '#3b82f6'
+    };
+    
+    toast.style.backgroundColor = colors[type] || colors.info;
+    toast.textContent = message;
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-out forwards';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, duration);
+}
+
+window.removeAdditionalRoutePhoto = removeAdditionalRoutePhoto;
+window.makeMainRoutePhoto = makeMainRoutePhoto;
+window.validateImageFile = validateImageFile;
+window.moveRoutePhotoUp = moveRoutePhotoUp;
+window.moveRoutePhotoDown = moveRoutePhotoDown;
+window.handlePhotosUpload = handlePhotosUpload;
+window.updatePhotoOrderNumbers = updatePhotoOrderNumbers;
+window.addPointPhotos = addPointPhotos;
+window.showPointPhotoActions = showPointPhotoActions;
+window.makePointPhotoMain = makePointPhotoMain;
+window.deletePointPhoto = deletePointPhoto;
+
+window.updatePointsList = updatePointsList;
+window.addNewPoint = addNewPoint;
+window.editPoint = editPoint;
+window.deletePoint = deletePoint;
+window.getPointById = getPointById;
+window.updateRouteStats = updateRouteStats;
+
+window.initializePhotoHandlers = function() {
+    if (!window.removedExistingPhotos) window.removedExistingPhotos = new Set();
+    if (!window.newPhotoFiles) window.newPhotoFiles = [];
+    if (!window.mainPhotoToSet) window.mainPhotoToSet = null;
+    if (!window.removedPointPhotoIds) window.removedPointPhotoIds = new Set();
+    if (!window.newPointPhotoFiles) window.newPointPhotoFiles = [];
+    if (!window.pointMainPhotoToSet) window.pointMainPhotoToSet = null;
+    if (!window.routePoints) window.routePoints = [];
+};
+
+window.initializePhotoHandlers();
+</script>
+<script src="{% static 'js/route_editor.js' %}"></script>
+<script src="{% static 'js/audio_generation.js' %}"></script>
+{% endblock %}

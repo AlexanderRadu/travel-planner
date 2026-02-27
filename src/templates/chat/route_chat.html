@@ -1,0 +1,1147 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block title %}{% trans "Route Chat" %} "{{ route.name }}" - Waylines{% endblock %}
+
+{% block content %}
+<style>
+body {
+  overflow: hidden;
+  height: 100vh;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+main {
+  min-height: calc(100vh - 56px - 60px) !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+.container-fluid.h-100 {
+  height: calc(100vh - 56px - 60px) !important;
+  overflow: hidden;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+footer {
+  position: relative !important;
+  height: 60px !important;
+  margin-top: 0 !important;
+  z-index: 1 !important;
+}
+</style>
+
+<div id="notifications" class="notifications-container"></div>
+<div class="container-fluid h-100 p-0">
+  <div class="row g-0 h-100">
+    <div class="col-12 h-100" id="chat-main-col">
+      <div class="chat-container h-100 d-flex flex-column">
+        <div class="chat-header bg-white border-bottom p-3 shadow-sm" style="flex-shrink: 0;">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <a href="{% url 'chat:chat_dashboard' %}" class="btn btn-sm btn-outline-secondary me-3">
+                <i class="fas fa-arrow-left"></i>
+              </a>
+              <button class="btn btn-sm btn-outline-info me-3 d-md-none" onclick="toggleRouteInfo()">
+                <i class="fas fa-info-circle"></i>
+              </button>
+              <div class="position-relative me-3">
+                <div class="avatar bg-gradient-success text-white rounded-circle d-flex align-items-center justify-content-center" 
+                     style="width: 50px; height: 50px; font-size: 18px;">
+                  <i class="fas fa-route"></i>
+                </div>
+              </div>
+              <div>
+                <h5 class="mb-1 fw-bold">
+                  <i class="fas fa-comments text-primary me-2"></i>
+                  {% trans "Route Chat:" %} <span class="text-success">"{{ route.name }}"</span>
+                </h5>
+                <small class="text-muted" id="route-info">
+                  <i class="fas fa-user me-1"></i>
+                  {% trans "Author:" %}
+                  <a href="{% url 'user_profile' route.author.username %}" class="text-decoration-none fw-semibold">
+                    {{ route.author.username }}
+                  </a>
+                  • <i class="fas fa-lock {% if route.privacy == 'public' %}text-success{% else %}text-warning{% endif %} me-1"></i>
+                  {{ route.get_privacy_display }}
+                  {% if route.total_distance %}
+                  • <i class="fas fa-route me-1 text-info"></i>
+                  {{ route.total_distance }} {% trans "km" %}
+                  {% endif %}
+                </small>
+              </div>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown"
+                      style="width: 40px; height: 40px;">
+                <i class="fas fa-ellipsis-v text-muted"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                <li><a class="dropdown-item" href="#" onclick="toggleRouteInfo()">
+                  <i class="fas fa-info-circle me-2"></i> {% trans "Route Info" %}
+                </a></li>
+                <li><a class="dropdown-item" href="{% url 'route_detail' route.id %}">
+                  <i class="fas fa-map me-2"></i> {% trans "Route Details" %}
+                </a></li>
+                <li><a class="dropdown-item" href="{% url 'user_profile' route.author.username %}">
+                  <i class="fas fa-user me-2"></i> {% trans "Author Profile" %}
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" onclick="refreshRouteChat()">
+                  <i class="fas fa-sync-alt me-2"></i> {% trans "Refresh Chat" %}
+                </a></li>
+                <li><a class="dropdown-item" href="{% url 'chat:chat_dashboard' %}">
+                  <i class="fas fa-comments me-2"></i> {% trans "All Chats" %}
+                </a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-messages p-3" id="chat-messages" 
+             style="flex: 1 1 auto; overflow-y: auto; min-height: 0; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+          <div class="text-center mb-4 py-3 bg-white rounded shadow-sm border" id="chat-header-inside">
+            <h6 class="fw-bold text-success mb-1">
+              <i class="fas fa-route me-2"></i>{% trans "Route:" %} {{ route.name }}
+            </h6>
+            <small class="text-muted">
+              {% trans "Route discussion • Author:" %}
+              <a href="{% url 'user_profile' route.author.username %}" class="text-decoration-none">
+                {{ route.author.username }}
+              </a>
+              • {{ route.created_at|date:"d.m.Y" }}
+            </small>
+          </div>
+          {% for message in chat_messages %}
+          <div class="message-wrapper mb-3 {% if message.user == request.user %}own-message{% endif %}" 
+               data-message-id="{{ message.id }}">
+            <div class="message-bubble {% if message.user == request.user %}own-bubble{% else %}other-bubble{% endif %}">
+              {% if message.user != request.user %}
+              <div class="message-sender mb-1">
+                <small class="text-primary fw-bold">
+                  <a href="{% url 'user_profile' message.user.username %}" class="text-decoration-none">
+                    {{ message.user.username }}
+                  </a>
+                </small>
+              </div>
+              {% endif %}
+              <div class="message-content">
+                {{ message.message|linebreaks }}
+              </div>
+              <div class="message-time text-end mt-1">
+                <small class="{% if message.user == request.user %}text-light{% else %}text-muted{% endif %}">
+                  {{ message.timestamp|date:"H:i" }}
+                </small>
+                {% if message.user == request.user %}
+                <i class="fas fa-check-double text-light ms-1" style="font-size: 10px;"></i>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center text-muted py-5" id="empty-chat-message">
+            <div class="empty-state-icon mb-4">
+              <i class="fas fa-comments fa-4x text-light"></i>
+            </div>
+            <h4 class="fw-light">{% trans "Start the route discussion" %}</h4>
+            <p class="text-muted">{% trans "Send the first message in the route chat" %} <strong>"{{ route.name }}"</strong></p>
+            <div class="mt-3">
+              <span class="badge bg-info bg-opacity-10 text-info px-3 py-2">
+                <i class="fas fa-route me-1"></i>
+                {{ route.get_difficulty_display|default:"Not specified" }}
+              </span>
+              {% if route.total_distance %}
+              <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 mx-2">
+                <i class="fas fa-road me-1"></i>
+                {{ route.total_distance }} {% trans "km" %}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div id="chat-loading" class="text-center py-3 bg-white border-top" style="display: none; flex-shrink: 0;">
+          <div class="spinner-border spinner-border-sm text-primary" role="status">
+            <span class="visually-hidden">{% trans "Loading..." %}</span>
+          </div>
+          <small class="text-muted ms-2">{% trans "Loading messages..." %}</small>
+        </div>
+
+        <div id="typing-indicator" class="px-4 py-2 bg-white border-top" style="display: none; flex-shrink: 0;">
+          <div class="typing-dots">
+            <small class="text-muted">
+              <i class="fas fa-pencil-alt me-2"></i>
+              <span id="typing-user"></span> {% trans "is typing" %}
+              <span class="typing-animation"></span>
+            </small>
+          </div>
+        </div>
+
+        <div class="chat-input bg-white border-top p-3 shadow-sm" style="flex-shrink: 0;">
+          <form id="chat-form" class="d-flex align-items-end gap-2">
+            {% csrf_token %}
+            <input type="hidden" name="route_id" value="{{ route.id }}">
+            <div class="flex-grow-1 position-relative">
+              <div class="input-group">
+                <input type="text" 
+                       class="form-control border-end-0" 
+                       id="chat-message-input" 
+                       name="message"
+                       placeholder="{% trans 'Write a message in the route chat' %} '{{ route.name }}'..." 
+                       maxlength="1000"
+                       autocomplete="off"
+                       style="border-radius: 25px; padding: 12px 20px; border: 1px solid #e0e0e0;">
+                <button type="button" class="btn btn-outline-secondary border-start-0" 
+                        style="border-radius: 0 25px 25px 0; border: 1px solid #e0e0e0;">
+                  <i class="fas fa-smile"></i>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" 
+                    id="chat-message-submit"
+                    style="width: 50px; height: 50px;">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+          <div class="mt-2 d-flex justify-content-between align-items-center px-2" style="flex-shrink: 0;">
+            <small class="text-muted" id="char-counter">0/1000</small>
+            <small class="text-muted">
+              <i class="fas fa-route me-1 text-success"></i>
+              <strong>{% trans "Route:" %}</strong> {{ route.name|truncatechars:30 }}
+              • <i class="fas fa-users me-1 text-info ms-2"></i>
+              <span id="connection-status" class="ms-1">{% trans "Connecting..." %}</span>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="info-sidebar-overlay" id="route-info-overlay" style="display: none;"></div>
+<div class="info-sidebar" id="route-info-sidebar">
+  <div class="info-sidebar-content">
+    <div class="info-sidebar-header">
+      <h5 class="fw-bold mb-0">
+        <i class="fas fa-route me-2 text-success"></i>
+        {% trans "Route:" %} {{ route.name }}
+      </h5>
+      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleRouteInfo()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="info-sidebar-body">
+      <div class="text-center mb-4">
+        <div class="position-relative mx-auto mb-3">
+          <div class="avatar bg-gradient-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+               style="width: 100px; height: 100px; font-size: 32px;">
+            <i class="fas fa-route"></i>
+          </div>
+        </div>
+        <h5 class="fw-bold text-success">{{ route.name }}</h5>
+        <p class="text-muted mb-3">
+          <i class="fas fa-quote-left me-1 text-secondary"></i>
+          {{ route.description|default:"No description"|truncatewords:30 }}
+        </p>
+        <div class="route-status">
+          <span class="badge {% if route.is_active %}bg-success{% else %}bg-secondary{% endif %} bg-opacity-10 {% if route.is_active %}text-success{% else %}text-secondary{% endif %} px-3 py-2 rounded-pill">
+            <i class="fas fa-circle me-1" style="font-size: 8px;"></i>
+            {% if route.is_active %}{% trans "Active route" %}{% else %}{% trans "Inactive" %}{% endif %}
+          </span>
+        </div>
+      </div>
+      <div class="mb-4">
+        <h6 class="fw-semibold text-uppercase small mb-3 text-primary">
+          <i class="fas fa-info-circle me-2"></i>{% trans "Route Details" %}
+        </h6>
+        <div class="info-grid">
+          <div class="info-item d-flex justify-content-between align-items-center py-2 border-bottom">
+            <span class="text-muted">
+              <i class="fas fa-user me-2"></i>{% trans "Author" %}
+            </span>
+            <strong class="text-primary">
+              <a href="{% url 'user_profile' route.author.username %}" class="text-decoration-none">
+                {{ route.author.username }}
+              </a>
+            </strong>
+          </div>
+          <div class="info-item d-flex justify-content-between align-items-center py-2 border-bottom">
+            <span class="text-muted">
+              <i class="fas fa-road me-2"></i>{% trans "Distance" %}
+            </span>
+            <strong class="text-success">{{ route.total_distance|default:"0" }} {% trans "km" %}</strong>
+          </div>
+          <div class="info-item d-flex justify-content-between align-items-center py-2 border-bottom">
+            <span class="text-muted">
+              <i class="fas fa-lock me-2"></i>{% trans "Privacy" %}
+            </span>
+            <strong class="text-info">{{ route.get_privacy_display }}</strong>
+          </div>
+          <div class="info-item d-flex justify-content-between align-items-center py-2">
+            <span class="text-muted">
+              <i class="fas fa-calendar me-2"></i>{% trans "Created" %}
+            </span>
+            <strong>{{ route.created_at|date:"d.m.Y" }}</strong>
+          </div>
+        </div>
+      </div>
+      <div class="mb-4">
+        <h6 class="fw-semibold text-uppercase small mb-3 text-primary">
+          <i class="fas fa-bolt me-2"></i>{% trans "Actions" %}
+        </h6>
+        <div class="d-grid gap-2">
+          <a href="{% url 'route_detail' route.id %}" class="btn btn-outline-primary btn-sm py-2">
+            <i class="fas fa-map me-2"></i> {% trans "Route Details" %}
+          </a>
+          <a href="{% url 'user_profile' route.author.username %}" class="btn btn-outline-success btn-sm py-2">
+            <i class="fas fa-user me-2"></i> {% trans "Author Profile" %}
+          </a>
+          {% if request.user == route.author %}
+          <a href="{% url 'edit_route' route.id %}" class="btn btn-outline-warning btn-sm py-2">
+            <i class="fas fa-edit me-2"></i> {% trans "Edit Route" %}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="mt-auto">
+        <div class="alert alert-info border-0 bg-info bg-opacity-10 py-3 mb-3">
+          <small class="d-flex align-items-center">
+            <i class="fas fa-comments me-2 fs-5"></i>
+            <div>
+              <strong>{% trans "Route Chat:" %}</strong> {{ route.name }}
+              <br>
+              <span class="text-muted">{% trans "Discuss route details" %}</span>
+            </div>
+          </small>
+        </div>
+        <div class="d-grid gap-2">
+          <button class="btn btn-warning btn-sm py-2" onclick="refreshRouteChat()">
+            <i class="fas fa-sync-alt me-2"></i> {% trans "Refresh Chat" %}
+          </button>
+          <a href="{% url 'chat:chat_dashboard' %}" class="btn btn-outline-secondary btn-sm py-2">
+            <i class="fas fa-comments me-2"></i> {% trans "All Chats" %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+  --primary-blue: #1a73e8;
+  --primary-dark: #0d47a1;
+  --primary-light: #e8f0fe;
+  --secondary-blue: #4285f4;
+  --accent-blue: #8ab4f8;
+  --success: #34a853;
+  --warning: #fbbc05;
+  --danger: #ea4335;
+  --bg-light: #f8f9fa;
+  --border-light: #e0e0e0;
+  --text-dark: #202124;
+  --text-muted: #5f6368;
+}
+html, body {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+main {
+  min-height: calc(100vh - 56px - 60px) !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+.container-fluid.h-100 {
+  height: calc(100vh - 56px - 60px) !important;
+  max-height: calc(100vh - 56px - 60px);
+  overflow: hidden;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+footer {
+  height: 60px !important;
+  position: relative !important;
+  margin-top: 0 !important;
+  z-index: 1 !important;
+}
+.chat-container {
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-light);
+}
+.chat-header,
+.chat-input,
+#typing-indicator,
+#chat-loading {
+  flex-shrink: 0 !important;
+}
+.chat-messages {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.chat-header h5 {
+  color: var(--text-dark);
+}
+.chat-header .text-success {
+  color: var(--success) !important;
+  font-weight: 600;
+}
+#chat-header-inside {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-left: 4px solid var(--success) !important;
+  animation: fadeIn 0.5s ease-out;
+}
+#chat-header-inside h6 {
+  font-size: 1.1rem;
+}
+.message-wrapper {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.message-wrapper.own-message {
+  flex-direction: row-reverse;
+}
+.message-bubble {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  position: relative;
+  animation: messageSlideIn 0.3s ease-out;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.own-bubble {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  color: white;
+  border-bottom-right-radius: 6px;
+}
+.other-bubble {
+  background: white;
+  color: var(--text-dark);
+  border-bottom-left-radius: 6px;
+  border: 1px solid var(--border-light);
+}
+.message-content {
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+.message-time {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+.message-sender {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+#empty-chat-message {
+  animation: fadeIn 0.8s ease-out;
+}
+#empty-chat-message strong {
+  color: var(--success);
+  font-weight: 600;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.typing-animation::after {
+  content: '...';
+  animation: typing 1.5s infinite;
+}
+@keyframes typing {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+.avatar {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.bg-gradient-success {
+  background: linear-gradient(135deg, var(--success), #20c997) !important;
+}
+.empty-state-icon {
+  opacity: 0.5;
+}
+.chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+.chat-messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+.notifications-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1060;
+  max-width: 350px;
+  width: 100%;
+}
+.notification {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid;
+  transform: translateX(400px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
+  overflow: hidden;
+}
+.notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+.notification.hide {
+  transform: translateX(400px);
+  opacity: 0;
+}
+.info-sidebar {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 350px;
+  height: 100vh;
+  background: white;
+  box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+  z-index: 1040;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+}
+.info-sidebar.active {
+  right: 0;
+}
+.info-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1039;
+  display: none;
+}
+.info-sidebar-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.info-sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.info-sidebar-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.info-grid .info-item {
+  transition: background-color 0.2s ease;
+}
+.info-grid .info-item:hover {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+@media (max-width: 768px) {
+  .container-fluid.h-100 {
+    height: calc(100vh - 56px - 50px) !important;
+  }
+  footer {
+    height: 50px !important;
+  }
+  .chat-messages {
+    padding: 12px;
+  }
+  .message-bubble {
+    max-width: 85%;
+  }
+  .info-sidebar {
+    width: 100%;
+    right: -100%;
+  }
+  .chat-header {
+    padding: 16px !important;
+  }
+  .chat-input {
+    padding: 16px !important;
+  }
+}
+@media (max-width: 576px) {
+  .container-fluid.h-100 {
+    height: calc(100vh - 56px - 40px) !important;
+  }
+  footer {
+    height: 40px !important;
+  }
+  .message-bubble {
+    max-width: 90%;
+  }
+  .chat-input {
+    padding: 12px !important;
+  }
+}
+#chat-message-input {
+  flex: 1;
+}
+.container-fluid.p-0 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+#chat-main-col,
+.row.h-100 {
+  height: 100% !important;
+}
+body.chat-page {
+  padding-bottom: 0 !important;
+}
+main.py-4 {
+  padding-bottom: 0 !important;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const routeId = {{ route.id }};
+const routeTitle = "{{ route.name|escapejs }}";
+const currentUserId = {{ request.user.id }};
+const currentUsername = "{{ request.user.username }}";
+let routeChat = null;
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function getCurrentTime() {
+  return new Date().toLocaleTimeString('en-US', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+}
+
+function updateCharCounter() {
+  const input = document.querySelector('#chat-message-input');
+  const counter = document.querySelector('#char-counter');
+  if (input && counter) {
+    const length = input.value.length;
+    counter.textContent = `${length}/1000`;
+    counter.className = length > 950 ? 'text-danger' : 
+                      length > 800 ? 'text-warning' : 
+                      length > 0 ? 'text-success' : 'text-muted';
+  }
+}
+
+function scrollToBottom() {
+  const messagesContainer = document.querySelector('#chat-messages');
+  if (messagesContainer) {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+}
+
+function showTypingIndicator(username) {
+  const indicator = document.querySelector('#typing-indicator');
+  const userElement = document.querySelector('#typing-user');
+  if (indicator && userElement) {
+    userElement.textContent = username;
+    indicator.style.display = 'block';
+    setTimeout(setupFixedHeight, 100);
+    setTimeout(scrollToBottom, 100);
+  }
+}
+
+function hideTypingIndicator() {
+  const indicator = document.querySelector('#typing-indicator');
+  if (indicator) {
+    indicator.style.display = 'none';
+    setTimeout(setupFixedHeight, 100);
+  }
+}
+
+function showLoadingIndicator() {
+  const indicator = document.querySelector('#chat-loading');
+  if (indicator) {
+    indicator.style.display = 'block';
+  }
+}
+
+function hideLoadingIndicator() {
+  const indicator = document.querySelector('#chat-loading');
+  if (indicator) {
+    indicator.style.display = 'none';
+  }
+}
+
+function updateConnectionStatus(status, message) {
+  const statusElement = document.querySelector('#connection-status');
+  if (statusElement) {
+    statusElement.textContent = message;
+    const statusClasses = {
+      connected: 'text-success',
+      disconnected: 'text-warning',
+      error: 'text-danger',
+      connecting: 'text-info'
+    };
+    statusElement.className = statusClasses[status] || 'text-muted';
+  }
+}
+
+function addMessageToChat(messageData, isOwn = false) {
+  const messagesContainer = document.querySelector('#chat-messages');
+  if (!messagesContainer) return;
+  const emptyMessage = messagesContainer.querySelector('#empty-chat-message');
+  if (emptyMessage) {
+    emptyMessage.remove();
+  }
+  const existingMessage = messagesContainer.querySelector(`[data-message-id="${messageData.id}"]`);
+  if (existingMessage) {
+    if (messageData.is_temp) {
+      existingMessage.remove();
+    } else {
+      return;
+    }
+  }
+  const messageWrapper = document.createElement('div');
+  messageWrapper.className = `message-wrapper mb-3 ${isOwn ? 'own-message' : ''}`;
+  messageWrapper.dataset.messageId = messageData.id;
+  messageWrapper.style.animation = 'messageSlideIn 0.3s ease-out';
+  const senderName = isOwn ? '{% trans "You" %}' : messageData.user;
+  messageWrapper.innerHTML = `
+    <div class="message-bubble ${isOwn ? 'own-bubble' : 'other-bubble'}">
+      ${!isOwn ? `
+        <div class="message-sender mb-1">
+          <small class="text-primary fw-bold">
+            <a href="#" class="text-decoration-none">
+              ${escapeHtml(senderName)}
+            </a>
+          </small>
+        </div>
+      ` : ''}
+      <div class="message-content">
+        ${escapeHtml(messageData.message).replace(/\n/g, '<br>')}
+      </div>
+      <div class="message-time text-end mt-1">
+        <small class="${isOwn ? 'text-light' : 'text-muted'}">${messageData.created_at}</small>
+        ${isOwn ? '<i class="fas fa-check-double text-light ms-1" style="font-size: 10px;"></i>' : ''}
+      </div>
+    </div>
+  `;
+  messagesContainer.appendChild(messageWrapper);
+  scrollToBottom();
+}
+
+function showEmptyChatMessage() {
+  const messagesContainer = document.querySelector('#chat-messages');
+  if (messagesContainer) {
+    const existingHeader = messagesContainer.querySelector('#chat-header-inside');
+    if (!existingHeader) {
+      const header = document.createElement('div');
+      header.id = 'chat-header-inside';
+      header.className = 'text-center mb-4 py-3 bg-white rounded shadow-sm border';
+      header.innerHTML = `
+        <h6 class="fw-bold text-success mb-1">
+          <i class="fas fa-route me-2"></i>{% trans "Route:" %} ${escapeHtml(routeTitle)}
+        </h6>
+        <small class="text-muted">
+          {% trans "Route discussion • Author:" %}
+          <a href="#" class="text-decoration-none">
+            {{ route.author.username }}
+          </a>
+          • {{ route.created_at|date:"d.m.Y" }}
+        </small>
+      `;
+      messagesContainer.prepend(header);
+    }
+    const emptyMessage = messagesContainer.querySelector('#empty-chat-message');
+    if (!emptyMessage) {
+      const emptyState = document.createElement('div');
+      emptyState.id = 'empty-chat-message';
+      emptyState.className = 'text-center text-muted py-5';
+      emptyState.innerHTML = `
+        <div class="empty-state-icon mb-4">
+          <i class="fas fa-comments fa-4x text-light"></i>
+        </div>
+        <h4 class="fw-light">{% trans "Start the route discussion" %}</h4>
+        <p class="text-muted">{% trans "Send the first message in the route chat" %} <strong>"${escapeHtml(routeTitle)}"</strong></p>
+        <div class="mt-3">
+          <span class="badge bg-info bg-opacity-10 text-info px-3 py-2">
+            <i class="fas fa-route me-1"></i>
+            {{ route.get_difficulty_display|default:"Not specified" }}
+          </span>
+          {% if route.total_distance %}
+          <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 mx-2">
+            <i class="fas fa-road me-1"></i>
+            {{ route.total_distance }} {% trans "km" %}
+          </span>
+          {% endif %}
+        </div>
+      `;
+      messagesContainer.appendChild(emptyState);
+    }
+  }
+}
+
+function setupFixedHeight() {
+  function updateHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    const navbar = document.querySelector('nav.navbar');
+    const footer = document.querySelector('footer');
+    const navbarHeight = navbar ? navbar.offsetHeight : 56;
+    const footerHeight = footer ? footer.offsetHeight : 60;
+    const totalHeight = navbarHeight + footerHeight;
+    const container = document.querySelector('.container-fluid.h-100');
+    if (container) {
+      const containerHeight = window.innerHeight - totalHeight;
+      container.style.height = `${containerHeight}px`;
+      container.style.maxHeight = `${containerHeight}px`;
+    }
+    const messagesContainer = document.querySelector('#chat-messages');
+    if (messagesContainer) {
+      const headerHeight = document.querySelector('.chat-header').offsetHeight;
+      const inputHeight = document.querySelector('.chat-input').offsetHeight;
+      const availableHeight = window.innerHeight - totalHeight - headerHeight - inputHeight;
+      messagesContainer.style.height = `${availableHeight}px`;
+      messagesContainer.style.maxHeight = `${availableHeight}px`;
+    }
+    if (footer) {
+      footer.style.position = 'relative';
+      footer.style.bottom = '0';
+    }
+  }
+  updateHeight();
+  window.addEventListener('resize', updateHeight);
+  window.addEventListener('orientationchange', updateHeight);
+  const observer = new MutationObserver(function() {
+    setTimeout(updateHeight, 100);
+  });
+  const typingIndicator = document.getElementById('typing-indicator');
+  if (typingIndicator) {
+    observer.observe(typingIndicator, {
+      attributes: true,
+      attributeFilter: ['style']
+    });
+  }
+}
+
+class RouteFirebaseChat {
+  constructor(routeId, currentUser, routeTitle) {
+    this.routeId = routeId;
+    this.currentUser = currentUser;
+    this.routeTitle = routeTitle;
+    this.isSending = false;
+    this.database = firebase.database();
+    this.messagesRef = this.database.ref(`route_chats/${routeId}/messages`);
+    this.typingRef = this.database.ref(`route_chats/${routeId}/typing`);
+  }
+
+  init() {
+    try {
+      this.setupMessageListener();
+      this.setupTypingListener();
+      updateConnectionStatus('connected', '{% trans "Connected" %}');
+      return this;
+    } catch (error) {
+      console.error('❌ Firebase init error:', error);
+      updateConnectionStatus('error', '{% trans "Connection failed" %}');
+      throw error;
+    }
+  }
+
+  setupMessageListener() {
+    this.messagesRef.orderByChild('timestamp').on('child_added', (snapshot) => {
+      const messageData = snapshot.val();
+      this.displayMessage(messageData);
+    });
+  }
+
+  setupTypingListener() {
+    this.typingRef.on('value', (snapshot) => {
+      const typingData = snapshot.val();
+      this.handleTypingIndicator(typingData);
+    });
+  }
+
+  displayMessage(messageData) {
+    if (!messageData) return;
+    const isOwn = messageData.user_id === this.currentUser.id;
+    addMessageToChat(messageData, isOwn);
+  }
+
+  handleTypingIndicator(typingData) {
+    const typingUsers = Object.keys(typingData || {}).filter(userId => {
+      return userId != this.currentUser.id && typingData[userId] === true;
+    });
+    if (typingUsers.length > 0) {
+      showTypingIndicator(`${typingUsers.length} {% trans "user(s)" %}`);
+    } else {
+      hideTypingIndicator();
+    }
+  }
+
+  async sendMessage(messageText) {
+    if (this.isSending) return false;
+    this.isSending = true;
+    const messageInput = document.querySelector('#chat-message-input');
+    const submitBtn = document.querySelector('#chat-message-submit');
+    if (messageInput) messageInput.disabled = true;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    }
+    try {
+      const messageData = {
+        id: `${this.currentUser.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        message: messageText,
+        user: this.currentUser.username,
+        user_id: this.currentUser.id,
+        timestamp: Date.now(),
+        created_at: getCurrentTime()
+      };
+      addMessageToChat({
+        ...messageData,
+        is_temp: true
+      }, true);
+      await this.messagesRef.child(messageData.id).set(messageData);
+      if (messageInput) {
+        messageInput.value = '';
+        messageInput.focus();
+      }
+      updateCharCounter();
+      this.setTyping(false);
+      return true;
+    } catch (error) {
+      showError('{% trans "Failed to send message:" %} ' + error.message);
+      return false;
+    } finally {
+      this.isSending = false;
+      if (messageInput) messageInput.disabled = false;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+      }
+    }
+  }
+
+  setTyping(isTyping) {
+    if (!this.typingRef) return;
+    try {
+      this.typingRef.child(this.currentUser.id).set(isTyping);
+    } catch (error) {
+      console.error('Typing indicator error:', error);
+    }
+  }
+
+  loadMessageHistory() {
+    showLoadingIndicator();
+    this.messagesRef.orderByChild('timestamp').limitToLast(50).once('value')
+      .then((snapshot) => {
+        const messages = [];
+        snapshot.forEach((childSnapshot) => {
+          messages.push(childSnapshot.val());
+        });
+        messages.sort((a, b) => a.timestamp - b.timestamp);
+        const messagesContainer = document.querySelector('#chat-messages');
+        if (messagesContainer) {
+          const header = messagesContainer.querySelector('#chat-header-inside');
+          messagesContainer.innerHTML = '';
+          if (header) messagesContainer.appendChild(header);
+        }
+        messages.forEach(message => {
+          const isOwn = message.user_id === this.currentUser.id;
+          addMessageToChat(message, isOwn);
+        });
+        if (messages.length === 0) {
+          showEmptyChatMessage();
+        }
+        hideLoadingIndicator();
+      })
+      .catch(error => {
+        console.error('History load error:', error);
+        hideLoadingIndicator();
+        showError('{% trans "Failed to load message history" %}');
+      });
+  }
+
+  destroy() {
+    if (this.messagesRef) this.messagesRef.off();
+    if (this.typingRef) {
+      this.typingRef.off();
+      this.setTyping(false);
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof firebase === 'undefined') {
+    showError('{% trans "Firebase is not loaded" %}');
+    return;
+  }
+  setupFixedHeight();
+  document.body.classList.add('chat-page');
+  routeChat = new RouteFirebaseChat(routeId, {
+    id: currentUserId,
+    username: currentUsername
+  }, routeTitle);
+  routeChat.init();
+  setupEventListeners();
+  setTimeout(() => {
+    if (routeChat) routeChat.loadMessageHistory();
+  }, 1000);
+  const messageInput = document.querySelector('#chat-message-input');
+  if (messageInput) {
+    messageInput.focus();
+    updateCharCounter();
+  }
+});
+
+function setupEventListeners() {
+  const messageInput = document.querySelector('#chat-message-input');
+  const chatForm = document.querySelector('#chat-form');
+  if (messageInput) {
+    let typingTimer;
+    messageInput.addEventListener('input', function() {
+      updateCharCounter();
+      if (routeChat && messageInput.value.trim().length > 0) {
+        routeChat.setTyping(true);
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => {
+          if (routeChat) routeChat.setTyping(false);
+        }, 1000);
+      }
+    });
+    messageInput.addEventListener('blur', function() {
+      if (routeChat) routeChat.setTyping(false);
+    });
+  }
+  if (chatForm) {
+    chatForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const messageInput = document.querySelector('#chat-message-input');
+      const message = messageInput ? messageInput.value.trim() : '';
+      if (!message) {
+        showWarning('{% trans "Please enter a message" %}');
+        return;
+      }
+      if (!routeChat) {
+        showError('{% trans "Chat is not ready" %}');
+        return;
+      }
+      routeChat.sendMessage(message);
+    });
+  }
+  window.addEventListener('resize', scrollToBottom);
+}
+
+function toggleRouteInfo() {
+  const sidebar = document.getElementById('route-info-sidebar');
+  const overlay = document.getElementById('route-info-overlay');
+  if (sidebar && overlay) {
+    if (sidebar.classList.contains('active')) {
+      sidebar.classList.remove('active');
+      overlay.style.display = 'none';
+      document.body.classList.remove('sidebar-open');
+    } else {
+      sidebar.classList.add('active');
+      overlay.style.display = 'block';
+      document.body.classList.add('sidebar-open');
+      overlay.onclick = toggleRouteInfo;
+    }
+  }
+}
+
+function refreshRouteChat() {
+  if (routeChat) {
+    routeChat.loadMessageHistory();
+    showSuccess(`{% trans "Chat for route" %} "${routeTitle}" {% trans "refreshed" %}`);
+  } else {
+    window.location.reload();
+  }
+}
+
+function showNotification(message, type = 'info') {
+  const notifications = document.getElementById('notifications');
+  const notificationId = 'notification-' + Date.now();
+  const typeConfig = {
+    'success': { class: 'notification-success', icon: 'fa-check-circle', duration: 3000 },
+    'error': { class: 'notification-error', icon: 'fa-exclamation-circle', duration: 5000 },
+    'warning': { class: 'notification-warning', icon: 'fa-exclamation-triangle', duration: 4000 },
+    'info': { class: 'notification-info', icon: 'fa-info-circle', duration: 3000 }
+  };
+  const config = typeConfig[type] || typeConfig.info;
+  const notification = document.createElement('div');
+  notification.id = notificationId;
+  notification.className = `notification ${config.class}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      <div class="notification-icon"><i class="fas ${config.icon}"></i></div>
+      <div class="notification-message">${escapeHtml(message)}</div>
+      <button type="button" class="notification-close" onclick="closeNotification('${notificationId}')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="notification-progress"></div>
+  `;
+  notifications.appendChild(notification);
+  setTimeout(() => notification.classList.add('show'), 10);
+  setTimeout(() => closeNotification(notificationId), config.duration);
+}
+
+function closeNotification(notificationId) {
+  const notification = document.getElementById(notificationId);
+  if (notification) {
+    notification.classList.remove('show');
+    notification.classList.add('hide');
+    setTimeout(() => notification.remove(), 400);
+  }
+}
+
+function showError(message) { showNotification(message, 'error'); }
+function showSuccess(message) { showNotification(message, 'success'); }
+function showWarning(message) { showNotification(message, 'warning'); }
+function showInfo(message) { showNotification(message, 'info'); }
+
+window.addEventListener('beforeunload', function() {
+  if (routeChat) routeChat.destroy();
+});
+</script>
+{% endblock %}

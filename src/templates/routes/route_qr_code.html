@@ -1,0 +1,129 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% blocktrans with name=route.name %}QR code: {{ name }}{% endblocktrans %}</title>
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/fontawesome-all.min.css' %}" rel="stylesheet">
+  <style>
+    body {
+      background: #f8f9fa;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      margin: 0;
+    }
+    .qr-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .qr-header {
+      background: #2563eb;
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+    .qr-body {
+      padding: 32px;
+      text-align: center;
+    }
+    .qr-image {
+      max-width: 240px;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 0 auto 16px;
+    }
+    .route-url {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 8px;
+      word-break: break-all;
+      font-size: 13px;
+      margin: 16px 0;
+    }
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 480px) {
+      .qr-body {
+        padding: 24px;
+      }
+      .btn-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="qr-card">
+    <div class="qr-header">
+      <h1 class="h5 mb-1"><i class="fas fa-qrcode me-2"></i>{% trans "QR code" %}</h1>
+      <p class="mb-0 small opacity-90">{{ route.name }}</p>
+    </div>
+    <div class="qr-body">
+      {% if qr_url %}
+        <img src="{{ qr_url }}" alt="{% blocktrans with name=route.name %}QR code for {{ name }}{% endblocktrans %}" class="qr-image">
+      {% else %}
+        <div class="alert alert-warning small mb-3">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          {% trans "QR code not generated" %}
+        </div>
+      {% endif %}
+
+      <p class="text-muted small mb-3">
+        {% trans "Scan to access the route" %}
+      </p>
+
+      <div class="route-url">
+        <a href="{{ route_url }}" target="_blank" class="text-primary text-decoration-none">{{ route_url }}</a>
+      </div>
+
+      <div class="btn-group">
+        <a href="{{ route_url }}" class="btn btn-primary btn-sm" target="_blank">
+          <i class="fas fa-external-link-alt me-1"></i>{% trans "Open" %}
+        </a>
+        <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
+          <i class="fas fa-print me-1"></i>{% trans "Print" %}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlLink = document.querySelector('.route-url a');
+      if (urlLink) {
+        urlLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          const url = this.href;
+
+          navigator.clipboard.writeText(url).then(() => {
+            const originalText = urlLink.textContent;
+            urlLink.textContent = '{% trans "Copied!" %}';
+            urlLink.classList.add('text-success');
+
+            setTimeout(() => {
+              urlLink.textContent = originalText;
+              urlLink.classList.remove('text-success');
+            }, 1500);
+          }).catch(() => {
+            window.open(url, '_blank');
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>

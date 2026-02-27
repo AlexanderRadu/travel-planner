@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Find Friends" %} - Waylines{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="text-center mb-5">
+        <h1 class="h3 mb-2">{% trans "Find Friends" %}</h1>
+        <p class="text-muted">{% trans "Find users and add them as friends" %}</p>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <form method="get" class="d-flex gap-2">
+            <div class="flex-grow-1">
+              <input type="text" name="q" class="form-control" 
+                     value="{{ request.GET.q }}" placeholder="{% trans 'Enter username...' %}">
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-search"></i> {% trans "Search" %}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {% if users %}
+      <div class="row">
+        {% for user_data in users %}
+        {% with user=user_data.user friendship_status=user_data.friendship_status %}
+        <div class="col-md-6 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  {% if user.profile.avatar %}
+                  <img src="{{ user.profile.avatar.url }}" class="rounded-circle" 
+                       style="width: 60px; height: 60px; object-fit: cover;" alt="{{ user.username }}">
+                  {% else %}
+                  <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" 
+                       style="width: 60px; height: 60px;">
+                    <i class="fas fa-user text-muted fa-lg"></i>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <h6 class="mb-1">{{ user.username }}</h6>
+                  {% if user.profile.bio %}
+                  <p class="text-muted small mb-1">{{ user.profile.bio|truncatewords:8 }}</p>
+                  {% endif %}
+                  <small class="text-muted">
+                    <i class="fas fa-route"></i> {{ user.public_active_route_count }} {% trans "routes" %}
+                  </small>
+                </div>
+                <div class="flex-shrink-0">
+                  {% if friendship_status == 'accepted' %}
+                  <span class="badge bg-success">
+                    <i class="fas fa-check"></i> {% trans "Friend" %}
+                  </span>
+                  {% elif friendship_status == 'pending' %}
+                  {% if user_data.friendship.from_user == request.user %}
+                  <span class="badge bg-warning">{% trans "Awaiting Response" %}</span>
+                  {% else %}
+                  <span class="badge bg-info">{% trans "Request Sent" %}</span>
+                  {% endif %}
+                  {% elif friendship_status == 'rejected' %}
+                  <span class="badge bg-danger">{% trans "Rejected" %}</span>
+                  {% else %}
+                  <a href="{% url 'send_friend_request' user.id %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-user-plus"></i> {% trans "Add" %}
+                  </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-5">
+        {% if request.GET.q %}
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h4>{% trans "No users found" %}</h4>
+        <p class="text-muted">{% trans "Try a different search query" %}</p>
+        {% else %}
+        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+        <h4>{% trans "Start your search" %}</h4>
+        <p class="text-muted">{% trans "Enter a username in the search field above" %}</p>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

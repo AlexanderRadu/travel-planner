@@ -1,0 +1,8 @@
+channels==4.3.2
+Django==5.2.8
+django-cleanup==9.0.0
+django-qrcode==0.3
+gpxpy==1.6.2
+pillow==12.0.0
+requests==2.32.5
+whitenoise==6.11.0

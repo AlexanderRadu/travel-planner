@@ -1,0 +1,49 @@
+[tool.ruff]
+line-length = 79
+target-version = "py313"
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "migrations",
+    "manage.py",
+    "settings.py",
+]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "DJ",  # flake8-django
+    "N",   # pep8-naming
+    "S",   # flake8-bandit (security)
+    "T20", # flake8-print
+    "RUF", # ruff-specific rules
+]
+ignore = [
+    "E501",   # line too long
+    "S101",   # use of assert
+    "S105",   # hardcoded passwords
+    "S106",   # hardcoded passwords
+    "RUF012", # mutable class attributes
+    "RUF001",
+]
+
+
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "S106", "T20"]
+"**/admin.py" = ["RUF012"]
+"**/models.py" = ["RUF012"]
+"**/views.py" = ["N802"]
+"conftest.py" = ["S101"]

@@ -1,0 +1,3704 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-18 18:47+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\ai_audio\apps.py:8
+msgid "AI Audio"
+msgstr "KI-Audio"
+
+#: .\ai_audio\models.py:9
+msgid "Alloy (neutral)"
+msgstr "Alloy (neutral)"
+
+#: .\ai_audio\models.py:10
+msgid "Echo (male)"
+msgstr "Echo (männlich)"
+
+#: .\ai_audio\models.py:11
+msgid "Nova (female)"
+msgstr "Nova (weiblich)"
+
+#: .\ai_audio\models.py:12
+msgid "Onyx (deep)"
+msgstr "Onyx (tief)"
+
+#: .\ai_audio\models.py:13
+msgid "Fable (storyteller)"
+msgstr "Fable (Geschichtenerzähler)"
+
+#: .\ai_audio\models.py:14
+msgid "Shimmer (soft)"
+msgstr "Shimmer (sanft)"
+
+#: .\ai_audio\models.py:18
+msgid "Auto-detect"
+msgstr "Automatisch erkennen"
+
+#: .\ai_audio\models.py:19
+#: .\templates\routes\modals\point_editor_modal.html:229
+msgid "Russian"
+msgstr "Russisch"
+
+#: .\ai_audio\models.py:20
+#: .\templates\routes\modals\point_editor_modal.html:232
+msgid "English"
+msgstr "Englisch"
+
+#: .\ai_audio\models.py:21
+msgid "Spanish"
+msgstr "Spanisch"
+
+#: .\ai_audio\models.py:22
+msgid "French"
+msgstr "Französisch"
+
+#: .\ai_audio\models.py:29 .\routes\models.py:307 .\routes\models.py:356
+#: .\templates\routes\modals\delete_confirm_modal.html:14
+#: .\templates\routes\route_editor.html:1231
+#: .\templates\routes\route_editor.html:1836
+msgid "Point"
+msgstr "Punkt"
+
+#: .\ai_audio\models.py:34 .\chat\models.py:86 .\interactions\models.py:13
+#: .\interactions\models.py:40 .\interactions\models.py:73
+#: .\routes\models.py:186 .\routes\models.py:211 .\routes\models.py:310
+#: .\routes\models.py:333 .\routes\models.py:353 .\users\models.py:49
+msgid "User"
+msgstr "Benutzer"
+
+#: .\ai_audio\models.py:36
+msgid "Text content"
+msgstr "Textinhalt"
+
+#: .\ai_audio\models.py:38
+msgid "Voice type"
+msgstr "Stimmentyp"
+
+#: .\ai_audio\models.py:41
+#: .\templates\routes\modals\point_editor_modal.html:227
+msgid "Language"
+msgstr "Sprache"
+
+#: .\ai_audio\models.py:44 .\templates\chat\private_chat.html:1246
+msgid "Audio file"
+msgstr "Audiodatei"
+
+#: .\ai_audio\models.py:46 .\templates\chat\private_chat.html:346
+#: .\templates\routes\route_detail.html:835 .\users\models.py:30
+msgid "Status"
+msgstr "Status"
+
+#: .\ai_audio\models.py:47
+msgid "Error message"
+msgstr "Fehlermeldung"
+
+#: .\ai_audio\models.py:49
+msgid "Processing time (sec)"
+msgstr "Verarbeitungszeit (Sek.)"
+
+#: .\ai_audio\models.py:51 .\chat\models.py:47 .\chat\models.py:66
+#: .\routes\models.py:71 .\routes\models.py:167 .\routes\models.py:192
+#: .\routes\models.py:270 .\routes\models.py:291 .\routes\models.py:313
+#: .\routes\models.py:336 .\templates\chat\route_chat.html:282
+#: .\templates\routes\route_detail.html:827
+msgid "Created"
+msgstr "Erstellt"
+
+#: .\ai_audio\models.py:52
+msgid "Completed"
+msgstr "Abgeschlossen"
+
+#: .\ai_audio\models.py:53
+msgid "Route-level audio"
+msgstr "Routenweises Audio"
+
+#: .\ai_audio\models.py:56
+msgid "Audio generation"
+msgstr "Audio-Generierung"
+
+#: .\ai_audio\models.py:57
+msgid "Audio generations"
+msgstr "Audio-Generierungen"
+
+#: .\ai_audio\views.py:34 .\ai_audio\views.py:237
+msgid "Text is empty"
+msgstr "Text ist leer"
+
+#: .\ai_audio\views.py:90 .\ai_audio\views.py:278
+msgid "Invalid parameter"
+msgstr "Ungültiger Parameter"
+
+#: .\ai_audio\views.py:115
+msgid "Coordinates not found"
+msgstr "Koordinaten nicht gefunden"
+
+#: .\ai_audio\views.py:117
+msgid "Ensure the point has latitude and longitude fields"
+msgstr "Stellen Sie sicher, dass der Punkt Breiten- und Längengrad-Felder hat"
+
+#: .\ai_audio\views.py:152 .\ai_audio\views.py:223
+msgid "Invalid input"
+msgstr "Ungültige Eingabe"
+
+#: .\ai_audio\views.py:201
+msgid "Coordinates are required"
+msgstr "Koordinaten sind erforderlich"
+
+#: .\chat\apps.py:8
+msgid "Chat"
+msgstr "Chat"
+
+#: .\chat\models.py:15 .\chat\models.py:37
+msgid "Conversation"
+msgstr "Konversation"
+
+#: .\chat\models.py:16
+msgid "Conversations"
+msgstr "Konversationen"
+
+#: .\chat\models.py:43 .\interactions\models.py:103
+msgid "Sender"
+msgstr "Absender"
+
+#: .\chat\models.py:45 .\chat\models.py:88 .\interactions\models.py:118
+#: .\templates\friends\friends.html:56
+msgid "Message"
+msgstr "Nachricht"
+
+#: .\chat\models.py:46 .\chat\models.py:90
+msgid "Read"
+msgstr "Gelesen"
+
+#: .\chat\models.py:50
+msgid "Private message"
+msgstr "Private Nachricht"
+
+#: .\chat\models.py:51
+msgid "Private messages"
+msgstr "Private Nachrichten"
+
+#: .\chat\models.py:63 .\interactions\models.py:20 .\interactions\models.py:47
+#: .\interactions\models.py:79 .\interactions\models.py:115
+#: .\routes\models.py:81 .\routes\models.py:161 .\routes\models.py:183
+#: .\routes\models.py:208 .\routes\models.py:244 .\routes\models.py:330
+msgid "Route"
+msgstr "Route"
+
+#: .\chat\models.py:65 .\routes\models.py:60
+#: .\templates\profile\profile.html:260 .\templates\routes\my_routes.html:41
+#: .\templates\routes\route_detail.html:838
+msgid "Active"
+msgstr "Aktiv"
+
+#: .\chat\models.py:67 .\routes\models.py:72 .\routes\models.py:314
+#: .\routes\models.py:337 .\templates\routes\route_detail.html:831
+msgid "Updated"
+msgstr "Aktualisiert"
+
+#: .\chat\models.py:70 .\chat\models.py:83
+msgid "Route chat"
+msgstr "Routen-Chat"
+
+#: .\chat\models.py:71
+msgid "Route chats"
+msgstr "Routen-Chats"
+
+#: .\chat\models.py:89 .\templates\routes\route_detail.html:512
+#: .\templates\routes\route_editor.html:72
+msgid "Time"
+msgstr "Zeit"
+
+#: .\chat\models.py:93
+msgid "Route chat message"
+msgstr "Routen-Chat-Nachricht"
+
+#: .\chat\models.py:94
+msgid "Route chat messages"
+msgstr "Routen-Chat-Nachrichten"
+
+#: .\chat\views.py:58 .\chat\views.py:264
+msgid "Cannot start a conversation with yourself"
+msgstr "Kann keine Konversation mit sich selbst starten"
+
+#: .\chat\views.py:78
+msgid "Message cannot be empty"
+msgstr "Nachricht darf nicht leer sein"
+
+#: .\chat\views.py:82
+msgid "Message is too long (max 1000 characters)"
+msgstr "Nachricht ist zu lang (max. 1000 Zeichen)"
+
+#: .\chat\views.py:90
+msgid "You do not have access to this route"
+msgstr "Sie haben keinen Zugriff auf diese Route"
+
+#: .\chat\views.py:244
+msgid "An error occurred while loading chats"
+msgstr "Beim Laden der Chats ist ein Fehler aufgetreten"
+
+#: .\chat\views.py:323
+msgid "You do not have access to this chat"
+msgstr "Sie haben keinen Zugriff auf diesen Chat"
+
+#: .\chat\views.py:327
+msgid "An error occurred while loading the chat"
+msgstr "Beim Laden des Chats ist ein Fehler aufgetreten"
+
+#: .\chat\views.py:340
+msgid "Missing user_id"
+msgstr "user_id fehlt"
+
+#: .\chat\views.py:349
+msgid "Cannot send message to yourself"
+msgstr "Kann keine Nachricht an sich selbst senden"
+
+#: .\chat\views.py:386
+msgid "Internal server error"
+msgstr "Interner Serverfehler"
+
+#: .\chat\views.py:399
+msgid "Missing route_id"
+msgstr "route_id fehlt"
+
+#: .\chat\views.py:439 .\templates\chat\private_chat.html:919
+msgid "Failed to send message"
+msgstr "Nachricht konnte nicht gesendet werden"
+
+#: .\chat\views.py:448 .\chat\views.py:529 .\chat\views.py:566
+#: .\chat\views.py:667
+msgid "Access denied"
+msgstr "Zugriff verweigert"
+
+#: .\chat\views.py:534
+msgid "Conversation not found"
+msgstr "Konversation nicht gefunden"
+
+#: .\chat\views.py:658
+msgid "Failed to get unread counts"
+msgstr "Lesestatus konnte nicht abgerufen werden"
+
+#: .\chat\views.py:679
+msgid "Conversation deleted"
+msgstr "Konversation gelöscht"
+
+#: .\chat\views.py:715
+msgid "Failed to mark messages as read"
+msgstr "Nachrichten konnten nicht als gelesen markiert werden"
+
+#: .\interactions\models.py:23
+msgid "Date added"
+msgstr "Hinzugefügt am"
+
+#: .\interactions\models.py:28
+msgid "Favorite"
+msgstr "Favorit"
+
+#: .\interactions\models.py:29 .\templates\profile\profile.html:80
+#: .\templates\routes\my_routes.html:63
+msgid "Favorites"
+msgstr "Favoriten"
+
+#: .\interactions\models.py:50
+msgid "Score"
+msgstr "Punktzahl"
+
+#: .\interactions\models.py:53 .\interactions\models.py:83 .\users\models.py:32
+#: .\users\models.py:61
+msgid "Created at"
+msgstr "Erstellt am"
+
+#: .\interactions\models.py:56 .\interactions\models.py:86 .\users\models.py:33
+#: .\users\models.py:62
+msgid "Updated at"
+msgstr "Aktualisiert am"
+
+#: .\interactions\models.py:61 .\routes\models.py:189
+msgid "Rating"
+msgstr "Bewertung"
+
+#: .\interactions\models.py:62
+msgid "Ratings"
+msgstr "Bewertungen"
+
+#: .\interactions\models.py:81 .\routes\models.py:312 .\routes\models.py:335
+msgid "Comment text"
+msgstr "Kommentartext"
+
+#: .\interactions\models.py:90 .\routes\models.py:191
+msgid "Comment"
+msgstr "Kommentar"
+
+#: .\interactions\models.py:91 .\templates\interactions\comments.html:9
+msgid "Comments"
+msgstr "Kommentare"
+
+#: .\interactions\models.py:109
+msgid "Recipient"
+msgstr "Empfänger"
+
+#: .\interactions\models.py:121
+msgid "Optional message for recipient"
+msgstr "Optionale Nachricht für Empfänger"
+
+#: .\interactions\models.py:123
+msgid "Sent at"
+msgstr "Gesendet am"
+
+#: .\interactions\models.py:124
+msgid "Is read"
+msgstr "Ist gelesen"
+
+#: .\interactions\models.py:125
+msgid "Read at"
+msgstr "Gelesen am"
+
+#: .\interactions\models.py:128
+msgid "Route share"
+msgstr "Route teilen"
+
+#: .\interactions\models.py:129
+msgid "Route shares"
+msgstr "Route-Teilungen"
+
+#: .\interactions\views.py:34 .\templates\interactions\comments.html:68
+#: .\templates\routes\modals\delete_confirm_modal.html:19
+#: .\templates\routes\route_editor.html:250
+#: .\templates\routes\route_editor.html:1371
+#: .\templates\routes\route_editor.html:1418
+#: .\templates\routes\route_editor.html:1672
+msgid "Delete"
+msgstr "Löschen"
+
+#: .\interactions\views.py:44 .\routes\models.py:33
+#: .\templates\chat\route_chat.html:260
+#: .\templates\interactions\comments.html:57
+#: .\templates\interactions\comments.html:310
+#: .\templates\interactions\comments.html:315
+#: .\templates\routes\route_detail.html:396
+msgid "Author"
+msgstr "Autor"
+
+#: .\interactions\views.py:89 .\templates\interactions\comments.html:80
+msgid "No comments yet. Be the first!"
+msgstr "Noch keine Kommentare. Sei der Erste!"
+
+#: .\interactions\views.py:105
+msgid "Added to favorites"
+msgstr "Zu Favoriten hinzugefügt"
+
+#: .\interactions\views.py:113
+msgid "Removed from favorites"
+msgstr "Aus Favoriten entfernt"
+
+#: .\interactions\views.py:141 .\interactions\views.py:179
+#: .\interactions\views.py:219 .\users\views.py:434
+msgid "Invalid request method"
+msgstr "Ungültige Anfragemethode"
+
+#: .\interactions\views.py:147
+msgid "You cannot rate your own route"
+msgstr "Sie können Ihre eigene Route nicht bewerten"
+
+#: .\interactions\views.py:152
+msgid "Invalid rating"
+msgstr "Ungültige Bewertung"
+
+#: .\interactions\views.py:157
+msgid "Rating must be between 1 and 5"
+msgstr "Bewertung muss zwischen 1 und 5 liegen"
+
+#: .\interactions\views.py:166
+msgid "Thank you for your rating!"
+msgstr "Danke für Ihre Bewertung!"
+
+#: .\interactions\views.py:190 .\interactions\views.py:193
+msgid "Comment cannot be empty"
+msgstr "Kommentar darf nicht leer sein"
+
+#: .\interactions\views.py:206
+msgid "Comment added successfully"
+msgstr "Kommentar erfolgreich hinzugefügt"
+
+#: .\interactions\views.py:210
+msgid "Comment added"
+msgstr "Kommentar hinzugefügt"
+
+#: .\interactions\views.py:232 .\interactions\views.py:238
+msgid "You do not have permission to delete this comment"
+msgstr "Sie haben keine Berechtigung, diesen Kommentar zu löschen"
+
+#: .\interactions\views.py:253
+msgid "Comment deleted successfully"
+msgstr "Kommentar erfolgreich gelöscht"
+
+#: .\interactions\views.py:257
+msgid "Comment deleted"
+msgstr "Kommentar gelöscht"
+
+#: .\routes\apps.py:8 .\routes\models.py:82
+#: .\templates\chat\private_chat.html:338
+#: .\templates\chat\private_chat.html:364 .\templates\home.html:56
+#: .\templates\profile\profile.html:46 .\templates\profile\user_profile.html:73
+#: .\templates\routes\filtered_routes.html:23
+#: .\templates\routes\route_detail.html:384
+msgid "Routes"
+msgstr "Routen"
+
+#: .\routes\models.py:16 .\templates\chat\dashboard.html:922
+#: .\templates\routes\route_editor.html:163
+msgid "Public"
+msgstr "Öffentlich"
+
+#: .\routes\models.py:17 .\templates\routes\route_editor.html:164
+msgid "Private"
+msgstr "Privat"
+
+#: .\routes\models.py:18
+msgid "Link-only"
+msgstr "Nur per Link"
+
+#: .\routes\models.py:19
+msgid "Personal"
+msgstr "Persönlich"
+
+#: .\routes\models.py:23 .\templates\home.html:220
+#: .\templates\routes\search_results.html:103
+msgid "Driving"
+msgstr "Auto"
+
+#: .\routes\models.py:24 .\templates\home.html:199
+#: .\templates\routes\route_editor.html:142
+#: .\templates\routes\search_results.html:95
+msgid "Walking"
+msgstr "Zu Fuß"
+
+#: .\routes\models.py:25 .\templates\home.html:241
+#: .\templates\routes\search_results.html:111
+msgid "Cycling"
+msgstr "Fahrrad"
+
+#: .\routes\models.py:26
+msgid "Mixed"
+msgstr "Gemischt"
+
+#: .\routes\models.py:35 .\routes\models.py:246
+msgid "Name"
+msgstr "Name"
+
+#: .\routes\models.py:36 .\routes\models.py:247
+msgid "Description"
+msgstr "Beschreibung"
+
+#: .\routes\models.py:38
+msgid "Short description"
+msgstr "Kurzbeschreibung"
+
+#: .\routes\models.py:41 .\templates\chat\route_chat.html:276
+#: .\templates\routes\route_detail.html:845
+#: .\templates\routes\route_editor.html:161
+msgid "Privacy"
+msgstr "Privatsphäre"
+
+#: .\routes\models.py:44 .\templates\routes\all_routes.html:49
+#: .\templates\routes\filtered_routes.html:61
+#: .\templates\routes\search_results.html:80
+msgid "Route type"
+msgstr "Routentyp"
+
+#: .\routes\models.py:49
+msgid "Duration (minutes)"
+msgstr "Dauer (Minuten)"
+
+#: .\routes\models.py:51
+msgid "Display duration"
+msgstr "Anzeigedauer"
+
+#: .\routes\models.py:54
+msgid "e.g. 2-3 hours, 1 day, 30 minutes"
+msgstr "z.B. 2-3 Stunden, 1 Tag, 30 Minuten"
+
+#: .\routes\models.py:57
+msgid "Country"
+msgstr "Land"
+
+#: .\routes\models.py:59
+msgid "Total distance (km)"
+msgstr "Gesamtdistanz (km)"
+
+#: .\routes\models.py:61
+msgid "Has audio guide"
+msgstr "Hat Audio-Guide"
+
+#: .\routes\models.py:63
+msgid "Elderly-friendly"
+msgstr "Seniorenfreundlich"
+
+#: .\routes\models.py:69
+msgid "Shared with"
+msgstr "Geteilt mit"
+
+#: .\routes\models.py:74
+msgid "Last status update"
+msgstr "Letzte Statusaktualisierung"
+
+#: .\routes\models.py:77 .\templates\routes\partials\route_card.html:189
+#: .\templates\routes\route_qr_code.html:72
+msgid "QR code"
+msgstr "QR-Code"
+
+#: .\routes\models.py:163 .\routes\models.py:288
+#: .\templates\chat\private_chat.html:220
+#: .\templates\routes\route_detail.html:929
+#: .\templates\routes\route_detail.html:1019
+msgid "Photo"
+msgstr "Foto"
+
+#: .\routes\models.py:164 .\routes\models.py:289
+msgid "Caption"
+msgstr "Bildunterschrift"
+
+#: .\routes\models.py:165 .\templates\routes\route_editor.html:1269
+msgid "Main photo"
+msgstr "Hauptfoto"
+
+#: .\routes\models.py:166 .\routes\models.py:265 .\routes\models.py:290
+msgid "Order"
+msgstr "Reihenfolge"
+
+#: .\routes\models.py:170
+msgid "Route photo"
+msgstr "Routenfoto"
+
+#: .\routes\models.py:171
+msgid "Route photos"
+msgstr "Routenbilder"
+
+#: .\routes\models.py:195
+msgid "Route rating"
+msgstr "Routenbewertung"
+
+#: .\routes\models.py:196
+msgid "Route ratings"
+msgstr "Routenbewertungen"
+
+#: .\routes\models.py:213
+msgid "Added"
+msgstr "Hinzugefügt"
+
+#: .\routes\models.py:216
+msgid "Favorite route"
+msgstr "Favoritenroute"
+
+#: .\routes\models.py:217
+msgid "Favorite routes"
+msgstr "Favoritenrouten"
+
+#: .\routes\models.py:226 .\templates\routes\modals\point_editor_modal.html:32
+msgid "Attraction"
+msgstr "Sehenswürdigkeit"
+
+#: .\routes\models.py:227
+msgid "Natural"
+msgstr "Natur"
+
+#: .\routes\models.py:228 .\templates\routes\modals\point_editor_modal.html:34
+msgid "Forest"
+msgstr "Wald"
+
+#: .\routes\models.py:229
+msgid "Bus stop"
+msgstr "Bushaltestelle"
+
+#: .\routes\models.py:230 .\templates\routes\modals\point_editor_modal.html:36
+msgid "Viewpoint"
+msgstr "Aussichtspunkt"
+
+#: .\routes\models.py:231 .\templates\routes\modals\point_editor_modal.html:37
+msgid "Restaurant"
+msgstr "Restaurant"
+
+#: .\routes\models.py:232 .\templates\routes\modals\point_editor_modal.html:38
+msgid "Hotel"
+msgstr "Hotel"
+
+#: .\routes\models.py:233 .\templates\routes\modals\point_editor_modal.html:39
+msgid "Museum"
+msgstr "Museum"
+
+#: .\routes\models.py:234 .\templates\routes\modals\point_editor_modal.html:40
+msgid "Park"
+msgstr "Park"
+
+#: .\routes\models.py:235 .\templates\routes\modals\point_editor_modal.html:41
+msgid "Monument"
+msgstr "Denkmal"
+
+#: .\routes\models.py:236 .\templates\routes\modals\point_editor_modal.html:42
+msgid "Church"
+msgstr "Kirche"
+
+#: .\routes\models.py:237 .\templates\routes\modals\point_editor_modal.html:43
+msgid "Beach"
+msgstr "Strand"
+
+#: .\routes\models.py:248 .\templates\routes\modals\point_editor_modal.html:48
+msgid "Address"
+msgstr "Adresse"
+
+#: .\routes\models.py:250 .\templates\routes\modals\point_editor_modal.html:71
+msgid "Latitude"
+msgstr "Breitengrad"
+
+#: .\routes\models.py:254 .\templates\routes\modals\point_editor_modal.html:78
+msgid "Longitude"
+msgstr "Längengrad"
+
+#: .\routes\models.py:257
+msgid "Elevation"
+msgstr "Höhe"
+
+#: .\routes\models.py:259 .\templates\routes\modals\point_editor_modal.html:28
+msgid "Category"
+msgstr "Kategorie"
+
+#: .\routes\models.py:262
+msgid "Hint author"
+msgstr "Tipp-Autor"
+
+#: .\routes\models.py:264 .\templates\routes\modals\point_editor_modal.html:87
+msgid "Tags"
+msgstr "Tags"
+
+#: .\routes\models.py:266
+msgid "Has panorama"
+msgstr "Hat Panorama"
+
+#: .\routes\models.py:268 .\templates\routes\partials\route_card.html:146
+msgid "Audio guide"
+msgstr "Audio-Guide"
+
+#: .\routes\models.py:273 .\routes\models.py:286
+msgid "Route point"
+msgstr "Routenpunkt"
+
+#: .\routes\models.py:274
+msgid "Route points"
+msgstr "Routenpunkte"
+
+#: .\routes\models.py:294 .\templates\routes\route_editor.html:1266
+#: .\templates\routes\route_editor.html:1301
+msgid "Point photo"
+msgstr "Punktfoto"
+
+#: .\routes\models.py:295
+msgid "Point photos"
+msgstr "Punktbilder"
+
+#: .\routes\models.py:317
+msgid "Point comment"
+msgstr "Punktkommentar"
+
+#: .\routes\models.py:318
+msgid "Point comments"
+msgstr "Punktkommentare"
+
+#: .\routes\models.py:340
+msgid "Route comment"
+msgstr "Routenkommentar"
+
+#: .\routes\models.py:341
+msgid "Route comments"
+msgstr "Routenkommentare"
+
+#: .\routes\models.py:358
+msgid "Visited at"
+msgstr "Besucht am"
+
+#: .\routes\models.py:361
+msgid "Visited point"
+msgstr "Besuchter Punkt"
+
+#: .\routes\models.py:362
+msgid "Visited points"
+msgstr "Besuchte Punkte"
+
+#: .\routes\views.py:265 .\routes\views.py:1623
+msgid "You do not have access to this route."
+msgstr "Sie haben keinen Zugriff auf diese Route."
+
+#: .\routes\views.py:355
+msgid "You do not have permission to send this route."
+msgstr "Sie haben keine Berechtigung, diese Route zu senden."
+
+#: .\routes\views.py:364
+msgid "Friend not selected."
+msgstr "Freund nicht ausgewählt."
+
+#: .\routes\views.py:380
+msgid "The user is not your friend."
+msgstr "Der Benutzer ist nicht Ihr Freund."
+
+#: .\routes\views.py:392
+msgid "A route has been shared with you"
+msgstr "Eine Route wurde mit Ihnen geteilt"
+
+#: .\routes\views.py:393
+#, python-brace-format
+msgid "{} has shared the route \"{}\" with you."
+msgstr "{} hat die Route \"{}\" mit Ihnen geteilt."
+
+#: .\routes\views.py:408
+#, python-brace-format
+msgid "Route \"{}\" has been sent to friend {}"
+msgstr "Route \"{}\" wurde an Freund {} gesendet"
+
+#: .\routes\views.py:414
+msgid "Friend not found."
+msgstr "Freund nicht gefunden."
+
+#: .\routes\views.py:418 .\routes\views.py:1102 .\routes\views.py:1701
+msgid "Invalid data format."
+msgstr "Ungültiges Datenformat."
+
+#: .\routes\views.py:433 .\routes\views.py:1263
+msgid "Route name is required."
+msgstr "Routenname ist erforderlich."
+
+#: .\routes\views.py:439
+msgid "Add at least one route point."
+msgstr "Fügen Sie mindestens einen Routenpunkt hinzu."
+
+#: .\routes\views.py:530 .\routes\views.py:1361 .\routes\views.py:1577
+msgid "Invalid JSON format."
+msgstr "Ungültiges JSON-Format."
+
+#: .\routes\views.py:934
+msgid "Route deleted successfully."
+msgstr "Route erfolgreich gelöscht."
+
+#: .\routes\views.py:948
+#, python-brace-format
+msgid "Route has been {}."
+msgstr "Route wurde {}."
+
+#: .\routes\views.py:949
+msgid "activated"
+msgstr "aktiviert"
+
+#: .\routes\views.py:949
+msgid "deactivated"
+msgstr "deaktiviert"
+
+#: .\routes\views.py:966
+msgid "Rating must be between 1 and 5."
+msgstr "Bewertung muss zwischen 1 und 5 liegen."
+
+#: .\routes\views.py:980 .\routes\views.py:995
+msgid "Only POST allowed."
+msgstr "Nur POST erlaubt."
+
+#: .\routes\views.py:1007 .\routes\views.py:1020
+msgid "Comment added."
+msgstr "Kommentar hinzugefügt."
+
+#: .\routes\views.py:1092
+msgid "Route not found or you are not the author."
+msgstr "Route nicht gefunden oder Sie sind nicht der Autor."
+
+#: .\routes\views.py:1107 .\routes\views.py:1667
+msgid "Email not provided."
+msgstr "E-Mail nicht angegeben."
+
+#: .\routes\views.py:1116 .\routes\views.py:1676
+msgid "No user registered with this email."
+msgstr "Kein Benutzer mit dieser E-Mail registriert."
+
+#: .\routes\views.py:1125 .\routes\views.py:1684
+msgid "You cannot share access with yourself."
+msgstr "Sie können keinen Zugriff mit sich selbst teilen."
+
+#: .\routes\views.py:1137 .\routes\views.py:1695
+#, python-brace-format
+msgid "Access to route “{}” has been granted to user {}"
+msgstr "Zugriff auf Route \"{}\" wurde an Benutzer {} erteilt"
+
+#: .\routes\views.py:1159
+msgid "Walking Routes"
+msgstr "Wanderrouten"
+
+#: .\routes\views.py:1177
+msgid "Driving Routes"
+msgstr "Autofahrtrouten"
+
+#: .\routes\views.py:1196
+msgid "Cycling Routes"
+msgstr "Fahrradrouten"
+
+#: .\routes\views.py:1213
+msgid "Adventure Routes"
+msgstr "Abenteuerrouten"
+
+#: .\routes\views.py:1269
+msgid "Add at least two route points."
+msgstr "Fügen Sie mindestens zwei Routenpunkte hinzu."
+
+#: .\routes\views.py:1597
+msgid "You do not have permission to generate a QR code for this route."
+msgstr "Sie haben keine Berechtigung, einen QR-Code für diese Route zu generieren."
+
+#: .\routes\views.py:1657
+msgid "You do not have permission to share access to this route."
+msgstr "Sie haben keine Berechtigung, den Zugriff auf diese Route zu teilen."
+
+#: .\templates\base.html:533
+msgid "Search routes"
+msgstr "Routen suchen"
+
+#: .\templates\base.html:537 .\templates\friends\find_friends.html:23
+#: .\templates\routes\all_routes.html:42
+#: .\templates\routes\filtered_routes.html:54
+msgid "Search"
+msgstr "Suchen"
+
+#: .\templates\base.html:547 .\templates\profile\profile.html:243
+#: .\templates\routes\all_routes.html:22
+#: .\templates\routes\filtered_routes.html:40
+#: .\templates\routes\search_results.html:16
+msgid "All routes"
+msgstr "Alle Routen"
+
+#: .\templates\base.html:555
+msgid "Shared with me"
+msgstr "Mit mir geteilt"
+
+#: .\templates\base.html:561 .\templates\routes\my_routes.html:10
+msgid "My routes"
+msgstr "Meine Routen"
+
+#: .\templates\base.html:569
+msgid "Chats"
+msgstr "Chats"
+
+#: .\templates\base.html:587
+msgid "Friend requests"
+msgstr "Freundschaftsanfragen"
+
+#: .\templates\base.html:593 .\templates\profile\profile.html:252
+#, python-format
+msgid "%(time)s ago"
+msgstr "vor %(time)s"
+
+#: .\templates\base.html:608
+msgid "No new requests"
+msgstr "Keine neuen Anfragen"
+
+#: .\templates\base.html:611
+msgid "All friends"
+msgstr "Alle Freunde"
+
+#: .\templates\base.html:612
+msgid "Find friends"
+msgstr "Freunde finden"
+
+#: .\templates\base.html:623 .\templates\chat\private_chat.html:82
+#: .\templates\chat\private_chat.html:361 .\templates\friends\friends.html:66
+msgid "Profile"
+msgstr "Profil"
+
+#: .\templates\base.html:624 .\templates\home.html:36 .\templates\home.html:165
+#: .\templates\home.html:267 .\templates\routes\my_routes.html:90
+#: .\templates\routes\search_results.html:186
+#: .\templates\routes\shared_routes.html:53
+msgid "Create route"
+msgstr "Route erstellen"
+
+#: .\templates\base.html:626
+msgid "Log out"
+msgstr "Abmelden"
+
+#: .\templates\base.html:632
+msgid "Log in"
+msgstr "Anmelden"
+
+#: .\templates\base.html:637
+msgid "Register"
+msgstr "Registrieren"
+
+#: .\templates\base.html:717
+msgid "Platform for creating and sharing routes"
+msgstr "Plattform zum Erstellen und Teilen von Routen"
+
+#: .\templates\base.html:797
+msgid "Enter a search query"
+msgstr "Suchbegriff eingeben"
+
+#: .\templates\chat\dashboard.html:3 .\templates\chat\dashboard.html:615
+#: .\templates\chat\dashboard.html:1466 .\templates\chat\dashboard.html:1469
+#: .\templates\chat\dashboard.html:1504 .\templates\chat\dashboard.html:1506
+msgid "Messages"
+msgstr "Nachrichten"
+
+#: .\templates\chat\dashboard.html:616
+msgid "Chat with friends and discuss routes"
+msgstr "Chatten Sie mit Freunden und diskutieren Sie Routen"
+
+#: .\templates\chat\dashboard.html:622 .\templates\chat\dashboard.html:762
+msgid "Write"
+msgstr "Schreiben"
+
+#: .\templates\chat\dashboard.html:626
+msgid "All Routes"
+msgstr "Alle Routen"
+
+#: .\templates\chat\dashboard.html:651
+msgid "Active now"
+msgstr "Jetzt aktiv"
+
+#: .\templates\chat\dashboard.html:661
+msgid "Search friends..."
+msgstr "Freunde suchen..."
+
+#: .\templates\chat\dashboard.html:669
+msgid "Private Messages"
+msgstr "Private Nachrichten"
+
+#: .\templates\chat\dashboard.html:708
+msgid "You:"
+msgstr "Sie:"
+
+#: .\templates\chat\dashboard.html:713 .\templates\chat\dashboard.html:748
+msgid "Start conversation"
+msgstr "Konversation starten"
+
+#: .\templates\chat\dashboard.html:759 .\templates\chat\dashboard.html:992
+msgid "No messages"
+msgstr "Keine Nachrichten"
+
+#: .\templates\chat\dashboard.html:760
+msgid "Start chatting with friends"
+msgstr "Beginnen Sie mit Freunden zu chatten"
+
+#: .\templates\chat\dashboard.html:777
+#: .\templates\profile\user_profile.html:168
+msgid "My Routes"
+msgstr "Meine Routen"
+
+#: .\templates\chat\dashboard.html:807
+msgid "Mine"
+msgstr "Meine"
+
+#: .\templates\chat\dashboard.html:822 .\templates\chat\dashboard.html:889
+#: .\templates\chat\dashboard.html:937 .\templates\chat\dashboard.html:1317
+msgid "new"
+msgstr "neu"
+
+#: .\templates\chat\dashboard.html:824 .\templates\chat\dashboard.html:891
+#: .\templates\chat\dashboard.html:939 .\templates\chat\dashboard.html:1330
+msgid "Discussion"
+msgstr "Diskussion"
+
+#: .\templates\chat\dashboard.html:840 .\templates\friends\friends.html:148
+msgid "Shared Routes"
+msgstr "Geteilte Routen"
+
+#: .\templates\chat\dashboard.html:874
+msgid "Shared"
+msgstr "Geteilt"
+
+#: .\templates\chat\dashboard.html:955 .\templates\chat\private_chat.html:342
+#: .\templates\friends\friends.html:4 .\templates\friends\friends.html:12
+#: .\templates\profile\profile.html:50 .\templates\profile\user_profile.html:79
+msgid "Friends"
+msgstr "Freunde"
+
+#: .\templates\chat\dashboard.html:994
+msgid "Create a route or add friends to start chatting"
+msgstr "Erstellen Sie eine Route oder fügen Sie Freunde hinzu, um zu chatten"
+
+#: .\templates\chat\dashboard.html:998
+#: .\templates\profile\user_profile.html:264
+#: .\templates\routes\route_editor.html:21
+msgid "Create Route"
+msgstr "Route erstellen"
+
+#: .\templates\chat\dashboard.html:1001 .\templates\chat\dashboard.html:1065
+#: .\templates\friends\find_friends.html:4
+#: .\templates\friends\find_friends.html:11 .\templates\friends\friends.html:16
+#: .\templates\friends\friends.html:90
+msgid "Find Friends"
+msgstr "Freunde finden"
+
+#: .\templates\chat\dashboard.html:1013
+#: .\templates\routes\partials\route_card.html:280
+msgid "Select a friend"
+msgstr "Freund auswählen"
+
+#: .\templates\chat\dashboard.html:1024
+msgid "Start typing friend name..."
+msgstr "Freundesnamen eingeben..."
+
+#: .\templates\chat\dashboard.html:1062
+msgid "You have no friends yet"
+msgstr "Sie haben noch keine Freunde"
+
+#: .\templates\chat\dashboard.html:1063
+msgid "Find friends to start chatting"
+msgstr "Finden Sie Freunde, um zu chatten"
+
+#: .\templates\chat\dashboard.html:1181 .\templates\chat\private_chat.html:64
+#: .\templates\chat\private_chat.html:330
+#: .\templates\chat\private_chat.html:348
+#: .\templates\chat\private_chat.html:1363
+#: .\templates\chat\private_chat.html:1365
+#: .\templates\chat\private_chat.html:1370
+msgid "Online"
+msgstr "Online"
+
+#: .\templates\chat\dashboard.html:1185 .\templates\chat\private_chat.html:330
+#: .\templates\chat\private_chat.html:348
+#: .\templates\chat\private_chat.html:1386
+msgid "Offline"
+msgstr "Offline"
+
+#: .\templates\chat\private_chat.html:3
+msgid "Chat with"
+msgstr "Chatten mit"
+
+#: .\templates\chat\private_chat.html:66
+#: .\templates\chat\private_chat.html:1379
+msgid "Was"
+msgstr "War"
+
+#: .\templates\chat\private_chat.html:66
+#: .\templates\chat\private_chat.html:1379 .\templates\friends\friends.html:117
+msgid "ago"
+msgstr "vor"
+
+#: .\templates\chat\private_chat.html:79 .\templates\chat\private_chat.html:304
+msgid "User Info"
+msgstr "Benutzerinfo"
+
+#: .\templates\chat\private_chat.html:85
+msgid "Block"
+msgstr "Blockieren"
+
+#: .\templates\chat\private_chat.html:89 .\templates\chat\private_chat.html:374
+#: .\templates\chat\route_chat.html:90 .\templates\chat\route_chat.html:319
+msgid "Refresh Chat"
+msgstr "Chat aktualisieren"
+
+#: .\templates\chat\private_chat.html:92 .\templates\chat\private_chat.html:377
+#: .\templates\chat\route_chat.html:93 .\templates\chat\route_chat.html:322
+msgid "All Chats"
+msgstr "Alle Chats"
+
+#: .\templates\chat\private_chat.html:128
+#: .\templates\chat\private_chat.html:1008
+msgid "Image"
+msgstr "Bild"
+
+#: .\templates\chat\private_chat.html:131
+#: .\templates\chat\private_chat.html:1011
+msgid "Failed to load image"
+msgstr "Bild konnte nicht geladen werden"
+
+#: .\templates\chat\private_chat.html:138
+#: .\templates\chat\private_chat.html:1023
+#: .\templates\chat\private_chat.html:1235
+msgid "Your browser does not support video."
+msgstr "Ihr Browser unterstützt kein Video."
+
+#: .\templates\chat\private_chat.html:145
+#: .\templates\chat\private_chat.html:1035
+msgid "Your browser does not support audio."
+msgstr "Ihr Browser unterstützt kein Audio."
+
+#: .\templates\chat\private_chat.html:177
+#: .\templates\chat\private_chat.html:1124
+msgid "Start a conversation"
+msgstr "Konversation starten"
+
+#: .\templates\chat\private_chat.html:178
+#: .\templates\chat\private_chat.html:1125
+msgid "Send your first message to"
+msgstr "Senden Sie Ihre erste Nachricht an"
+
+#: .\templates\chat\private_chat.html:184 .\templates\chat\route_chat.html:165
+#: .\templates\routes\route_editor.html:2094
+msgid "Loading..."
+msgstr "Laden..."
+
+#: .\templates\chat\private_chat.html:186 .\templates\chat\route_chat.html:167
+msgid "Loading messages..."
+msgstr "Nachrichten werden geladen..."
+
+#: .\templates\chat\private_chat.html:192 .\templates\chat\route_chat.html:174
+msgid "is typing"
+msgstr "tippt"
+
+#: .\templates\chat\private_chat.html:226
+msgid "Video"
+msgstr "Video"
+
+#: .\templates\chat\private_chat.html:232
+msgid "Audio"
+msgstr "Audio"
+
+#: .\templates\chat\private_chat.html:241
+msgid "Write a message..."
+msgstr "Nachricht schreiben..."
+
+#: .\templates\chat\private_chat.html:281
+msgid "Recording voice message..."
+msgstr "Sprachnachricht aufnehmen..."
+
+#: .\templates\chat\private_chat.html:292 .\templates\chat\route_chat.html:212
+msgid "Connecting..."
+msgstr "Verbinden..."
+
+#: .\templates\chat\private_chat.html:326
+msgid "Waylines user"
+msgstr "Waylines-Benutzer"
+
+#: .\templates\chat\private_chat.html:335
+msgid "General Info"
+msgstr "Allgemeine Info"
+
+#: .\templates\chat\private_chat.html:352
+msgid "In chat since"
+msgstr "Im Chat seit"
+
+#: .\templates\chat\private_chat.html:358 .\templates\chat\route_chat.html:290
+msgid "Actions"
+msgstr "Aktionen"
+
+#: .\templates\chat\private_chat.html:367
+msgid "Shared Route"
+msgstr "Geteilte Route"
+
+#: .\templates\chat\private_chat.html:791
+#: .\templates\chat\private_chat.html:818 .\templates\chat\route_chat.html:881
+msgid "Connected"
+msgstr "Verbunden"
+
+#: .\templates\chat\private_chat.html:793 .\templates\chat\route_chat.html:885
+msgid "Connection failed"
+msgstr "Verbindung fehlgeschlagen"
+
+#: .\templates\chat\private_chat.html:794
+msgid "Failed to connect to chat"
+msgstr "Verbindung zum Chat fehlgeschlagen"
+
+#: .\templates\chat\private_chat.html:820
+msgid "Reconnecting..."
+msgstr "Wiederverbinden..."
+
+#: .\templates\chat\private_chat.html:871 .\templates\chat\route_chat.html:1001
+msgid "Failed to load message history"
+msgstr "Nachrichtenverlauf konnte nicht geladen werden"
+
+#: .\templates\chat\private_chat.html:876
+msgid "Message is sending..."
+msgstr "Nachricht wird gesendet..."
+
+#: .\templates\chat\private_chat.html:890
+msgid "Failed to upload media file"
+msgstr "Mediendatei konnte nicht hochgeladen werden"
+
+#: .\templates\chat\private_chat.html:943
+msgid "Network error"
+msgstr "Netzwerkfehler"
+
+#: .\templates\chat\private_chat.html:951
+msgid "Failed to upload file"
+msgstr "Datei konnte nicht hochgeladen werden"
+
+#: .\templates\chat\private_chat.html:997 .\templates\chat\route_chat.html:747
+msgid "You"
+msgstr "Sie"
+
+#: .\templates\chat\private_chat.html:1170
+msgid "Enter a message or attach a file"
+msgstr "Nachricht eingeben oder Datei anhängen"
+
+#: .\templates\chat\private_chat.html:1175
+msgid "Chat is not initialized. Please refresh the page."
+msgstr "Chat ist nicht initialisiert. Bitte Seite aktualisieren."
+
+#: .\templates\chat\private_chat.html:1207
+msgid "Unsupported file type"
+msgstr "Nicht unterstützter Dateityp"
+
+#: .\templates\chat\private_chat.html:1212
+msgid "File is too large. Maximum size: 10MB"
+msgstr "Datei ist zu groß. Maximale Größe: 10 MB"
+
+#: .\templates\chat\private_chat.html:1226
+msgid "Preview"
+msgstr "Vorschau"
+
+#: .\templates\chat\private_chat.html:1319
+msgid "Chat refreshed"
+msgstr "Chat aktualisiert"
+
+#: .\templates\chat\private_chat.html:1321
+msgid "Chat is not initialized"
+msgstr "Chat ist nicht initialisiert"
+
+#: .\templates\chat\private_chat.html:1325
+msgid "Are you sure you want to block"
+msgstr "Sind Sie sicher, dass Sie blockieren möchten"
+
+#: .\templates\chat\private_chat.html:1326
+msgid "Block feature is under development"
+msgstr "Block-Funktion ist in Entwicklung"
+
+#: .\templates\chat\private_chat.html:1330
+msgid "Shared route feature is under development"
+msgstr "Route-Teilungsfunktion ist in Entwicklung"
+
+#: .\templates\chat\private_chat.html:1396
+msgid "just now"
+msgstr "gerade eben"
+
+#: .\templates\chat\private_chat.html:1397
+#: .\templates\routes\partials\route_card.html:232
+#: .\templates\routes\route_detail.html:506
+msgid "min"
+msgstr "Min."
+
+#: .\templates\chat\private_chat.html:1398
+#: .\templates\routes\partials\route_card.html:230
+#: .\templates\routes\route_detail.html:504
+msgid "h"
+msgstr "Std."
+
+#: .\templates\chat\private_chat.html:1399
+#: .\templates\routes\partials\route_card.html:227
+#: .\templates\routes\route_detail.html:501
+msgid "d"
+msgstr "T."
+
+#: .\templates\chat\route_chat.html:4 .\templates\routes\route_detail.html:414
+#: .\templates\routes\route_detail.html:773
+msgid "Route Chat"
+msgstr "Routen-Chat"
+
+#: .\templates\chat\route_chat.html:56 .\templates\chat\route_chat.html:311
+msgid "Route Chat:"
+msgstr "Routen-Chat:"
+
+#: .\templates\chat\route_chat.html:60
+msgid "Author:"
+msgstr "Autor:"
+
+#: .\templates\chat\route_chat.html:68 .\templates\chat\route_chat.html:155
+#: .\templates\chat\route_chat.html:272 .\templates\chat\route_chat.html:813
+#: .\templates\profile\profile.html:85 .\templates\profile\profile.html:257
+#: .\templates\routes\partials\route_card.html:217
+msgid "km"
+msgstr "km"
+
+#: .\templates\chat\route_chat.html:80
+msgid "Route Info"
+msgstr "Routeninfo"
+
+#: .\templates\chat\route_chat.html:83 .\templates\chat\route_chat.html:255
+#: .\templates\chat\route_chat.html:294
+msgid "Route Details"
+msgstr "Routendetails"
+
+#: .\templates\chat\route_chat.html:86 .\templates\chat\route_chat.html:297
+msgid "Author Profile"
+msgstr "Autorprofil"
+
+#: .\templates\chat\route_chat.html:104 .\templates\chat\route_chat.html:210
+#: .\templates\chat\route_chat.html:227 .\templates\chat\route_chat.html:782
+msgid "Route:"
+msgstr "Route:"
+
+#: .\templates\chat\route_chat.html:107 .\templates\chat\route_chat.html:785
+msgid "Route discussion • Author:"
+msgstr "Routendiskussion • Autor:"
+
+#: .\templates\chat\route_chat.html:145 .\templates\chat\route_chat.html:803
+msgid "Start the route discussion"
+msgstr "Routendiskussion starten"
+
+#: .\templates\chat\route_chat.html:146 .\templates\chat\route_chat.html:804
+msgid "Send the first message in the route chat"
+msgstr "Senden Sie die erste Nachricht im Routen-Chat"
+
+#: .\templates\chat\route_chat.html:190
+msgid "Write a message in the route chat"
+msgstr "Nachricht im Routen-Chat schreiben"
+
+#: .\templates\chat\route_chat.html:249
+msgid "Active route"
+msgstr "Aktive Route"
+
+#: .\templates\chat\route_chat.html:249 .\templates\profile\profile.html:260
+#: .\templates\routes\my_routes.html:52
+#: .\templates\routes\partials\route_card.html:43
+#: .\templates\routes\route_detail.html:840
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: .\templates\chat\route_chat.html:270
+#: .\templates\routes\route_detail.html:490
+#: .\templates\routes\route_editor.html:64
+msgid "Distance"
+msgstr "Distanz"
+
+#: .\templates\chat\route_chat.html:301 .\templates\routes\route_editor.html:21
+msgid "Edit Route"
+msgstr "Route bearbeiten"
+
+#: .\templates\chat\route_chat.html:313
+msgid "Discuss route details"
+msgstr "Routendetails diskutieren"
+
+#: .\templates\chat\route_chat.html:915
+msgid "user(s)"
+msgstr "Benutzer"
+
+#: .\templates\chat\route_chat.html:953
+msgid "Failed to send message:"
+msgstr "Nachricht konnte nicht gesendet werden:"
+
+#: .\templates\chat\route_chat.html:1016
+msgid "Firebase is not loaded"
+msgstr "Firebase ist nicht geladen"
+
+#: .\templates\chat\route_chat.html:1062
+msgid "Please enter a message"
+msgstr "Bitte geben Sie eine Nachricht ein"
+
+#: .\templates\chat\route_chat.html:1066
+msgid "Chat is not ready"
+msgstr "Chat ist nicht bereit"
+
+#: .\templates\chat\route_chat.html:1095
+msgid "Chat for route"
+msgstr "Chat für Route"
+
+#: .\templates\chat\route_chat.html:1095
+msgid "refreshed"
+msgstr "aktualisiert"
+
+#: .\templates\friends\find_friends.html:4
+msgid "Find Friends - Waylines"
+msgstr "Freunde finden - Waylines"
+
+#: .\templates\friends\find_friends.html:11
+msgid "Find users and add them as friends"
+msgstr "Benutzer finden und als Freunde hinzufügen"
+
+#: .\templates\friends\find_friends.html:20
+msgid "Enter username..."
+msgstr "Benutzernamen eingeben..."
+
+#: .\templates\friends\find_friends.html:54 .\templates\friends\friends.html:49
+#: .\templates\home.html:25
+msgid "routes"
+msgstr "Routen"
+
+#: .\templates\friends\find_friends.html:60
+#: .\templates\profile\user_profile.html:115
+msgid "Friend"
+msgstr "Freund"
+
+#: .\templates\friends\find_friends.html:64
+msgid "Awaiting Response"
+msgstr "Warte auf Antwort"
+
+#: .\templates\friends\find_friends.html:66
+#: .\templates\profile\user_profile.html:127
+msgid "Request Sent"
+msgstr "Anfrage gesendet"
+
+#: .\templates\friends\find_friends.html:69 .\users\models.py:11
+msgid "Rejected"
+msgstr "Abgelehnt"
+
+#: .\templates\friends\find_friends.html:72
+#: .\templates\routes\route_editor.html:299
+#: .\templates\routes\route_editor.html:1316
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: .\templates\friends\find_friends.html:87
+msgid "No users found"
+msgstr "Keine Benutzer gefunden"
+
+#: .\templates\friends\find_friends.html:88
+msgid "Try a different search query"
+msgstr "Versuchen Sie eine andere Suchanfrage"
+
+#: .\templates\friends\find_friends.html:91
+msgid "Start your search"
+msgstr "Beginnen Sie Ihre Suche"
+
+#: .\templates\friends\find_friends.html:92
+msgid "Enter a username in the search field above"
+msgstr "Geben Sie einen Benutzernamen in das Suchfeld oben ein"
+
+#: .\templates\friends\friends.html:4
+msgid "Friends - Waylines"
+msgstr "Freunde - Waylines"
+
+#: .\templates\friends\friends.html:13
+msgid "Your friends and their routes"
+msgstr "Ihre Freunde und ihre Routen"
+
+#: .\templates\friends\friends.html:72
+msgid "Remove Friend"
+msgstr "Freund entfernen"
+
+#: .\templates\friends\friends.html:87
+msgid "You don't have any friends yet"
+msgstr "Sie haben noch keine Freunde"
+
+#: .\templates\friends\friends.html:88
+msgid "Find friends to see their routes and share yours"
+msgstr "Finden Sie Freunde, um ihre Routen zu sehen und Ihre zu teilen"
+
+#: .\templates\friends\friends.html:100
+msgid "Friend Requests"
+msgstr "Freundschaftsanfragen"
+
+#: .\templates\friends\friends.html:122
+msgid "Accept"
+msgstr "Akzeptieren"
+
+#: .\templates\friends\friends.html:125
+msgid "Reject"
+msgstr "Ablehnen"
+
+#: .\templates\friends\friends.html:136 .\templates\profile\profile.html:68
+msgid "Statistics"
+msgstr "Statistiken"
+
+#: .\templates\friends\friends.html:140
+msgid "Total Friends"
+msgstr "Gesamte Freunde"
+
+#: .\templates\friends\friends.html:144
+msgid "Pending Requests"
+msgstr "Ausstehende Anfragen"
+
+#: .\templates\home.html:4
+msgid "Home - Waylines"
+msgstr "Startseite - Waylines"
+
+#: .\templates\home.html:19
+msgid "Travel. It's worth it."
+msgstr "Reisen. Es lohnt sich."
+
+#: .\templates\home.html:24
+msgid "Discover new"
+msgstr "Entdecken Sie neue"
+
+#: .\templates\home.html:26
+msgid "for your adventures"
+msgstr "für Ihre Abenteuer"
+
+#: .\templates\home.html:30
+msgid ""
+"Create, save, and share the best routes with a community of travelers. Find "
+"inspiration in every direction."
+msgstr "Erstellen, speichern und teilen Sie die besten Routen mit einer Gemeinschaft von Reisenden. Finden Sie Inspiration in jede Richtung."
+
+#: .\templates\home.html:39 .\templates\home.html:204 .\templates\home.html:225
+#: .\templates\home.html:246
+msgid "Explore"
+msgstr "Erkunden"
+
+#: .\templates\home.html:43
+msgid "Get started for free"
+msgstr "Kostenlos starten"
+
+#: .\templates\home.html:46
+msgid "Demo tour"
+msgstr "Demo-Tour"
+
+#: .\templates\home.html:62
+msgid "Travelers"
+msgstr "Reisende"
+
+#: .\templates\home.html:68
+msgid "Countries"
+msgstr "Länder"
+
+#: .\templates\home.html:80
+msgid "Travel"
+msgstr "Reisen"
+
+#: .\templates\home.html:86
+msgid "Mountain trails"
+msgstr "Bergpfade"
+
+#: .\templates\home.html:93
+msgid "City routes"
+msgstr "Stadtrouten"
+
+#: .\templates\home.html:100
+msgid "Coastal paths"
+msgstr "Küstenwege"
+
+#: .\templates\home.html:107
+msgid "Forest trails"
+msgstr "Waldwege"
+
+#: .\templates\home.html:114
+msgid "Beach routes"
+msgstr "Strandrouten"
+
+#: .\templates\home.html:121
+msgid "Camping"
+msgstr "Camping"
+
+#: .\templates\home.html:128
+msgid "Historic paths"
+msgstr "Historische Wege"
+
+#: .\templates\home.html:143
+msgid "Popular"
+msgstr "Beliebt"
+
+#: .\templates\home.html:146
+msgid "Explore the best routes"
+msgstr "Entdecken Sie die besten Routen"
+
+#: .\templates\home.html:147
+msgid "The most saved and recommended routes from the community"
+msgstr "Die meistgespeicherten und empfohlenen Routen der Community"
+
+#: .\templates\home.html:161
+msgid "No routes yet"
+msgstr "Noch keine Routen"
+
+#: .\templates\home.html:162
+msgid "Be the first explorer and create the first route!"
+msgstr "Seien Sie der erste Entdecker und erstellen Sie die erste Route!"
+
+#: .\templates\home.html:176
+msgid "View all routes"
+msgstr "Alle Routen anzeigen"
+
+#: .\templates\home.html:185
+msgid "Choose your travel style"
+msgstr "Wählen Sie Ihren Reise-Stil"
+
+#: .\templates\home.html:186
+msgid "Routes for any mood and activity"
+msgstr "Routen für jede Stimmung und Aktivität"
+
+#: .\templates\home.html:201 .\templates\home.html:222
+#: .\templates\home.html:243
+#, python-format
+msgid "%(count)s route"
+msgid_plural "%(count)s routes"
+msgstr[0] "%(count)s Route"
+msgstr[1] "%(count)s Routen"
+
+#: .\templates\home.html:259
+msgid "Start your journey"
+msgstr "Starten Sie Ihre Reise"
+
+#: .\templates\home.html:261
+msgid "Join the traveler community and discover the world in a new way"
+msgstr "Treten Sie der Reisenden-Community bei und entdecken Sie die Welt auf neue Weise"
+
+#: .\templates\home.html:270
+msgid "Find inspiration"
+msgstr "Inspiration finden"
+
+#: .\templates\home.html:274
+msgid "Join for free"
+msgstr "Kostenlos beitreten"
+
+#: .\templates\home.html:277
+msgid "Watch demo"
+msgstr "Demo ansehen"
+
+#: .\templates\interactions\comments.html:20
+msgid "Write your comment..."
+msgstr "Schreiben Sie Ihren Kommentar..."
+
+#: .\templates\interactions\comments.html:24
+msgid "Post"
+msgstr "Beitrag"
+
+#: .\templates\interactions\comments.html:32
+#: .\templates\registration\login.html:4 .\templates\registration\login.html:13
+#: .\templates\registration\login.html:80
+#: .\templates\registration\register.html:182
+msgid "Sign in"
+msgstr "Anmelden"
+
+#: .\templates\interactions\comments.html:32
+msgid "to leave a comment."
+msgstr "um einen Kommentar zu hinterlassen."
+
+#: .\templates\interactions\comments.html:203
+msgid "Sending..."
+msgstr "Wird gesendet..."
+
+#: .\templates\interactions\comments.html:207
+msgid "Please enter a comment"
+msgstr "Bitte geben Sie einen Kommentar ein"
+
+#: .\templates\interactions\comments.html:230
+#: .\templates\interactions\comments.html:283
+msgid "Invalid server response"
+msgstr "Ungültige Serverantwort"
+
+#: .\templates\interactions\comments.html:243
+#: .\templates\interactions\comments.html:246
+#: .\templates\interactions\comments.html:294
+#: .\templates\interactions\comments.html:297
+#: .\templates\routes\modals\point_editor_modal.html:1002
+msgid "Error:"
+msgstr "Fehler:"
+
+#: .\templates\interactions\comments.html:243
+#: .\templates\interactions\comments.html:294
+#: .\templates\routes\modals\point_editor_modal.html:1001
+msgid "Unknown error"
+msgstr "Unbekannter Fehler"
+
+#: .\templates\interactions\comments.html:260
+msgid "Are you sure you want to delete this comment?"
+msgstr "Sind Sie sicher, dass Sie diesen Kommentar löschen möchten?"
+
+#: .\templates\profile\profile.html:4
+msgid "Profile - Waylines"
+msgstr "Profil - Waylines"
+
+#: .\templates\profile\profile.html:54 .\templates\profile\user_profile.html:85
+msgid "km traveled"
+msgstr "km gereist"
+
+#: .\templates\profile\profile.html:60
+msgid "Public profile"
+msgstr "Öffentliches Profil"
+
+#: .\templates\profile\profile.html:72
+msgid "Registered"
+msgstr "Registriert"
+
+#: .\templates\profile\profile.html:76
+msgid "Total routes"
+msgstr "Gesamte Routen"
+
+#: .\templates\profile\profile.html:84
+msgid "Total distance"
+msgstr "Gesamtdistanz"
+
+#: .\templates\profile\profile.html:94
+msgid "Edit profile"
+msgstr "Profil bearbeiten"
+
+#: .\templates\profile\profile.html:98
+#, python-format
+msgid "Username change available in %(days)s days"
+msgstr "Benutzernamenänderung verfügbar in %(days)s Tagen"
+
+#: .\templates\profile\profile.html:109 .\templates\registration\login.html:40
+#: .\templates\registration\register.html:41
+msgid "Username"
+msgstr "Benutzername"
+
+#: .\templates\profile\profile.html:118
+msgid "Only letters, digits, and underscores allowed"
+msgstr "Nur Buchstaben, Ziffern und Unterstriche erlaubt"
+
+#: .\templates\profile\profile.html:122
+msgid "Only letters, digits, and underscores (_). Maximum 150 characters."
+msgstr "Nur Buchstaben, Ziffern und Unterstriche (_). Maximal 150 Zeichen."
+
+#: .\templates\profile\profile.html:125
+msgid "Username can be changed once every 30 days"
+msgstr "Benutzername kann alle 30 Tage geändert werden"
+
+#: .\templates\profile\profile.html:130
+#, python-format
+msgid ""
+"\n"
+"                        You will be able to change your username in %(days)s "
+"days\n"
+"                      "
+msgstr ""
+"\n"
+"                        Sie können Ihren Benutzernamen in %(days)s Tändern ändern\n"
+"                      "
+
+#: .\templates\profile\profile.html:141
+#: .\templates\registration\register.html:62 .\users\forms.py:10
+#: .\users\forms.py:41
+msgid "Email"
+msgstr "E-Mail"
+
+#: .\templates\profile\profile.html:147
+msgid "Notifications will be sent to this email"
+msgstr "Benachrichtigungen werden an diese E-Mail gesendet"
+
+#: .\templates\profile\profile.html:155
+#: .\templates\registration\register.html:82
+msgid "First name"
+msgstr "Vorname"
+
+#: .\templates\profile\profile.html:165
+#: .\templates\registration\register.html:99
+msgid "Last name"
+msgstr "Nachname"
+
+#: .\templates\profile\profile.html:176 .\users\models.py:52
+msgid "Avatar"
+msgstr "Avatar"
+
+#: .\templates\profile\profile.html:191
+msgid "Remove current avatar"
+msgstr "Aktuellen Avatar entfernen"
+
+#: .\templates\profile\profile.html:199
+msgid "About me"
+msgstr "Über mich"
+
+#: .\templates\profile\profile.html:204
+msgid "Tell us about yourself..."
+msgstr "Erzählen Sie uns von sich..."
+
+#: .\templates\profile\profile.html:210 .\users\models.py:53
+msgid "Location"
+msgstr "Standort"
+
+#: .\templates\profile\profile.html:216
+msgid "City, country"
+msgstr "Stadt, Land"
+
+#: .\templates\profile\profile.html:221
+#: .\templates\profile\user_profile.html:63 .\users\models.py:54
+msgid "Website"
+msgstr "Webseite"
+
+#: .\templates\profile\profile.html:233
+#: .\templates\profile\user_profile.html:132
+#: .\templates\routes\modals\delete_confirm_modal.html:17
+#: .\templates\routes\modals\delete_route_modal.html:102
+#: .\templates\routes\modals\point_editor_modal.html:462
+#: .\templates\routes\modals\reset_confirm_modal.html:17
+#: .\templates\routes\partials\route_card.html:291
+#: .\templates\routes\partials\route_card.html:319
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: .\templates\profile\profile.html:234
+msgid "Save changes"
+msgstr "Änderungen speichern"
+
+#: .\templates\profile\profile.html:242
+msgid "Recent routes"
+msgstr "Letzte Routen"
+
+#: .\templates\profile\profile.html:269
+msgid "You don't have any routes yet"
+msgstr "Sie haben noch keine Routen"
+
+#: .\templates\profile\profile.html:270
+msgid "Create your first route"
+msgstr "Erstellen Sie Ihre erste Route"
+
+#: .\templates\profile\profile.html:316
+msgid "Username is required"
+msgstr "Benutzername ist erforderlich"
+
+#: .\templates\profile\profile.html:322
+msgid "Maximum length is 150 characters"
+msgstr "Maximale Länge beträgt 150 Zeichen"
+
+#: .\templates\profile\profile.html:328
+msgid "Only Latin letters, digits, and underscores (_) are allowed"
+msgstr "Nur lateinische Buchstaben, Ziffern und Unterstriche (_) sind erlaubt"
+
+#: .\templates\profile\profile.html:334
+msgid "Minimum length is 3 characters"
+msgstr "Mindestlänge beträgt 3 Zeichen"
+
+#: .\templates\profile\profile.html:371
+msgid "This username is already taken"
+msgstr "Dieser Benutzername ist bereits vergeben"
+
+#: .\templates\profile\profile.html:374
+msgid "Username is available"
+msgstr "Benutzername ist verfügbar"
+
+#: .\templates\profile\profile.html:396
+msgid ""
+"Warning! After changing your username:\\\\n\\\\n1. You will need to use the "
+"new username to log in\\\\n2. Your profile link will change\\\\n3. Friends "
+"may not find you immediately by the new name\\\\n4. Next change will be "
+"available in 30 days\\\\n\\\\nAre you sure you want to change your username?"
+msgstr "Warnung! Nach der Änderung Ihres Benutzernamens:\\\\n\\\\n1. Sie müssen den neuen Benutzernamen zum Anmelden verwenden\\\\n2. Ihr Profillink ändert sich\\\\n3. Freunde finden Sie möglicherweise nicht sofort unter dem neuen Namen\\\\n4. Die nächste Änderung ist in 30 Tagen verfügbar\\\\n\\\\nSind Sie sicher, dass Sie Ihren Benutzernamen ändern möchten?"
+
+#: .\templates\profile\profile.html:413
+#, python-format
+msgid ""
+"Username can only be changed once every 30 days. Next change will be "
+"available in %(days)s days."
+msgstr "Benutzername kann nur alle 30 Tage geändert werden. Die nächste Änderung ist in %(days)s Tagen verfügbar."
+
+#: .\templates\profile\user_profile.html:4
+#, python-format
+msgid "%(username)s's Profile - Waylines"
+msgstr "%(username)s's Profil - Waylines"
+
+#: .\templates\profile\user_profile.html:9
+#, python-format
+msgid "%(username)s's Profile"
+msgstr "%(username)s's Profil"
+
+#: .\templates\profile\user_profile.html:96
+msgid "Private Routes"
+msgstr "Private Routen"
+
+#: .\templates\profile\user_profile.html:98
+#, python-format
+msgid ""
+"\n"
+"                      You have %(count)s private route.\n"
+"                    "
+msgid_plural ""
+"\n"
+"                      You have %(count)s private routes.\n"
+"                    "
+msgstr[0] ""
+"\n"
+"                      Sie haben %(count)s private Route.\n"
+"                    "
+msgstr[1] ""
+"\n"
+"                      Sie haben %(count)s private Routen.\n"
+"                    "
+
+#: .\templates\profile\user_profile.html:103
+#: .\templates\routes\partials\route_card.html:98
+msgid "View"
+msgstr "Ansehen"
+
+#: .\templates\profile\user_profile.html:119
+msgid "Remove from friends?"
+msgstr "Aus Freunden entfernen?"
+
+#: .\templates\profile\user_profile.html:141
+msgid "Accept Request"
+msgstr "Anfrage akzeptieren"
+
+#: .\templates\profile\user_profile.html:155
+msgid "Add Friend"
+msgstr "Freund hinzufügen"
+
+#: .\templates\profile\user_profile.html:165
+msgid "Edit Profile"
+msgstr "Profil bearbeiten"
+
+#: .\templates\profile\user_profile.html:176
+#, python-format
+msgid "Member since %(date)s"
+msgstr "Mitglied seit %(date)s"
+
+#: .\templates\profile\user_profile.html:187
+#, python-format
+msgid ""
+"\n"
+"                %(username)s's Friend\n"
+"              "
+msgid_plural ""
+"\n"
+"                %(username)s's Friends\n"
+"              "
+msgstr[0] ""
+"\n"
+"                %(username)s's Freund\n"
+"              "
+msgstr[1] ""
+"\n"
+"                %(username)s's Freunde\n"
+"              "
+
+#: .\templates\profile\user_profile.html:222
+#, python-format
+msgid "Show all (%(count)s)"
+msgstr "Alle anzeigen (%(count)s)"
+
+#: .\templates\profile\user_profile.html:250
+msgid "You don't have any public routes yet"
+msgstr "Sie haben noch keine öffentlichen Routen"
+
+#: .\templates\profile\user_profile.html:252
+#, python-format
+msgid "%(username)s hasn't published any public routes yet"
+msgstr "%(username)s hat noch keine öffentlichen Routen veröffentlicht"
+
+#: .\templates\profile\user_profile.html:257
+msgid "Create your first route and share it with the community!"
+msgstr "Erstellen Sie Ihre erste Route und teilen Sie sie mit der Community!"
+
+#: .\templates\profile\user_profile.html:259
+msgid "This user hasn't published any routes yet"
+msgstr "Dieser Benutzer hat noch keine Routen veröffentlicht"
+
+#: .\templates\registration\login.html:14
+msgid "Enter your credentials to sign in"
+msgstr "Geben Sie Ihre Zugangsdaten zum Anmelden ein"
+
+#: .\templates\registration\login.html:22
+#: .\templates\registration\register.html:22
+#: .\templates\routes\modals\delete_route_modal.html:12
+#: .\templates\routes\modals\delete_route_modal.html:108
+#: .\templates\routes\route_editor.html:1421
+msgid "Close"
+msgstr "Schließen"
+
+#: .\templates\registration\login.html:45
+msgid "Enter your username"
+msgstr "Geben Sie Ihren Benutzernamen ein"
+
+#: .\templates\registration\login.html:58
+#: .\templates\registration\register.html:118
+msgid "Password"
+msgstr "Passwort"
+
+#: .\templates\registration\login.html:63
+msgid "Enter your password"
+msgstr "Geben Sie Ihr Passwort ein"
+
+#: .\templates\registration\login.html:76
+msgid "Remember me"
+msgstr "Angemeldet bleiben"
+
+#: .\templates\registration\login.html:84
+msgid "Don't have an account?"
+msgstr "Noch kein Konto?"
+
+#: .\templates\registration\login.html:85
+#: .\templates\registration\register.html:4
+#: .\templates\registration\register.html:13
+#: .\templates\registration\register.html:177
+msgid "Sign up"
+msgstr "Registrieren"
+
+#: .\templates\registration\logout.html:4
+msgid "Signed out"
+msgstr "Abgemeldet"
+
+#: .\templates\registration\logout.html:15
+msgid "You have been successfully signed out"
+msgstr "Sie wurden erfolgreich abgemeldet"
+
+#: .\templates\registration\logout.html:16
+msgid "Thank you for using our service"
+msgstr "Vielen Dank für die Nutzung unseres Dienstes"
+
+#: .\templates\registration\logout.html:19
+msgid "Sign in again"
+msgstr "Erneut anmelden"
+
+#: .\templates\registration\logout.html:20
+msgid "Go to homepage"
+msgstr "Zur Startseite gehen"
+
+#: .\templates\registration\register.html:14
+msgid "Create a new account"
+msgstr "Neues Konto erstellen"
+
+#: .\templates\registration\register.html:46
+msgid "Choose a username"
+msgstr "Wählen Sie einen Benutzernamen"
+
+#: .\templates\registration\register.html:57
+msgid "Letters, digits and @/./+/-/_ only"
+msgstr "Nur Buchstaben, Ziffern und @/./+/-/_"
+
+#: .\templates\registration\register.html:67
+msgid "Enter your email"
+msgstr "Geben Sie Ihre E-Mail ein"
+
+#: .\templates\registration\register.html:87
+msgid "Your first name"
+msgstr "Ihr Vorname"
+
+#: .\templates\registration\register.html:104
+msgid "Your last name"
+msgstr "Ihr Nachname"
+
+#: .\templates\registration\register.html:123
+msgid "Create a password"
+msgstr "Passwort erstellen"
+
+#: .\templates\registration\register.html:133
+msgid ""
+"Your password must contain at least 8 characters, can't be too common, and "
+"can't be entirely numeric."
+msgstr "Ihr Passwort muss mindestens 8 Zeichen enthalten, darf nicht zu allgemein sein und darf nicht nur aus Zahlen bestehen."
+
+#: .\templates\registration\register.html:138
+msgid "Confirm password"
+msgstr "Passwort bestätigen"
+
+#: .\templates\registration\register.html:143
+msgid "Repeat password"
+msgstr "Passwort wiederholen"
+
+#: .\templates\registration\register.html:164
+msgid ""
+"I agree to the <a href=\"#\">Terms of Service</a> and <a href=\"#\">Privacy "
+"Policy</a>"
+msgstr "Ich stimme den <a href=\"#\">Nutzungsbedingungen</a> und der <a href=\"#\">Datenschutzrichtlinie</a> zu"
+
+#: .\templates\registration\register.html:181
+msgid "Already have an account?"
+msgstr "Bereits ein Konto?"
+
+#: .\templates\routes\all_routes.html:4
+msgid "All Routes - Waylines"
+msgstr "Alle Routen - Waylines"
+
+#: .\templates\routes\all_routes.html:24
+#: .\templates\routes\filtered_routes.html:32
+#, python-format
+msgid ""
+"\n"
+"          Found %(count)s route\n"
+"        "
+msgid_plural ""
+"\n"
+"          Found %(count)s routes\n"
+"        "
+msgstr[0] ""
+"\n"
+"          %(count)s Route gefunden\n"
+"        "
+msgstr[1] ""
+"\n"
+"          %(count)s Routen gefunden\n"
+"        "
+
+#: .\templates\routes\all_routes.html:37
+#: .\templates\routes\filtered_routes.html:49
+#: .\templates\routes\search_results.html:71
+msgid "Filters"
+msgstr "Filter"
+
+#: .\templates\routes\all_routes.html:45
+#: .\templates\routes\filtered_routes.html:57
+msgid "Name, description..."
+msgstr "Name, Beschreibung..."
+
+#: .\templates\routes\all_routes.html:51
+#: .\templates\routes\filtered_routes.html:63
+#: .\templates\routes\search_results.html:87
+msgid "All types"
+msgstr "Alle Typen"
+
+#: .\templates\routes\all_routes.html:62
+#: .\templates\routes\filtered_routes.html:74
+msgid "Sort by"
+msgstr "Sortieren nach"
+
+#: .\templates\routes\all_routes.html:65
+#: .\templates\routes\filtered_routes.html:77
+#: .\templates\routes\search_results.html:49
+msgid "Newest first"
+msgstr "Neueste zuerst"
+
+#: .\templates\routes\all_routes.html:68
+#: .\templates\routes\filtered_routes.html:80
+msgid "By popularity"
+msgstr "Nach Beliebtheit"
+
+#: .\templates\routes\all_routes.html:71
+#: .\templates\routes\filtered_routes.html:83
+#: .\templates\routes\search_results.html:55
+msgid "By rating"
+msgstr "Nach Bewertung"
+
+#: .\templates\routes\all_routes.html:77
+#: .\templates\routes\filtered_routes.html:89
+msgid "Apply"
+msgstr "Anwenden"
+
+#: .\templates\routes\all_routes.html:78
+#: .\templates\routes\filtered_routes.html:90
+#: .\templates\routes\modals\reset_confirm_modal.html:19
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+#: .\templates\routes\all_routes.html:97
+#: .\templates\routes\filtered_routes.html:110
+#: .\templates\routes\search_results.html:176
+msgid "No routes found"
+msgstr "Keine Routen gefunden"
+
+#: .\templates\routes\all_routes.html:98
+#: .\templates\routes\filtered_routes.html:111
+msgid "Try adjusting your search criteria"
+msgstr "Versuchen Sie, Ihre Suchkriterien anzupassen"
+
+#: .\templates\routes\all_routes.html:99
+#: .\templates\routes\filtered_routes.html:112
+#: .\templates\routes\search_results.html:185
+#: .\templates\routes\search_results.html:197
+msgid "Reset filters"
+msgstr "Filter zurücksetzen"
+
+#: .\templates\routes\filtered_routes.html:4
+#, python-format
+msgid "%(title)s - Waylines"
+msgstr "%(title)s - Waylines"
+
+#: .\templates\routes\filtered_routes.html:22
+#: .\templates\routes\route_detail.html:383
+msgid "Home"
+msgstr "Startseite"
+
+#: .\templates\routes\modals\delete_confirm_modal.html:12
+msgid "Delete point?"
+msgstr "Punkt löschen?"
+
+#: .\templates\routes\modals\delete_confirm_modal.html:14
+msgid "will be removed from the route."
+msgstr "wird von der Route entfernt."
+
+#: .\templates\routes\modals\delete_route_modal.html:9
+#: .\templates\routes\modals\delete_route_modal.html:105
+#: .\templates\routes\route_editor.html:113
+msgid "Delete route"
+msgstr "Route löschen"
+
+#: .\templates\routes\modals\delete_route_modal.html:10
+msgid "This action is irreversible"
+msgstr "Diese Aktion ist irreversibel"
+
+#: .\templates\routes\modals\delete_route_modal.html:20
+msgid "Permanently delete this route?"
+msgstr "Diese Route dauerhaft löschen?"
+
+#: .\templates\routes\modals\delete_route_modal.html:22
+msgid "You are about to delete the route"
+msgstr "Sie sind dabei, die Route zu löschen"
+
+#: .\templates\routes\modals\delete_route_modal.html:24
+msgid "All associated data will be permanently removed."
+msgstr "Alle zugehörigen Daten werden dauerhaft entfernt."
+
+#: .\templates\routes\modals\delete_route_modal.html:32
+msgid "The following will be deleted:"
+msgstr "Folgendes wird gelöscht:"
+
+#: .\templates\routes\modals\delete_route_modal.html:34
+msgid "All route photos will be deleted from media storage"
+msgstr "Alle Routenfotos werden aus dem Medienspeicher gelöscht"
+
+#: .\templates\routes\modals\delete_route_modal.html:35
+msgid "All route points and their photos will be removed"
+msgstr "Alle Routenpunkte und ihre Fotos werden entfernt"
+
+#: .\templates\routes\modals\delete_route_modal.html:36
+msgid "All audio guides will be deleted"
+msgstr "Alle Audio-Guides werden gelöscht"
+
+#: .\templates\routes\modals\delete_route_modal.html:37
+msgid "All cache and temporary files will be cleared"
+msgstr "Alle Cache- und temporären Dateien werden gelöscht"
+
+#: .\templates\routes\modals\delete_route_modal.html:38
+msgid "This action cannot be undone"
+msgstr "Diese Aktion kann nicht rückgängig gemacht werden"
+
+#: .\templates\routes\modals\delete_route_modal.html:47
+msgid "Deletion in progress..."
+msgstr "Löschung läuft..."
+
+#: .\templates\routes\modals\delete_route_modal.html:55
+#: .\templates\routes\modals\delete_route_modal.html:182
+msgid "Starting deletion process..."
+msgstr "Löschvorgang wird gestartet..."
+
+#: .\templates\routes\modals\delete_route_modal.html:63
+msgid "Success!"
+msgstr "Erfolg!"
+
+#: .\templates\routes\modals\delete_route_modal.html:73
+msgid "Error!"
+msgstr "Fehler!"
+
+#: .\templates\routes\modals\delete_route_modal.html:84
+msgid "Please confirm deletion"
+msgstr "Bitte Löschung bestätigen"
+
+#: .\templates\routes\modals\delete_route_modal.html:86
+msgid "To delete this route, type the route name below to confirm:"
+msgstr "Um diese Route zu löschen, geben Sie den Routennamen unten zur Bestätigung ein:"
+
+#: .\templates\routes\modals\delete_route_modal.html:89
+msgid "Type route name here..."
+msgstr "Routennamen hier eingeben..."
+
+#: .\templates\routes\modals\delete_route_modal.html:92
+msgid "Route name does not match"
+msgstr "Routennamen stimmt nicht überein"
+
+#: .\templates\routes\modals\delete_route_modal.html:216
+msgid "Preparing deletion..."
+msgstr "Löschung wird vorbereitet..."
+
+#: .\templates\routes\modals\delete_route_modal.html:217
+msgid "Deleting route photos..."
+msgstr "Routenbilder werden gelöscht..."
+
+#: .\templates\routes\modals\delete_route_modal.html:218
+msgid "Removing route points..."
+msgstr "Routenpunkte werden entfernt..."
+
+#: .\templates\routes\modals\delete_route_modal.html:219
+msgid "Deleting audio guides..."
+msgstr "Audio-Guides werden gelöscht..."
+
+#: .\templates\routes\modals\delete_route_modal.html:220
+msgid "Clearing cache..."
+msgstr "Cache wird geleert..."
+
+#: .\templates\routes\modals\delete_route_modal.html:221
+msgid "Finalizing deletion..."
+msgstr "Löschung wird abgeschlossen..."
+
+#: .\templates\routes\modals\delete_route_modal.html:222
+msgid "Deletion complete!"
+msgstr "Löschung abgeschlossen!"
+
+#: .\templates\routes\modals\delete_route_modal.html:276
+msgid "Route has been successfully deleted."
+msgstr "Route wurde erfolgreich gelöscht."
+
+#: .\templates\routes\modals\delete_route_modal.html:288
+#: .\templates\routes\route_editor.html:1219
+msgid "Error deleting route"
+msgstr "Fehler beim Löschen der Route"
+
+#: .\templates\routes\modals\delete_route_modal.html:304
+msgid "An error occurred during deletion"
+msgstr "Während der Löschung ist ein Fehler aufgetreten"
+
+#: .\templates\routes\modals\point_editor_modal.html:9
+msgid "Edit Point"
+msgstr "Punkt bearbeiten"
+
+#: .\templates\routes\modals\point_editor_modal.html:21
+msgid "Point Name"
+msgstr "Punktname"
+
+#: .\templates\routes\modals\point_editor_modal.html:23
+#: .\templates\routes\modals\point_editor_modal.html:1836
+msgid "Enter point name"
+msgstr "Punktnamen eingeben"
+
+#: .\templates\routes\modals\point_editor_modal.html:31
+msgid "Select category"
+msgstr "Kategorie auswählen"
+
+#: .\templates\routes\modals\point_editor_modal.html:33
+msgid "Nature"
+msgstr "Natur"
+
+#: .\templates\routes\modals\point_editor_modal.html:35
+msgid "Bus Stop"
+msgstr "Bushaltestelle"
+
+#: .\templates\routes\modals\point_editor_modal.html:50
+msgid "Location address"
+msgstr "Standortadresse"
+
+#: .\templates\routes\modals\point_editor_modal.html:53
+msgid "Enter address manually if not detected automatically"
+msgstr "Adresse manuell eingeben, falls nicht automatisch erkannt"
+
+#: .\templates\routes\modals\point_editor_modal.html:58
+msgid "Hint Author"
+msgstr "Tipp-Autor"
+
+#: .\templates\routes\modals\point_editor_modal.html:60
+msgid "Hint author name"
+msgstr "Name des Tipp-Autors"
+
+#: .\templates\routes\modals\point_editor_modal.html:67
+msgid "Coordinates"
+msgstr "Koordinaten"
+
+#: .\templates\routes\modals\point_editor_modal.html:89
+msgid "tag1, tag2, tag3..."
+msgstr "tag1, tag2, tag3..."
+
+#: .\templates\routes\modals\point_editor_modal.html:92
+msgid "Enter tags separated by commas"
+msgstr "Tags durch Kommas getrennt eingeben"
+
+#: .\templates\routes\modals\point_editor_modal.html:99
+msgid "Point Description"
+msgstr "Punktbeschreibung"
+
+#: .\templates\routes\modals\point_editor_modal.html:101
+msgid "Tell about this place..."
+msgstr "Erzählen Sie über diesen Ort..."
+
+#: .\templates\routes\modals\point_editor_modal.html:109
+#: .\templates\routes\route_detail.html:984
+msgid "Photos"
+msgstr "Fotos"
+
+#: .\templates\routes\modals\point_editor_modal.html:119
+#: .\templates\routes\modals\point_editor_modal.html:695
+#: .\templates\routes\route_editor.html:277
+#: .\templates\routes\route_editor.html:1331
+msgid "Add Photo"
+msgstr "Foto hinzufügen"
+
+#: .\templates\routes\modals\point_editor_modal.html:120
+#: .\templates\routes\modals\point_editor_modal.html:696
+msgid "Max 5 photos"
+msgstr "Max. 5 Fotos"
+
+#: .\templates\routes\modals\point_editor_modal.html:126
+msgid "Maximum 5 photos. JPG, PNG, WebP. Max 5MB each."
+msgstr "Maximal 5 Fotos. JPG, PNG, WebP. Max. 5 MB pro Foto."
+
+#: .\templates\routes\modals\point_editor_modal.html:138
+#: .\templates\routes\modals\point_editor_modal.html:880
+#: .\templates\routes\modals\point_editor_modal.html:1365
+#: .\templates\routes\route_detail.html:711
+msgid "Point Audio Guide"
+msgstr "Punkt Audio-Guide"
+
+#: .\templates\routes\modals\point_editor_modal.html:140
+msgid "Record, upload or generate AI audio"
+msgstr "Audio aufnehmen, hochladen oder KI-Audio generieren"
+
+#: .\templates\routes\modals\point_editor_modal.html:145
+msgid "Enable Audio"
+msgstr "Audio aktivieren"
+
+#: .\templates\routes\modals\point_editor_modal.html:165
+#: .\templates\routes\route_detail.html:458
+#: .\templates\routes\route_detail.html:656
+#: .\templates\routes\route_editor.html:178
+msgid "Audio Guide"
+msgstr "Audio-Guide"
+
+#: .\templates\routes\modals\point_editor_modal.html:168
+msgid "Re-record"
+msgstr "Neu aufnehmen"
+
+#: .\templates\routes\modals\point_editor_modal.html:171
+msgid "Delete Audio"
+msgstr "Audio löschen"
+
+#: .\templates\routes\modals\point_editor_modal.html:184
+msgid "Record Audio"
+msgstr "Audio aufnehmen"
+
+#: .\templates\routes\modals\point_editor_modal.html:195
+msgid "Upload Audio"
+msgstr "Audio hochladen"
+
+#: .\templates\routes\modals\point_editor_modal.html:217
+msgid "AI Audio Generation"
+msgstr "KI-Audio-Generierung"
+
+#: .\templates\routes\modals\point_editor_modal.html:219
+msgid "Create tour text and audio guide in one click"
+msgstr "Tour-Text und Audio-Guide mit einem Klick erstellen"
+
+#: .\templates\routes\modals\point_editor_modal.html:221
+msgid "Yandex GPT + SpeechKit"
+msgstr "Yandex GPT + SpeechKit"
+
+#: .\templates\routes\modals\point_editor_modal.html:230
+msgid "Kazakh"
+msgstr "Kasachisch"
+
+#: .\templates\routes\modals\point_editor_modal.html:231
+msgid "Uzbek"
+msgstr "Usbekisch"
+
+#: .\templates\routes\modals\point_editor_modal.html:233
+msgid "German"
+msgstr "Deutsch"
+
+#: .\templates\routes\modals\point_editor_modal.html:234
+msgid "Hebrew"
+msgstr "Hebräisch"
+
+#: .\templates\routes\modals\point_editor_modal.html:239
+msgid "Voice"
+msgstr "Stimme"
+
+#: .\templates\routes\modals\point_editor_modal.html:245
+msgid "Role"
+msgstr "Rolle"
+
+#: .\templates\routes\modals\point_editor_modal.html:247
+msgid "Neutral"
+msgstr "Neutral"
+
+#: .\templates\routes\modals\point_editor_modal.html:248
+msgid "Happy"
+msgstr "Fröhlich"
+
+#: .\templates\routes\modals\point_editor_modal.html:249
+msgid "Angry"
+msgstr "Wütend"
+
+#: .\templates\routes\modals\point_editor_modal.html:257
+msgid "Speech Rate"
+msgstr "Sprachgeschwindigkeit"
+
+#: .\templates\routes\modals\point_editor_modal.html:270
+msgid "Voice Pitch"
+msgstr "Stimmlage"
+
+#: .\templates\routes\modals\point_editor_modal.html:284
+msgid "Audio Format"
+msgstr "Audio-Format"
+
+#: .\templates\routes\modals\point_editor_modal.html:312
+msgid "Generation Type"
+msgstr "Generierungsart"
+
+#: .\templates\routes\modals\point_editor_modal.html:317
+msgid "Generate Audio from Description"
+msgstr "Audio aus Beschreibung generieren"
+
+#: .\templates\routes\modals\point_editor_modal.html:323
+#: .\templates\routes\modals\point_editor_modal.html:854
+msgid "Generate Description and Audio"
+msgstr "Beschreibung und Audio generieren"
+
+#: .\templates\routes\modals\point_editor_modal.html:332
+msgid "Text for Audio Guide"
+msgstr "Text für Audio-Guide"
+
+#: .\templates\routes\modals\point_editor_modal.html:335
+msgid "Use Point Description"
+msgstr "Punktbeschreibung verwenden"
+
+#: .\templates\routes\modals\point_editor_modal.html:338
+#: .\templates\routes\modals\point_editor_modal.html:1195
+#: .\templates\routes\partials\route_card.html:107
+#: .\templates\routes\partials\route_card.html:314
+#: .\templates\routes\route_detail.html:418
+#: .\templates\routes\route_editor.html:1366
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: .\templates\routes\modals\point_editor_modal.html:351
+msgid "Load text for audio generation"
+msgstr "Text für Audio-Generierung laden"
+
+#: .\templates\routes\modals\point_editor_modal.html:352
+msgid "Click 'Use Point Description' or enter text manually"
+msgstr "Klicken Sie auf 'Punktbeschreibung verwenden' oder geben Sie Text manuell ein"
+
+#: .\templates\routes\modals\point_editor_modal.html:362
+msgid "Description Style"
+msgstr "Beschreibungsstil"
+
+#: .\templates\routes\modals\point_editor_modal.html:364
+msgid "Storytelling"
+msgstr "Geschichtenerzählend"
+
+#: .\templates\routes\modals\point_editor_modal.html:365
+msgid "Historical"
+msgstr "Historisch"
+
+#: .\templates\routes\modals\point_editor_modal.html:366
+msgid "Touristic"
+msgstr "Touristisch"
+
+#: .\templates\routes\modals\point_editor_modal.html:367
+msgid "Poetic"
+msgstr "Poetisch"
+
+#: .\templates\routes\modals\point_editor_modal.html:368
+msgid "Scientific"
+msgstr "Wissenschaftlich"
+
+#: .\templates\routes\modals\point_editor_modal.html:373
+msgid "Text Length"
+msgstr "Textlänge"
+
+#: .\templates\routes\modals\point_editor_modal.html:375
+msgid "Short (1-2 paragraphs)"
+msgstr "Kurz (1-2 Absätze)"
+
+#: .\templates\routes\modals\point_editor_modal.html:376
+msgid "Medium (3-4 paragraphs)"
+msgstr "Mittel (3-4 Absätze)"
+
+#: .\templates\routes\modals\point_editor_modal.html:377
+msgid "Detailed (5+ paragraphs)"
+msgstr "Detailliert (5+ Absätze)"
+
+#: .\templates\routes\modals\point_editor_modal.html:385
+msgid "Coordinates: not specified"
+msgstr "Koordinaten: nicht angegeben"
+
+#: .\templates\routes\modals\point_editor_modal.html:388
+msgid "Description will be generated based on point coordinates and address"
+msgstr "Beschreibung wird basierend auf Punktkoordinaten und Adresse generiert"
+
+#: .\templates\routes\modals\point_editor_modal.html:397
+#: .\templates\routes\modals\point_editor_modal.html:844
+#: .\templates\routes\modals\point_editor_modal.html:1722
+msgid "Generate Audio"
+msgstr "Audio generieren"
+
+#: .\templates\routes\modals\point_editor_modal.html:408
+#: .\templates\routes\modals\point_editor_modal.html:975
+msgid "Preparing..."
+msgstr "Wird vorbereitet..."
+
+#: .\templates\routes\modals\point_editor_modal.html:422
+msgid "Audio guide created!"
+msgstr "Audio-Guide erstellt!"
+
+#: .\templates\routes\modals\point_editor_modal.html:423
+msgid "Audio automatically applied to point"
+msgstr "Audio automatisch auf Punkt angewendet"
+
+#: .\templates\routes\modals\point_editor_modal.html:426
+#: .\templates\routes\modals\point_editor_modal.html:1416
+#: .\templates\routes\modals\point_editor_modal.html:1446
+#: .\templates\routes\modals\point_editor_modal.html:1492
+msgid "Play"
+msgstr "Abspielen"
+
+#: .\templates\routes\modals\point_editor_modal.html:437
+msgid "Error"
+msgstr "Fehler"
+
+#: .\templates\routes\modals\point_editor_modal.html:442
+msgid "Retry"
+msgstr "Wiederholen"
+
+#: .\templates\routes\modals\point_editor_modal.html:453
+msgid "Supported formats: MP3, WAV, M4A. Maximum size - 50MB"
+msgstr "Unterstützte Formate: MP3, WAV, M4A. Maximale Größe - 50 MB"
+
+#: .\templates\routes\modals\point_editor_modal.html:465
+msgid "Save Point"
+msgstr "Punkt speichern"
+
+#: .\templates\routes\modals\point_editor_modal.html:674
+msgid "Photo removed"
+msgstr "Foto entfernt"
+
+#: .\templates\routes\modals\point_editor_modal.html:864
+msgid "not specified"
+msgstr "nicht angegeben"
+
+#: .\templates\routes\modals\point_editor_modal.html:866
+msgid "Coordinates:"
+msgstr "Koordinaten:"
+
+#: .\templates\routes\modals\point_editor_modal.html:866
+msgid "Address:"
+msgstr "Adresse:"
+
+#: .\templates\routes\modals\point_editor_modal.html:955
+msgid "Save point first"
+msgstr "Punkt zuerst speichern"
+
+#: .\templates\routes\modals\point_editor_modal.html:961
+msgid "Load text for audio generation first"
+msgstr "Zuerst Text für Audio-Generierung laden"
+
+#: .\templates\routes\modals\point_editor_modal.html:966
+msgid "Text too long (maximum 5000 characters)"
+msgstr "Text zu lang (maximal 5000 Zeichen)"
+
+#: .\templates\routes\modals\point_editor_modal.html:981
+msgid "Yandex GPT creating description..."
+msgstr "Yandex GPT erstellt Beschreibung..."
+
+#: .\templates\routes\modals\point_editor_modal.html:986
+msgid "Description generated successfully"
+msgstr "Beschreibung erfolgreich generiert"
+
+#: .\templates\routes\modals\point_editor_modal.html:997
+msgid "No text for audio generation"
+msgstr "Kein Text für Audio-Generierung"
+
+#: .\templates\routes\modals\point_editor_modal.html:1013
+msgid "Coordinate fields not found in form"
+msgstr "Koordinatenfelder im Formular nicht gefunden"
+
+#: .\templates\routes\modals\point_editor_modal.html:1020
+msgid "Specify point coordinates first"
+msgstr "Zuerst Punktkoordinaten angeben"
+
+#: .\templates\routes\modals\point_editor_modal.html:1024
+msgid "Yandex GPT creating tour text..."
+msgstr "Yandex GPT erstellt Tour-Text..."
+
+#: .\templates\routes\modals\point_editor_modal.html:1057
+msgid "Tour text created!"
+msgstr "Tour-Text erstellt!"
+
+#: .\templates\routes\modals\point_editor_modal.html:1060
+msgid "Server error"
+msgstr "Serverfehler"
+
+#: .\templates\routes\modals\point_editor_modal.html:1072
+msgid "SpeechKit generating audio..."
+msgstr "SpeechKit generiert Audio..."
+
+#: .\templates\routes\modals\point_editor_modal.html:1146
+msgid "AudioGuide"
+msgstr "AudioGuide"
+
+#: .\templates\routes\modals\point_editor_modal.html:1157
+msgid "Audio guide created with voice"
+msgstr "Audio-Guide erstellt mit Stimme"
+
+#: .\templates\routes\modals\point_editor_modal.html:1161
+msgid "Server error during audio generation"
+msgstr "Serverfehler während der Audio-Generierung"
+
+#: .\templates\routes\modals\point_editor_modal.html:1182
+msgid "Load text first"
+msgstr "Zuerst Text laden"
+
+#: .\templates\routes\modals\point_editor_modal.html:1198
+msgid "Text saved"
+msgstr "Text gespeichert"
+
+#: .\templates\routes\modals\point_editor_modal.html:1213
+#: .\templates\routes\route_editor.html:24
+msgid "Save"
+msgstr "Speichern"
+
+#: .\templates\routes\modals\point_editor_modal.html:1227
+msgid "Point description loaded"
+msgstr "Punktbeschreibung geladen"
+
+#: .\templates\routes\modals\point_editor_modal.html:1229
+msgid ""
+"Point description is empty. Add description or choose another generation "
+"type."
+msgstr "Punktbeschreibung ist leer. Beschreibung hinzufügen oder anderen Generierungstyp wählen."
+
+#: .\templates\routes\modals\point_editor_modal.html:1230
+msgid "Point description is empty"
+msgstr "Punktbeschreibung ist leer"
+
+#: .\templates\routes\modals\point_editor_modal.html:1261
+msgid "Disabling audio will hide the player. Continue?"
+msgstr "Deaktivierung des Audios versteckt den Player. Fortfahren?"
+
+#: .\templates\routes\modals\point_editor_modal.html:1381
+#: .\templates\routes\modals\point_editor_modal.html:1686
+msgid "Click \\"
+msgstr "Klicken Sie \\"
+
+#: .\templates\routes\modals\point_editor_modal.html:1408
+msgid "Pause"
+msgstr "Pause"
+
+#: .\templates\routes\modals\point_editor_modal.html:1411
+msgid "Audio playback error"
+msgstr "Audio-Wiedergabefehler"
+
+#: .\templates\routes\modals\point_editor_modal.html:1452
+msgid "Are you sure you want to re-record audio?"
+msgstr "Sind Sie sicher, dass Sie Audio neu aufnehmen möchten?"
+
+#: .\templates\routes\modals\point_editor_modal.html:1459
+msgid "Audio reset. You can record new one."
+msgstr "Audio zurückgesetzt. Sie können neu aufnehmen."
+
+#: .\templates\routes\modals\point_editor_modal.html:1464
+msgid "Are you sure you want to delete audio?"
+msgstr "Sind Sie sicher, dass Sie Audio löschen möchten?"
+
+#: .\templates\routes\modals\point_editor_modal.html:1476
+msgid "Audio deleted"
+msgstr "Audio gelöscht"
+
+#: .\templates\routes\modals\point_editor_modal.html:1541
+msgid "Recording"
+msgstr "Aufnahme"
+
+#: .\templates\routes\modals\point_editor_modal.html:1545
+msgid "Recording completed (demo)"
+msgstr "Aufnahme abgeschlossen (Demo)"
+
+#: .\templates\routes\modals\point_editor_modal.html:1590
+msgid "Audio file uploaded"
+msgstr "Audiodatei hochgeladen"
+
+#: .\templates\routes\modals\point_editor_modal.html:1594
+msgid "Generating..."
+msgstr "Wird generiert..."
+
+#: .\templates\routes\modals\point_editor_modal.html:1655
+msgid "Unsupported audio format"
+msgstr "Nicht unterstütztes Audioformat"
+
+#: .\templates\routes\modals\point_editor_modal.html:1660
+msgid "File size should not exceed 50MB"
+msgstr "Dateigröße sollte 50 MB nicht überschreiten"
+
+#: .\templates\routes\modals\point_editor_modal.html:1841
+msgid "Invalid point coordinates"
+msgstr "Ungültige Punktkoordinaten"
+
+#: .\templates\routes\modals\reset_confirm_modal.html:12
+msgid "Reset route?"
+msgstr "Route zurücksetzen?"
+
+#: .\templates\routes\modals\reset_confirm_modal.html:14
+msgid "All route points will be deleted. This action cannot be undone."
+msgstr "Alle Routenpunkte werden gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+
+#: .\templates\routes\my_routes.html:4
+msgid "My Routes - Waylines"
+msgstr "Meine Routen - Waylines"
+
+#: .\templates\routes\my_routes.html:12
+#, python-format
+msgid ""
+"\n"
+"          %(count)s route\n"
+"        "
+msgid_plural ""
+"\n"
+"          %(count)s routes\n"
+"        "
+msgstr[0] ""
+"\n"
+"          %(count)s Route\n"
+"        "
+msgstr[1] ""
+"\n"
+"          %(count)s Routen\n"
+"        "
+
+#: .\templates\routes\my_routes.html:21
+msgid "Find"
+msgstr "Finden"
+
+#: .\templates\routes\my_routes.html:24
+msgid "Create"
+msgstr "Erstellen"
+
+#: .\templates\routes\my_routes.html:33
+msgid "Categories"
+msgstr "Kategorien"
+
+#: .\templates\routes\my_routes.html:88
+msgid "No active routes"
+msgstr "Keine aktiven Routen"
+
+#: .\templates\routes\my_routes.html:108
+msgid "No inactive routes"
+msgstr "Keine inaktiven Routen"
+
+#: .\templates\routes\my_routes.html:125
+msgid "You have no favorite routes yet"
+msgstr "Sie haben noch keine Favoritenrouten"
+
+#: .\templates\routes\my_routes.html:126
+msgid "Click ❤️ on routes to add them here"
+msgstr "Klicken Sie ❤️ auf Routen, um sie hier hinzuzufügen"
+
+#: .\templates\routes\my_routes.html:128
+#: .\templates\routes\shared_routes.html:50
+msgid "Find routes"
+msgstr "Routen finden"
+
+#: .\templates\routes\partials\route_card.html:19
+#: .\templates\routes\route_detail.html:918
+#: .\templates\routes\route_detail.html:1008
+msgid "Previous"
+msgstr "Zurück"
+
+#: .\templates\routes\partials\route_card.html:23
+#: .\templates\routes\route_detail.html:922
+#: .\templates\routes\route_detail.html:1012
+msgid "Next"
+msgstr "Weiter"
+
+#: .\templates\routes\partials\route_card.html:30
+msgid "No photo added"
+msgstr "Kein Foto hinzugefügt"
+
+#: .\templates\routes\partials\route_card.html:55
+msgid "Remove from favorites"
+msgstr "Aus Favoriten entfernen"
+
+#: .\templates\routes\partials\route_card.html:55
+#: .\templates\routes\partials\route_card.html:56
+msgid "Add to favorites"
+msgstr "Zu Favoriten hinzufügen"
+
+#: .\templates\routes\partials\route_card.html:56
+msgid "In favorites"
+msgstr "In Favoriten"
+
+#: .\templates\routes\partials\route_card.html:116
+msgid "Deactivate"
+msgstr "Deaktivieren"
+
+#: .\templates\routes\partials\route_card.html:116
+msgid "Activate"
+msgstr "Aktivieren"
+
+#: .\templates\routes\partials\route_card.html:141
+msgid "For seniors"
+msgstr "Für Senioren"
+
+#: .\templates\routes\partials\route_card.html:153
+msgid "Shared with you"
+msgstr "Mit Ihnen geteilt"
+
+#: .\templates\routes\partials\route_card.html:165
+msgid "Share"
+msgstr "Teilen"
+
+#: .\templates\routes\partials\route_card.html:176
+msgid "Copy link"
+msgstr "Link kopieren"
+
+#: .\templates\routes\partials\route_card.html:177
+msgid "Send route link"
+msgstr "Routen-Link senden"
+
+#: .\templates\routes\partials\route_card.html:190
+msgid "Show route QR code"
+msgstr "Routen-QR-Code anzeigen"
+
+#: .\templates\routes\partials\route_card.html:203
+msgid "Send to friend"
+msgstr "An Freund senden"
+
+#: .\templates\routes\partials\route_card.html:204
+msgid "Share with friends"
+msgstr "Mit Freunden teilen"
+
+#: .\templates\routes\partials\route_card.html:235
+msgid "Not specified"
+msgstr "Nicht angegeben"
+
+#: .\templates\routes\partials\route_card.html:259
+msgid "Route QR code"
+msgstr "Routen-QR-Code"
+
+#: .\templates\routes\partials\route_card.html:264
+msgid "Scan to quickly access the route"
+msgstr "Scannen Sie, um schnell auf die Route zuzugreifen"
+
+#: .\templates\routes\partials\route_card.html:275
+msgid "Send route to a friend"
+msgstr "Route an einen Freund senden"
+
+#: .\templates\routes\partials\route_card.html:282
+msgid "Choose from the list..."
+msgstr "Aus der Liste wählen..."
+
+#: .\templates\routes\partials\route_card.html:286
+msgid "Add a message (optional)"
+msgstr "Nachricht hinzufügen (optional)"
+
+#: .\templates\routes\partials\route_card.html:287
+msgid "e.g. Check out this interesting route!"
+msgstr "z.B. Schau dir diese interessante Route an!"
+
+#: .\templates\routes\partials\route_card.html:292
+msgid "Send"
+msgstr "Senden"
+
+#: .\templates\routes\partials\route_card.html:302
+msgid "Grant route access"
+msgstr "Routenzugriff gewähren"
+
+#: .\templates\routes\partials\route_card.html:307
+msgid "User email"
+msgstr "Benutzer-E-Mail"
+
+#: .\templates\routes\partials\route_card.html:308
+msgid "Enter user email"
+msgstr "Benutzer-E-Mail eingeben"
+
+#: .\templates\routes\partials\route_card.html:311
+msgid "Access level"
+msgstr "Zugriffslevel"
+
+#: .\templates\routes\partials\route_card.html:313
+msgid "View only"
+msgstr "Nur ansehen"
+
+#: .\templates\routes\partials\route_card.html:320
+msgid "Grant access"
+msgstr "Zugriff gewähren"
+
+#: .\templates\routes\route_detail.html:410
+msgid "In Favorites"
+msgstr "In Favoriten"
+
+#: .\templates\routes\route_detail.html:410
+msgid "Add to Favorites"
+msgstr "Zu Favoriten hinzufügen"
+
+#: .\templates\routes\route_detail.html:424
+msgid "Log In"
+msgstr "Anmelden"
+
+#: .\templates\routes\route_detail.html:453
+#: .\templates\routes\route_editor.html:186
+msgid "Elderly Friendly"
+msgstr "Seniorenfreundlich"
+
+#: .\templates\routes\route_detail.html:463
+msgid "Not Active"
+msgstr "Nicht aktiv"
+
+#: .\templates\routes\route_detail.html:469
+msgid "About Route"
+msgstr "Über Route"
+
+#: .\templates\routes\route_detail.html:483
+msgid "Description is missing"
+msgstr "Beschreibung fehlt"
+
+#: .\templates\routes\route_detail.html:518
+#: .\templates\routes\route_editor.html:68
+msgid "Points"
+msgstr "Punkte"
+
+#: .\templates\routes\route_detail.html:524
+msgid "Export Route"
+msgstr "Route exportieren"
+
+#: .\templates\routes\route_detail.html:529
+msgid "Export GPX"
+msgstr "GPX exportieren"
+
+#: .\templates\routes\route_detail.html:535
+msgid "Export KML"
+msgstr "KML exportieren"
+
+#: .\templates\routes\route_detail.html:541
+msgid "Export GeoJSON"
+msgstr "GeoJSON exportieren"
+
+#: .\templates\routes\route_detail.html:552
+#: .\templates\routes\route_detail.html:941
+msgid "Route Gallery"
+msgstr "Routen-Galerie"
+
+#: .\templates\routes\route_detail.html:557
+msgid "View All Photos"
+msgstr "Alle Fotos ansehen"
+
+#: .\templates\routes\route_detail.html:591
+#: .\templates\routes\route_detail.html:602
+msgid "photos"
+msgstr "Fotos"
+
+#: .\templates\routes\route_detail.html:592
+msgid "Click to see all"
+msgstr "Klicken Sie, um alle zu sehen"
+
+#: .\templates\routes\route_detail.html:602
+msgid "Show all"
+msgstr "Alle anzeigen"
+
+#: .\templates\routes\route_detail.html:614
+msgid "Full Audio Guide"
+msgstr "Vollständiger Audio-Guide"
+
+#: .\templates\routes\route_detail.html:621
+msgid "Audio Tour for Entire Route"
+msgstr "Audio-Tour für gesamte Route"
+
+#: .\templates\routes\route_detail.html:624
+msgid "Automatically generated by AI"
+msgstr "Automatisch von KI generiert"
+
+#: .\templates\routes\route_detail.html:628
+msgid "points"
+msgstr "Punkte"
+
+#: .\templates\routes\route_detail.html:633
+#: .\templates\routes\route_detail.html:719
+msgid "Your browser does not support audio elements."
+msgstr "Ihr Browser unterstützt keine Audio-Elemente."
+
+#: .\templates\routes\route_detail.html:639
+msgid "AI Generation"
+msgstr "KI-Generierung"
+
+#: .\templates\routes\route_detail.html:644
+msgid "Auto-update"
+msgstr "Auto-Aktualisierung"
+
+#: .\templates\routes\route_detail.html:658
+msgid "An AI-generated audio guide is available for this route."
+msgstr "Ein KI-generierter Audio-Guide ist für diese Route verfügbar."
+
+#: .\templates\routes\route_detail.html:662
+msgid "Generate Audio Guide"
+msgstr "Audio-Guide generieren"
+
+#: .\templates\routes\route_detail.html:671
+msgid "Route Map"
+msgstr "Routen-Karte"
+
+#: .\templates\routes\route_detail.html:681
+#: .\templates\routes\route_editor.html:295
+msgid "Route Points"
+msgstr "Routenpunkte"
+
+#: .\templates\routes\route_detail.html:714
+msgid "AI Generated"
+msgstr "KI-generiert"
+
+#: .\templates\routes\route_detail.html:723
+msgid "Automatically generated by neural network"
+msgstr "Automatisch von neuronalem Netzwerk generiert"
+
+#: .\templates\routes\route_detail.html:732
+#: .\templates\routes\route_editor.html:1289
+#: .\templates\routes\route_editor.html:1326
+msgid "Point Photos"
+msgstr "Punktfotos"
+
+#: .\templates\routes\route_detail.html:738
+msgid "Show All"
+msgstr "Alle anzeigen"
+
+#: .\templates\routes\route_detail.html:774
+msgid "Join the discussion about this route with other users"
+msgstr "Nehmen Sie an der Diskussion über diese Route mit anderen Benutzern teil"
+
+#: .\templates\routes\route_detail.html:776
+msgid "Go to Chat"
+msgstr "Zum Chat gehen"
+
+#: .\templates\routes\route_detail.html:797
+msgid "based on"
+msgstr "basierend auf"
+
+#: .\templates\routes\route_detail.html:797
+msgid "ratings"
+msgstr "Bewertungen"
+
+#: .\templates\routes\route_detail.html:801
+msgid "Your rating:"
+msgstr "Ihre Bewertung:"
+
+#: .\templates\routes\route_detail.html:812
+msgid "Rate"
+msgstr "Bewerten"
+
+#: .\templates\routes\route_detail.html:821
+msgid "Information"
+msgstr "Information"
+
+#: .\templates\routes\route_detail.html:855
+msgid "Quick Access"
+msgstr "Schnellzugriff"
+
+#: .\templates\routes\route_detail.html:858
+msgid "Open Chat"
+msgstr "Chat öffnen"
+
+#: .\templates\routes\route_detail.html:860
+msgid "Chat with other route participants"
+msgstr "Chatten Sie mit anderen Routenteilnehmern"
+
+#: .\templates\routes\route_detail.html:867
+msgid "Similar Routes"
+msgstr "Ähnliche Routen"
+
+#: .\templates\routes\route_detail.html:929
+#: .\templates\routes\route_detail.html:1019
+msgid "of"
+msgstr "von"
+
+#: .\templates\routes\route_detail.html:970
+msgid "Total photos"
+msgstr "Gesamtfotos"
+
+#: .\templates\routes\route_editor.html:31
+msgid "Search places..."
+msgstr "Orte suchen..."
+
+#: .\templates\routes\route_editor.html:50
+msgid "Satellite"
+msgstr "Satellit"
+
+#: .\templates\routes\route_editor.html:81
+msgid "Optimize"
+msgstr "Optimieren"
+
+#: .\templates\routes\route_editor.html:84
+msgid "Clear route"
+msgstr "Route leeren"
+
+#: .\templates\routes\route_editor.html:95
+msgid "Basic Information"
+msgstr "Grundinformation"
+
+#: .\templates\routes\route_editor.html:105
+msgid "Route Name"
+msgstr "Routenname"
+
+#: .\templates\routes\route_editor.html:108
+msgid "Enter route name"
+msgstr "Routennamen eingeben"
+
+#: .\templates\routes\route_editor.html:121
+msgid "Short Description"
+msgstr "Kurzbeschreibung"
+
+#: .\templates\routes\route_editor.html:123
+msgid "Brief description of your route..."
+msgstr "Kurzbeschreibung Ihrer Route..."
+
+#: .\templates\routes\route_editor.html:128
+msgid "Full Route Description"
+msgstr "Vollständige Routenbeschreibung"
+
+#: .\templates\routes\route_editor.html:130
+msgid "Detailed description of your route..."
+msgstr "Detaillierte Beschreibung Ihrer Route..."
+
+#: .\templates\routes\route_editor.html:135
+msgid "Route Parameters"
+msgstr "Routenparameter"
+
+#: .\templates\routes\route_editor.html:139
+msgid "Route Type"
+msgstr "Routentyp"
+
+#: .\templates\routes\route_editor.html:145
+msgid "Car"
+msgstr "Auto"
+
+#: .\templates\routes\route_editor.html:148
+msgid "Bicycle"
+msgstr "Fahrrad"
+
+#: .\templates\routes\route_editor.html:154
+msgid "Completion Time"
+msgstr "Fertigstellungszeit"
+
+#: .\templates\routes\route_editor.html:156
+msgid "e.g., 2-3 hours, 1 day, 30 minutes"
+msgstr "z.B., 2-3 Stunden, 1 Tag, 30 Minuten"
+
+#: .\templates\routes\route_editor.html:165
+msgid "By Link"
+msgstr "Per Link"
+
+#: .\templates\routes\route_editor.html:172
+msgid "Features"
+msgstr "Features"
+
+#: .\templates\routes\route_editor.html:194
+msgid "Child Friendly"
+msgstr "Kinderfreundlich"
+
+#: .\templates\routes\route_editor.html:207
+msgid "Route Photos"
+msgstr "Routenbilder"
+
+#: .\templates\routes\route_editor.html:209
+msgid "Up to 10 photos"
+msgstr "Bis zu 10 Fotos"
+
+#: .\templates\routes\route_editor.html:228
+msgid "Upload photos. Click ⭐ to set as main photo"
+msgstr "Fotos hochladen. Klicken Sie ⭐, um als Hauptfoto festzulegen"
+
+#: .\templates\routes\route_editor.html:245
+#: .\templates\routes\route_editor.html:1415
+#: .\templates\routes\route_editor.html:1667
+msgid "Set as main"
+msgstr "Als Hauptbild setzen"
+
+#: .\templates\routes\route_editor.html:258
+#: .\templates\routes\route_editor.html:1679
+msgid "Move up"
+msgstr "Nach oben"
+
+#: .\templates\routes\route_editor.html:263
+#: .\templates\routes\route_editor.html:1684
+msgid "Move down"
+msgstr "Nach unten"
+
+#: .\templates\routes\route_editor.html:284
+msgid "Main photo is marked with a gold star ⭐"
+msgstr "Hauptfoto ist mit einem goldenen Stern ⭐ markiert"
+
+#: .\templates\routes\route_editor.html:308
+msgid "No route points yet"
+msgstr "Noch keine Routenpunkte"
+
+#: .\templates\routes\route_editor.html:309
+msgid "Click on the map to add points"
+msgstr "Klicken Sie auf die Karte, um Punkte hinzuzufügen"
+
+#: .\templates\routes\route_editor.html:327
+msgid "Building route..."
+msgstr "Route wird erstellt..."
+
+#: .\templates\routes\route_editor.html:1193
+msgid "Deleting route..."
+msgstr "Route wird gelöscht..."
+
+#: .\templates\routes\route_editor.html:1210
+msgid "Route deleted successfully"
+msgstr "Route erfolgreich gelöscht"
+
+#: .\templates\routes\route_editor.html:1264
+msgid "Click to manage photos"
+msgstr "Klicken Sie, um Fotos zu verwalten"
+
+#: .\templates\routes\route_editor.html:1275
+msgid "additional photos"
+msgstr "zusätzliche Fotos"
+
+#: .\templates\routes\route_editor.html:1464
+#: .\templates\routes\route_editor.html:1492
+msgid "Photo not found"
+msgstr "Foto nicht gefunden"
+
+#: .\templates\routes\route_editor.html:1486
+msgid "Photo set as main for point"
+msgstr "Foto als Hauptbild für Punkt gesetzt"
+
+#: .\templates\routes\route_editor.html:1496
+msgid "Delete this photo?"
+msgstr "Dieses Foto löschen?"
+
+#: .\templates\routes\route_editor.html:1519
+msgid "Photo deleted"
+msgstr "Foto gelöscht"
+
+#: .\templates\routes\route_editor.html:1562
+msgid "Photo added"
+msgstr "Foto hinzugefügt"
+
+#: .\templates\routes\route_editor.html:1646
+msgid "Maximum 10 photos can be uploaded"
+msgstr "Maximal 10 Fotos können hochgeladen werden"
+
+#: .\templates\routes\route_editor.html:1803
+msgid "Untitled"
+msgstr "Unbenannt"
+
+#: .\templates\routes\route_editor.html:1882
+msgid "Photo selected as main"
+msgstr "Foto als Hauptbild ausgewählt"
+
+#: .\templates\routes\route_editor.html:1915
+msgid "Please select only images"
+msgstr "Bitte wählen Sie nur Bilder aus"
+
+#: .\templates\routes\route_editor.html:1920
+msgid "File size should not exceed 5MB"
+msgstr "Dateigröße sollte 5 MB nicht überschreiten"
+
+#: .\templates\routes\route_editor.html:2010
+msgid "Point added"
+msgstr "Punkt hinzugefügt"
+
+#: .\templates\routes\route_editor.html:2020
+msgid "Point editing function unavailable"
+msgstr "Punktbearbeitungsfunktion nicht verfügbar"
+
+#: .\templates\routes\route_editor.html:2025
+msgid "Delete this route point?"
+msgstr "Diesen Routenpunkt löschen?"
+
+#: .\templates\routes\route_editor.html:2036
+msgid "Point deleted"
+msgstr "Punkt gelöscht"
+
+#: .\templates\routes\route_qr_code.html:7
+#, python-format
+msgid "QR code: %(name)s"
+msgstr "QR-Code: %(name)s"
+
+#: .\templates\routes\route_qr_code.html:77
+#, python-format
+msgid "QR code for %(name)s"
+msgstr "QR-Code für %(name)s"
+
+#: .\templates\routes\route_qr_code.html:81
+msgid "QR code not generated"
+msgstr "QR-Code nicht generiert"
+
+#: .\templates\routes\route_qr_code.html:86
+msgid "Scan to access the route"
+msgstr "Scannen Sie, um auf die Route zuzugreifen"
+
+#: .\templates\routes\route_qr_code.html:95
+msgid "Open"
+msgstr "Öffnen"
+
+#: .\templates\routes\route_qr_code.html:98
+msgid "Print"
+msgstr "Drucken"
+
+#: .\templates\routes\route_qr_code.html:114
+msgid "Copied!"
+msgstr "Kopiert!"
+
+#: .\templates\routes\search_results.html:4
+msgid "Search Results - Waylines"
+msgstr "Suchergebnisse - Waylines"
+
+#: .\templates\routes\search_results.html:14
+msgid "Search results"
+msgstr "Suchergebnisse"
+
+#: .\templates\routes\search_results.html:21
+#, python-format
+msgid "For query \"%(query)s\""
+msgstr "Für Suchanfrage \"%(query)s\""
+
+#: .\templates\routes\search_results.html:23
+#, python-format
+msgid ""
+"\n"
+"                Found %(count)s route\n"
+"              "
+msgid_plural ""
+"\n"
+"                Found %(count)s routes\n"
+"              "
+msgstr[0] ""
+"\n"
+"                %(count)s Route gefunden\n"
+"              "
+msgstr[1] ""
+"\n"
+"                %(count)s Routen gefunden\n"
+"              "
+
+#: .\templates\routes\search_results.html:35
+#: .\templates\routes\shared_routes.html:18
+#, python-format
+msgid ""
+"\n"
+"                %(count)s route\n"
+"              "
+msgid_plural ""
+"\n"
+"                %(count)s routes\n"
+"              "
+msgstr[0] ""
+"\n"
+"                %(count)s Route\n"
+"              "
+msgstr[1] ""
+"\n"
+"                %(count)s Routen\n"
+"              "
+
+#: .\templates\routes\search_results.html:50
+msgid "Oldest first"
+msgstr "Älteste zuerst"
+
+#: .\templates\routes\search_results.html:51
+msgid "Distance ↑"
+msgstr "Distanz ↑"
+
+#: .\templates\routes\search_results.html:52
+msgid "Distance ↓"
+msgstr "Distanz ↓"
+
+#: .\templates\routes\search_results.html:53
+msgid "Name A-Z"
+msgstr "Name A-Z"
+
+#: .\templates\routes\search_results.html:54
+msgid "Name Z-A"
+msgstr "Name Z-A"
+
+#: .\templates\routes\search_results.html:118
+msgid "Distance, km"
+msgstr "Distanz, km"
+
+#: .\templates\routes\search_results.html:125
+msgid "Any distance"
+msgstr "Beliebige Distanz"
+
+#: .\templates\routes\search_results.html:133
+msgid "up to 5 km"
+msgstr "bis zu 5 km"
+
+#: .\templates\routes\search_results.html:141
+msgid "5–15 km"
+msgstr "5–15 km"
+
+#: .\templates\routes\search_results.html:149
+msgid "15+ km"
+msgstr "15+ km"
+
+#: .\templates\routes\search_results.html:179
+#, python-format
+msgid "No routes match your query \"%(query)s\"."
+msgstr "Keine Routen entsprechen Ihrer Suchanfrage \"%(query)s\"."
+
+#: .\templates\routes\search_results.html:181
+msgid "No routes match the selected filters."
+msgstr "Keine Routen entsprechen den ausgewählten Filtern."
+
+#: .\templates\routes\search_results.html:194
+msgid "No matching routes"
+msgstr "Keine passenden Routen"
+
+#: .\templates\routes\search_results.html:195
+msgid "Try adjusting your filter criteria."
+msgstr "Versuchen Sie, Ihre Filterkriterien anzupassen."
+
+#: .\templates\routes\shared_routes.html:4
+msgid "Shared Routes - Waylines"
+msgstr "Geteilte Routen - Waylines"
+
+#: .\templates\routes\shared_routes.html:12
+msgid "Routes shared with me"
+msgstr "Mit mir geteilte Routen"
+
+#: .\templates\routes\shared_routes.html:13
+msgid "Routes your friends have shared with you"
+msgstr "Routen, die Ihre Freunde mit Ihnen geteilt haben"
+
+#: .\templates\routes\shared_routes.html:44
+msgid "No shared routes yet"
+msgstr "Noch keine geteilten Routen"
+
+#: .\templates\routes\shared_routes.html:46
+msgid ""
+"When your friends share routes with you, they will appear here. You can also "
+"share your own routes with friends!"
+msgstr "Wenn Ihre Freunde Routen mit Ihnen teilen, erscheinen sie hier. Sie können auch Ihre eigenen Routen mit Freunden teilen!"
+
+#: .\users\apps.py:8
+msgid "Users"
+msgstr "Benutzer"
+
+#: .\users\forms.py:11 .\users\forms.py:42
+msgid "Имя"
+msgstr "Vorname"
+
+#: .\users\forms.py:12 .\users\forms.py:43
+msgid "Фамилия"
+msgstr "Nachname"
+
+#: .\users\forms.py:25
+msgid "Имя пользователя"
+msgstr "Benutzername"
+
+#: .\users\forms.py:26
+msgid "Пароль"
+msgstr "Passwort"
+
+#: .\users\forms.py:27
+msgid "Подтверждение пароля"
+msgstr "Passwortbestätigung"
+
+#: .\users\forms.py:45
+msgid "Удалить аватар"
+msgstr "Avatar entfernen"
+
+#: .\users\forms.py:52
+msgid "О себе"
+msgstr "Über mich"
+
+#: .\users\forms.py:53
+msgid "Аватар"
+msgstr "Avatar"
+
+#: .\users\forms.py:54
+msgid "Местоположение"
+msgstr "Standort"
+
+#: .\users\forms.py:55
+msgid "Веб-сайт"
+msgstr "Webseite"
+
+#: .\users\models.py:9
+msgid "Pending"
+msgstr "Ausstehend"
+
+#: .\users\models.py:10
+msgid "Accepted"
+msgstr "Akzeptiert"
+
+#: .\users\models.py:18
+msgid "From user"
+msgstr "Von Benutzer"
+
+#: .\users\models.py:24
+msgid "To user"
+msgstr "An Benutzer"
+
+#: .\users\models.py:37
+msgid "Friendship"
+msgstr "Freundschaft"
+
+#: .\users\models.py:38
+msgid "Friendships"
+msgstr "Freundschaften"
+
+#: .\users\models.py:51
+msgid "Bio"
+msgstr "Biografie"
+
+#: .\users\models.py:56
+msgid "Last username change"
+msgstr "Letzte Benutzernamenänderung"
+
+#: .\users\models.py:59
+msgid "Date when username was last changed"
+msgstr "Datum, an dem der Benutzername zuletzt geändert wurde"
+
+#: .\users\models.py:65
+msgid "User profile"
+msgstr "Benutzerprofil"
+
+#: .\users\models.py:66
+msgid "User profiles"
+msgstr "Benutzerprofile"
+
+#: .\users\models.py:69
+#, python-format
+msgid "Profile of %(username)s"
+msgstr "Profil von %(username)s"
+
+#: .\users\views.py:82
+#, python-format
+msgid "User %(username)s has been removed from your friends"
+msgstr "Benutzer %(username)s wurde aus Ihren Freunden entfernt"
+
+#: .\users\views.py:86
+msgid "Friendship not found"
+msgstr "Freundschaft nicht gefunden"
+
+#: .\users\views.py:102
+msgid "You can only send messages to your friends"
+msgstr "Sie können nur Nachrichten an Ihre Freunde senden"
+
+#: .\users\views.py:154
+msgid "You cannot send a friend request to yourself"
+msgstr "Sie können keine Freundschaftsanfrage an sich selbst senden"
+
+#: .\users\views.py:162
+msgid "A friend request already exists"
+msgstr "Eine Freundschaftsanfrage existiert bereits"
+
+#: .\users\views.py:167
+#, python-format
+msgid "Friend request sent to %(username)s"
+msgstr "Freundschaftsanfrage an %(username)s gesendet"
+
+#: .\users\views.py:183
+#, python-format
+msgid "You have accepted the friend request from %(username)s"
+msgstr "Sie haben die Freundschaftsanfrage von %(username)s akzeptiert"
+
+#: .\users\views.py:198
+#, python-format
+msgid "You have declined the friend request from %(username)s"
+msgstr "Sie haben die Freundschaftsanfrage von %(username)s abgelehnt"
+
+#: .\users\views.py:228
+msgid "Имя пользователя можно менять только раз в 30 дней"
+msgstr "Benutzername kann nur alle 30 Tage geändert werden"
+
+#: .\users\views.py:238
+msgid "Это имя пользователя уже занято"
+msgstr "Dieser Benutzername ist bereits vergeben"
+
+#: .\users\views.py:265
+msgid "Профиль успешно обновлен"
+msgstr "Profil erfolgreich aktualisiert"
+
+#: .\users\views.py:384
+msgid "Registration successful!"
+msgstr "Registrierung erfolgreich!"
+
+#: .\users\views.py:399
+#, python-format
+msgid "Welcome back, %(username)s!"
+msgstr "Willkommen zurück, %(username)s!"
+
+#: .\users\views.py:410
+msgid "You have been logged out"
+msgstr "Sie wurden abgemeldet"
+
+#: .\users\views.py:443
+msgid "You do not have permission to share this route"
+msgstr "Sie haben keine Berechtigung, diese Route zu teilen"
+
+#: .\users\views.py:453
+msgid "No friend selected"
+msgstr "Kein Freund ausgewählt"
+
+#: .\users\views.py:468
+msgid "This user is not your friend"
+msgstr "Dieser Benutzer ist nicht Ihr Freund"
+
+#: .\users\views.py:476
+msgid "Route shared with you"
+msgstr "Route mit Ihnen geteilt"
+
+#: .\users\views.py:478
+#, python-format
+msgid "%(sender)s has shared the route \"%(route_name)s\" with you"
+msgstr "%(sender)s hat die Route \"%(route_name)s\" mit Ihnen geteilt"
+
+#: .\users\views.py:490
+#, python-format
+msgid "Route \"%(route_name)s\" has been shared with %(name)s"
+msgstr "Route \"%(route_name)s\" wurde mit %(name)s geteilt"
+
+#: .\users\views.py:498
+msgid "Invalid data format"
+msgstr "Ungültiges Datenformat"
+
+#: .\users\views.py:533
+msgid "Имя пользователя не может быть пустым"
+msgstr "Benutzername darf nicht leer sein"

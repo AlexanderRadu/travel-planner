@@ -1,0 +1,1965 @@
+{% load i18n %}
+<!-- templates/routes/modals/point_editor_modal.html -->
+<div class="modal fade" id="point-editor-modal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-map-marker-alt text-primary me-2"></i>
+          {% trans "Edit Point" %}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="point-form">
+          <input type="hidden" id="edit-point-index">
+          <input type="hidden" id="edit-point-id">
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{% trans "Point Name" %} *</label>
+                <input type="text" id="point-name" class="form-control border-0 bg-light" required
+                       placeholder='{% trans "Enter point name" %}'
+                       style="border-radius: 12px; padding: 12px 16px;">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{% trans "Category" %}</label>
+                <select id="point-category" class="form-select border-0 bg-light" 
+                        style="border-radius: 12px; padding: 12px 16px;">
+                  <option value="">{% trans "Select category" %}</option>
+                  <option value="attraction">🏛️ {% trans "Attraction" %}</option>
+                  <option value="nature">🌿 {% trans "Nature" %}</option>
+                  <option value="forest">🌲 {% trans "Forest" %}</option>
+                  <option value="bus_stop">🚌 {% trans "Bus Stop" %}</option>
+                  <option value="viewpoint">👁️ {% trans "Viewpoint" %}</option>
+                  <option value="restaurant">🍽️ {% trans "Restaurant" %}</option>
+                  <option value="hotel">🏨 {% trans "Hotel" %}</option>
+                  <option value="museum">🏛️ {% trans "Museum" %}</option>
+                  <option value="park">🌳 {% trans "Park" %}</option>
+                  <option value="monument">🗽 {% trans "Monument" %}</option>
+                  <option value="church">⛪ {% trans "Church" %}</option>
+                  <option value="beach">🏖️ {% trans "Beach" %}</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{% trans "Address" %}</label>
+                <input type="text" id="point-address" class="form-control border-0 bg-light"
+                       placeholder='{% trans "Location address" %}'
+                       style="border-radius: 12px; padding: 12px 16px;">
+                <div class="form-text small text-muted mt-1">
+                  {% trans "Enter address manually if not detected automatically" %}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{% trans "Hint Author" %}</label>
+                <input type="text" id="point-hint-author" class="form-control border-0 bg-light"
+                       placeholder='{% trans "Hint author name" %}'
+                       style="border-radius: 12px; padding: 12px 16px;">
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{% trans "Coordinates" %}</label>
+                <div class="coord-inputs">
+                  <div class="input-group mb-2">
+                    <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
+                      <i class="fas fa-latitude me-1"></i>{% trans "Latitude" %}
+                    </span>
+                    <input type="text" id="point-lat" class="form-control border-0 bg-light" readonly
+                           style="border-radius: 0 12px 12px 0;">
+                  </div>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
+                      <i class="fas fa-longitude me-1"></i>{% trans "Longitude" %}
+                    </span>
+                    <input type="text" id="point-lng" class="form-control border-0 bg-light" readonly
+                           style="border-radius: 0 12px 12px 0;">
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{% trans "Tags" %}</label>
+                <input type="text" id="point-tags" class="form-control border-0 bg-light"
+                       placeholder='{% trans "tag1, tag2, tag3..." %}'
+                       style="border-radius: 12px; padding: 12px 16px;">
+                <div class="form-text small text-muted mt-1">
+                  {% trans "Enter tags separated by commas" %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">{% trans "Point Description" %}</label>
+            <textarea id="point-description" class="form-control border-0 bg-light" rows="4" 
+                      placeholder='{% trans "Tell about this place..." %}'
+                      style="border-radius: 12px; padding: 12px 16px; resize: none;"></textarea>
+          </div>
+
+          <div class="card border-0 bg-light mb-4">
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label small fw-semibold mb-2 d-flex justify-content-between">
+                  <span>{% trans "Photos" %}</span>
+                  <span class="text-muted" id="photos-count">0/5</span>
+                </label>
+                <div class="photos-grid border rounded-3 bg-white p-3" 
+                     style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; min-height: 120px;">
+                  <div class="photo-upload border rounded-3 d-flex align-items-center justify-content-center text-muted"
+                       style="height: 120px; cursor: pointer; border-style: dashed !important;"
+                       onclick="document.getElementById('photos-input').click()">
+                    <div class="text-center">
+                      <i class="fas fa-plus fa-lg mb-2"></i>
+                      <div class="small">{% trans "Add Photo" %}</div>
+                      <div class="extra-small mt-1">{% trans "Max 5 photos" %}</div>
+                    </div>
+                  </div>
+                </div>
+                <input type="file" id="photos-input" accept="image/*" multiple style="display: none;">
+                <div class="form-text small text-muted mt-2">
+                  {% trans "Maximum 5 photos. JPG, PNG, WebP. Max 5MB each." %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-0 bg-light mb-4">
+            <div class="card-body">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                  <h6 class="fw-bold text-dark mb-1">
+                    <i class="fas fa-headphones text-primary me-2"></i>
+                    {% trans "Point Audio Guide" %}
+                  </h6>
+                  <p class="small text-muted mb-0">{% trans "Record, upload or generate AI audio" %}</p>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="enable-audio-guide" checked>
+                  <label class="form-check-label small fw-medium" for="enable-audio-guide">
+                    {% trans "Enable Audio" %}
+                  </label>
+                </div>
+              </div>
+
+              <div class="audio-player mb-3" id="point-audio-player" style="display: none;">
+                <div class="card bg-white border-0 shadow-sm">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center gap-3">
+                      <button class="btn btn-outline-primary btn-sm rounded-circle audio-play-btn" 
+                              style="width: 40px; height: 40px;" type="button">
+                        <i class="fas fa-play"></i>
+                      </button>
+                      <div class="flex-grow-1">
+                        <div class="d-flex align-items-center mb-1">
+                          <div class="progress flex-grow-1" style="height: 6px;">
+                            <div class="audio-progress progress-bar" role="progressbar" style="width: 0%"></div>
+                          </div>
+                          <div class="ms-2 audio-duration small text-muted">0:00</div>
+                        </div>
+                        <div class="small text-muted" id="audio-filename">{% trans "Audio Guide" %}</div>
+                      </div>
+                      <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary btn-sm" id="re-record-audio" title='{% trans "Re-record" %}' type="button">
+                          <i class="fas fa-redo"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" id="remove-audio" title='{% trans "Delete Audio" %}' type="button">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="audio-recorder" id="point-audio-recorder">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <button class="btn btn-primary w-100" id="start-audio-record" type="button">
+                      <i class="fas fa-microphone me-2"></i>{% trans "Record Audio" %}
+                    </button>
+                    <div class="recording-indicator mt-2" id="recording-indicator" style="display: none;">
+                      <div class="d-flex align-items-center justify-content-center gap-2">
+                        <div class="recording-pulse rounded-circle bg-danger" style="width: 12px; height: 12px;"></div>
+                        <span class="small fw-medium" id="recording-timer">00:00</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <button class="btn btn-outline-secondary w-100" id="upload-audio-file" type="button">
+                      <i class="fas fa-upload me-2"></i>{% trans "Upload Audio" %}
+                    </button>
+                    <input type="file" id="audio-file-input" accept="audio/*" style="display: none;">
+                  </div>
+                </div>
+
+                <div class="recording-visualizer mt-3" id="recording-visualizer" style="display: none;">
+                  <div class="card bg-white border-0">
+                    <div class="card-body">
+                      <div class="audio-visualizer d-flex align-items-end justify-content-center gap-1" 
+                           id="live-visualizer" style="height: 60px;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="ai-audio-generator mt-4" id="ai-audio-generator">
+                <div class="border-top pt-4 mt-4">
+                  <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div>
+                      <h6 class="fw-bold text-dark mb-1">
+                        <i class="fas fa-robot text-primary me-2"></i>
+                        {% trans "AI Audio Generation" %}
+                      </h6>
+                      <p class="small text-muted mb-0">{% trans "Create tour text and audio guide in one click" %}</p>
+                    </div>
+                    <span class="badge bg-success bg-opacity-10 text-success">{% trans "Yandex GPT + SpeechKit" %}</span>
+                  </div>
+
+                  <div class="ai-config-section mb-4">
+                    <div class="row g-3">
+                      <div class="col-md-4">
+                        <label class="form-label small fw-semibold">{% trans "Language" %}</label>
+                        <select class="form-select form-select-sm" id="ai-language-select">
+                          <option value="ru-RU" selected>🇷🇺 {% trans "Russian" %}</option>
+                          <option value="kk-KK">🇰🇿 {% trans "Kazakh" %}</option>
+                          <option value="uz-UZ">🇺🇿 {% trans "Uzbek" %}</option>
+                          <option value="en-US">🇺🇸 {% trans "English" %}</option>
+                          <option value="de-DE">🇩🇪 {% trans "German" %}</option>
+                          <option value="he-IL">🇮🇱 {% trans "Hebrew" %}</option>
+                        </select>
+                      </div>
+                      
+                      <div class="col-md-4">
+                        <label class="form-label small fw-semibold">{% trans "Voice" %}</label>
+                        <select class="form-select form-select-sm" id="ai-voice-select">
+                        </select>
+                      </div>
+                      
+                      <div class="col-md-4">
+                        <label class="form-label small fw-semibold">{% trans "Role" %}</label>
+                        <select class="form-select form-select-sm" id="ai-role-select">
+                          <option value="neutral" selected>{% trans "Neutral" %}</option>
+                          <option value="happy">{% trans "Happy" %}</option>
+                          <option value="angry">{% trans "Angry" %}</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                      <div class="col-md-6">
+                        <label class="form-label small fw-semibold d-flex justify-content-between">
+                          <span>{% trans "Speech Rate" %}</span>
+                          <span id="speed-value" class="text-primary">1x</span>
+                        </label>
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="small text-muted">0.1x</span>
+                          <input type="range" class="form-range flex-grow-1" id="speed-slider" 
+                                 min="0.1" max="3" step="0.1" value="1">
+                          <span class="small text-muted">3x</span>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-6">
+                        <label class="form-label small fw-semibold d-flex justify-content-between">
+                          <span>{% trans "Voice Pitch" %}</span>
+                          <span id="pitch-value" class="text-primary">0</span>
+                        </label>
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="small text-muted">-1000</span>
+                          <input type="range" class="form-range flex-grow-1" id="pitch-slider" 
+                                 min="-1000" max="1000" step="10" value="0">
+                          <span class="small text-muted">1000</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-3">
+                      <div class="col-md-12">
+                        <label class="form-label small fw-semibold">{% trans "Audio Format" %}</label>
+                        <div class="d-flex gap-3">
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" name="audio-format" id="format-mp3" value="mp3" checked>
+                            <label class="form-check-label small" for="format-mp3">
+                              MP3
+                            </label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" name="audio-format" id="format-ogg" value="ogg">
+                            <label class="form-check-label small" for="format-ogg">
+                              OggOpus
+                            </label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" name="audio-format" id="format-wav" value="wav">
+                            <label class="form-check-label small" for="format-wav">
+                              WAV
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="generation-type-section mb-4">
+                    <div class="row g-3">
+                      <div class="col-md-12">
+                        <label class="form-label small fw-semibold">{% trans "Generation Type" %}</label>
+                        <div class="btn-group w-100" role="group">
+                          <input type="radio" class="btn-check" name="generation-type" id="generate-audio" 
+                                 value="audio" autocomplete="off" checked>
+                          <label class="btn btn-outline-primary" for="generate-audio">
+                            <i class="fas fa-volume-up me-2"></i>{% trans "Generate Audio from Description" %}
+                          </label>
+                          
+                          <input type="radio" class="btn-check" name="generation-type" id="generate-both" 
+                                 value="both" autocomplete="off">
+                          <label class="btn btn-outline-success" for="generate-both">
+                            <i class="fas fa-magic me-2"></i>{% trans "Generate Description and Audio" %}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-4" id="audio-from-description-section">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <label class="form-label small fw-semibold mb-0">{% trans "Text for Audio Guide" %}</label>
+                      <div>
+                        <button class="btn btn-sm btn-outline-secondary" id="use-description-btn" type="button">
+                          <i class="fas fa-sync me-1"></i>{% trans "Use Point Description" %}
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary" id="edit-text-btn" type="button">
+                          <i class="fas fa-edit me-1"></i>{% trans "Edit" %}
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div class="card bg-white border">
+                      <div class="card-body">
+                        <div id="ai-text-preview" 
+                             style="min-height: 150px; max-height: 250px; overflow-y: auto; font-size: 0.9em; line-height: 1.5;"
+                             class="ai-generated-text"
+                             contenteditable="false">
+                          <div class="text-center text-muted py-4">
+                            <i class="fas fa-comment-alt fa-2x mb-2"></i>
+                            <div>{% trans "Load text for audio generation" %}</div>
+                            <div class="small mt-1">{% trans "Click 'Use Point Description' or enter text manually" %}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-4" id="generate-description-section" style="display: none;">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <label class="form-label small fw-semibold">{% trans "Description Style" %}</label>
+                        <select class="form-select form-select-sm" id="description-style">
+                          <option value="storytelling" selected>📖 {% trans "Storytelling" %}</option>
+                          <option value="historical">🏛️ {% trans "Historical" %}</option>
+                          <option value="touristic">👨‍👩‍👧‍👦 {% trans "Touristic" %}</option>
+                          <option value="poetic">🎭 {% trans "Poetic" %}</option>
+                          <option value="scientific">🔬 {% trans "Scientific" %}</option>
+                        </select>
+                      </div>
+                      
+                      <div class="col-md-6">
+                        <label class="form-label small fw-semibold">{% trans "Text Length" %}</label>
+                        <select class="form-select form-select-sm" id="description-length">
+                          <option value="short">{% trans "Short (1-2 paragraphs)" %}</option>
+                          <option value="medium" selected>{% trans "Medium (3-4 paragraphs)" %}</option>
+                          <option value="long">{% trans "Detailed (5+ paragraphs)" %}</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                      <div class="coordinates-info text-muted small">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        <span id="current-coordinates-display">{% trans "Coordinates: not specified" %}</span>
+                      </div>
+                      <div class="form-text small mt-1">
+                        {% trans "Description will be generated based on point coordinates and address" %}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ai-controls-section">
+                    <div class="d-grid gap-2">
+                      <button class="btn btn-primary btn-lg" id="ai-generate-main-btn" type="button">
+                        <i class="fas fa-magic me-2"></i>
+                        <span id="generate-btn-text">{% trans "Generate Audio" %}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="ai-status-section mt-4">
+                    <div class="ai-generation-progress" id="ai-generation-progress" style="display: none;">
+                      <div class="alert alert-info border-0">
+                        <div class="d-flex align-items-center">
+                          <div class="spinner-border spinner-border-sm me-3" role="status"></div>
+                          <div class="flex-grow-1">
+                            <div class="fw-medium small" id="progress-status">{% trans "Preparing..." %}</div>
+                            <div class="progress mt-2" style="height: 4px;">
+                              <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ai-audio-success mt-3" id="ai-audio-success" style="display: none;">
+                      <div class="alert alert-success border-0">
+                        <div class="d-flex align-items-center">
+                          <i class="fas fa-volume-up me-3"></i>
+                          <div class="flex-grow-1">
+                            <div class="fw-medium small">{% trans "Audio guide created!" %}</div>
+                            <div class="small mt-1" id="success-message">{% trans "Audio automatically applied to point" %}</div>
+                          </div>
+                          <button class="btn btn-success btn-sm" id="play-generated-audio-btn" type="button">
+                            <i class="fas fa-play me-1"></i>{% trans "Play" %}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ai-generation-error mt-3" id="ai-generation-error" style="display: none;">
+                      <div class="alert alert-danger border-0">
+                        <div class="d-flex align-items-center">
+                          <i class="fas fa-exclamation-triangle me-3"></i>
+                          <div class="flex-grow-1">
+                            <div class="fw-medium small" id="ai-error-title">{% trans "Error" %}</div>
+                            <div class="small mt-1" id="ai-error-message"></div>
+                          </div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger mt-2" id="retry-ai-generation" type="button">
+                          <i class="fas fa-redo me-1"></i>{% trans "Retry" %}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 pt-3 border-top border-opacity-25">
+                <div class="alert alert-warning bg-warning bg-opacity-10 border-warning border-opacity-25 small mb-0">
+                  <i class="fas fa-info-circle me-2"></i>
+                  {% trans "Supported formats: MP3, WAV, M4A. Maximum size - 50MB" %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i>{% trans "Cancel" %}
+        </button>
+        <button type="button" id="save-point-btn" class="btn btn-primary">
+          <i class="fas fa-save me-1"></i>{% trans "Save Point" %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.recording-pulse {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+#live-visualizer .audio-bar {
+    width: 3px;
+    background: linear-gradient(to top, #3b82f6, #60a5fa);
+    border-radius: 2px;
+    transition: height 0.1s ease;
+}
+
+.ai-generated-text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.photo-remove-btn {
+    transition: all 0.2s ease;
+}
+
+.photo-remove-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.photo-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8f9fa;
+    transition: transform 0.2s ease;
+}
+
+.photo-item:hover {
+    transform: translateY(-2px);
+}
+
+.photo-upload {
+    transition: all 0.2s ease;
+    border: 2px dashed #dee2e6 !important;
+}
+
+.photo-upload:hover {
+    border-color: #6c757d !important;
+    background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .coord-inputs .input-group {
+        flex-direction: column;
+    }
+    
+    .coord-inputs .input-group-text {
+        border-radius: 12px 12px 0 0 !important;
+        width: 100%;
+    }
+    
+    .coord-inputs .form-control {
+        border-radius: 0 0 12px 12px !important;
+        width: 100%;
+    }
+    
+    .photos-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .photos-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .ai-config-section .row > div {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+
+<script>
+window.pointEditor = {
+    currentPointIndex: null,
+    currentPointId: null,
+    pointAudio: null,
+    audioElement: null,
+    recordingTimer: null,
+    visualizerInterval: null,
+    isGeneratingAudio: false,
+    generatedText: null,
+    currentGenerationType: 'audio',
+    
+    pointPhotos: [],
+    
+    voiceMapByLanguage: {
+        'ru-RU': [
+            {name: 'Filipp', code: 'filipp'},
+            {name: 'Ermil', code: 'ermil'},
+            {name: 'Zahar', code: 'zahar'},
+            {name: 'Dasha', code: 'dasha'},
+            {name: 'Julia', code: 'julia'},
+            {name: 'Lera', code: 'lera'},
+            {name: 'Marina', code: 'marina'},
+            {name: 'Alexander', code: 'alexander'},
+            {name: 'Kirill', code: 'kirill'},
+            {name: 'Anton', code: 'anton'},
+            {name: 'Masha', code: 'masha'}
+        ],
+        'kk-KK': [
+            {name: 'Madi', code: 'madi'},
+            {name: 'Amira', code: 'amira'},
+            {name: 'Zhanar', code: 'zhanar'},
+            {name: 'Saule', code: 'saule'}
+        ],
+        'uz-UZ': [
+            {name: 'Yuldus', code: 'yuldus'},
+            {name: 'Nigora', code: 'nigora'},
+            {name: 'Zamira', code: 'zamira'}
+        ],
+        'en-US': [
+            {name: 'John', code: 'john'}
+        ],
+        'de-DE': [
+            {name: 'Lea', code: 'lea'}
+        ],
+        'he-IL': [
+            {name: 'Naomi', code: 'naomi'}
+        ]
+    },
+    
+    init: function() {
+        this.setupPhotoHandlers();
+        this.setupAudioHandlers();
+        this.setupAIGenerationHandlers();
+        document.getElementById('save-point-btn').addEventListener('click', () => this.savePoint());
+        this.setupAudioElement();
+        this.setupSliders();
+        this.setupGenerationTypeHandlers();
+        this.setupVoiceSelection();
+        this.initCompatibility();
+    },
+    
+    setupPhotoHandlers: function() {
+        const photosInput = document.getElementById('photos-input');
+        if (photosInput) {
+            photosInput.addEventListener('change', (e) => {
+                this.handlePhotosUpload(e.target.files);
+            });
+        }
+    },
+    
+    handlePhotosUpload: function(files) {
+      const currentCount = this.pointPhotos.length;
+      
+      if (currentCount + files.length > 5) {
+          this.showToast('Maximum 5 photos allowed', 'warning');
+          return;
+      }
+      
+      Array.from(files).forEach(file => {
+          if (!this.validateImageFile(file)) return;
+          
+          const reader = new FileReader();
+          reader.onload = (e) => {
+              this.pointPhotos.push({
+                  file: file,
+                  preview: e.target.result,
+                  isNew: true
+              });
+              this.updatePhotosGrid();
+          };
+          reader.readAsDataURL(file);
+      });
+  },
+    
+    createPhotoItem: function(src, index) {
+        const div = document.createElement('div');
+        div.className = 'photo-item';
+        div.innerHTML = `
+            <img src="${src}" class="w-100 h-100 object-fit-cover rounded" style="object-fit: cover; height: 120px;">
+            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 photo-remove-btn" 
+                    style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center;"
+                    onclick="window.pointEditor.removePhotoByIndex(${index})">
+                <i class="fas fa-times" style="font-size: 12px;"></i>
+            </button>
+        `;
+        return div;
+    },
+    
+    removePhotoByIndex: function(index) {
+        if (index >= 0 && index < this.pointPhotos.length) {
+            this.pointPhotos.splice(index, 1);
+            this.updatePhotosGrid();
+            this.showToast('{% trans "Photo removed" %}', 'info');
+        }
+    },
+    
+    updatePhotosGrid: function() {
+        const grid = document.querySelector('.photos-grid');
+        const countElement = document.getElementById('photos-count');
+        if (grid && countElement) {
+            grid.innerHTML = '';
+            
+            this.pointPhotos.forEach((photo, index) => {
+                const photoItem = this.createPhotoItem(photo.preview, index);
+                grid.appendChild(photoItem);
+            });
+            
+            const uploadButton = document.createElement('div');
+            uploadButton.className = 'photo-upload border rounded-3 d-flex align-items-center justify-content-center text-muted';
+            uploadButton.style.cssText = 'height: 120px; cursor: pointer; border-style: dashed !important;';
+            uploadButton.innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-plus fa-lg mb-2"></i>
+                    <div class="small">{% trans "Add Photo" %}</div>
+                    <div class="extra-small mt-1">{% trans "Max 5 photos" %}</div>
+                </div>
+            `;
+            uploadButton.onclick = () => document.getElementById('photos-input').click();
+            
+            if (this.pointPhotos.length < 5) {
+                grid.appendChild(uploadButton);
+            }
+            
+            countElement.textContent = `${this.pointPhotos.length}/5`;
+        }
+    },
+    
+    validateImageFile: function(file) {
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+          this.showToast('Unsupported image format', 'warning');
+          return false;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+          this.showToast('File size should not exceed 5MB', 'warning');
+          return false;
+      }
+      
+      return true;
+  },
+    
+    loadPhotosFromPoint: function(pointData) {
+      this.pointPhotos = [];
+      
+      if (pointData.photos && pointData.photos.length > 0) {
+          pointData.photos.forEach(photo => {
+              this.pointPhotos.push({
+                  preview: photo.url,
+                  isNew: false
+              });
+          });
+          this.updatePhotosGrid();
+      }
+  },
+    
+    getFullUrl: function(url) {
+        if (!url) return '';
+        if (url.startsWith('http') || url.startsWith('data:')) {
+            return url;
+        }
+        if (url.startsWith('/')) {
+            return window.location.origin + url;
+        }
+        return url;
+    },
+    
+    initCompatibility: function() {
+        window.audioGenerationManager = {
+            showAudioForPoint: (pointId, pointData) => {
+                this.handleAudioForPoint(pointId, pointData);
+            },
+            
+            showNoAudio: () => {
+                this.showAudioRecorder();
+            },
+            
+            currentAudioUrl: null,
+            
+            generateAudio: () => {
+                return this.processAIGeneration();
+            },
+            
+            deleteAudio: () => {
+                this.removeAudio();
+                return Promise.resolve();
+            },
+            
+            openAudioSettings: () => {
+                const aiSection = document.getElementById('ai-audio-generator');
+                if (aiSection) {
+                    aiSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        };
+    },
+    
+    setupVoiceSelection: function() {
+        const languageSelect = document.getElementById('ai-language-select');
+        const voiceSelect = document.getElementById('ai-voice-select');
+        
+        if (languageSelect && voiceSelect) {
+            const updateVoices = () => {
+                const selectedLanguage = languageSelect.value;
+                const voices = this.voiceMapByLanguage[selectedLanguage] || this.voiceMapByLanguage['ru-RU'];
+                const currentVoice = voiceSelect.value;
+                
+                voiceSelect.innerHTML = '';
+                
+                voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = voice.name;
+                    voiceSelect.appendChild(option);
+                });
+                
+                const availableVoices = voices.map(v => v.name);
+                if (availableVoices.includes(currentVoice)) {
+                    voiceSelect.value = currentVoice;
+                } else if (voices.length > 0) {
+                    voiceSelect.value = voices[0].name;
+                }
+            };
+            
+            languageSelect.addEventListener('change', updateVoices);
+            updateVoices();
+        }
+    },
+    
+    setupSliders: function() {
+        const speedSlider = document.getElementById('speed-slider');
+        const speedValue = document.getElementById('speed-value');
+        if (speedSlider && speedValue) {
+            speedSlider.addEventListener('input', (e) => {
+                speedValue.textContent = `${parseFloat(e.target.value).toFixed(1)}x`;
+            });
+            speedValue.textContent = `${parseFloat(speedSlider.value).toFixed(1)}x`;
+        }
+        
+        const pitchSlider = document.getElementById('pitch-slider');
+        const pitchValue = document.getElementById('pitch-value');
+        if (pitchSlider && pitchValue) {
+            pitchSlider.addEventListener('input', (e) => {
+                pitchValue.textContent = e.target.value;
+            });
+            pitchValue.textContent = pitchSlider.value;
+        }
+    },
+    
+    setupGenerationTypeHandlers: function() {
+        const generateAudioRadio = document.getElementById('generate-audio');
+        const generateBothRadio = document.getElementById('generate-both');
+        const audioFromDescriptionSection = document.getElementById('audio-from-description-section');
+        const generateDescriptionSection = document.getElementById('generate-description-section');
+        const generateBtnText = document.getElementById('generate-btn-text');
+        
+        if (generateAudioRadio && generateBothRadio) {
+            generateAudioRadio.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    this.currentGenerationType = 'audio';
+                    audioFromDescriptionSection.style.display = 'block';
+                    generateDescriptionSection.style.display = 'none';
+                    generateBtnText.textContent = '{% trans "Generate Audio" %}';
+                    this.updateCoordinatesDisplay();
+                }
+            });
+            
+            generateBothRadio.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    this.currentGenerationType = 'both';
+                    audioFromDescriptionSection.style.display = 'none';
+                    generateDescriptionSection.style.display = 'block';
+                    generateBtnText.textContent = '{% trans "Generate Description and Audio" %}';
+                    this.updateCoordinatesDisplay();
+                }
+            });
+        }
+    },
+    
+    updateCoordinatesDisplay: function() {
+        const lat = document.getElementById('point-lat').value;
+        const lng = document.getElementById('point-lng').value;
+        const address = document.getElementById('point-address').value || '{% trans "not specified" %}';
+        
+        const displayText = `{% trans "Coordinates:" %} ${lat || '—'}, ${lng || '—'} | {% trans "Address:" %} ${address}`;
+        
+        const coordinatesDisplay = document.getElementById('current-coordinates-display');
+        if (coordinatesDisplay) {
+            coordinatesDisplay.textContent = displayText;
+        }
+    },
+    
+    handleAudioForPoint: function(pointId, pointData) {
+        this.currentPointId = pointId;
+        
+        if (pointData?.audio_url) {
+            this.pointAudio = {
+                url: pointData.audio_url,
+                filename: pointData.audio_filename || '{% trans "Point Audio Guide" %}',
+                is_ai_generated: pointData.ai_audio_generated || false
+            };
+            this.showAudioPlayer();
+            
+            if (pointData.ai_audio_generated) {
+                this.showAIGenerationSuccess();
+            }
+        } else {
+            this.showAudioRecorder();
+        }
+        
+        if (pointData?.description) {
+            this.generatedText = pointData.description;
+            const preview = document.getElementById('ai-text-preview');
+            if (preview) {
+                preview.innerHTML = `<div class="ai-generated-text">${this.escapeHtml(pointData.description)}</div>`;
+            }
+        }
+        
+        setTimeout(() => {
+            this.updateCoordinatesDisplay();
+        }, 100);
+        
+        const generateBtn = document.getElementById('ai-generate-main-btn');
+        if (generateBtn) {
+            generateBtn.disabled = !pointId || pointId <= 0;
+        }
+    },
+    
+    setupAIGenerationHandlers: function() {
+        const generateBtn = document.getElementById('ai-generate-main-btn');
+        if (generateBtn) {
+            generateBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.processAIGeneration();
+            });
+        }
+        
+        const useDescBtn = document.getElementById('use-description-btn');
+        if (useDescBtn) {
+            useDescBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.loadExistingDescription();
+            });
+        }
+        
+        const editTextBtn = document.getElementById('edit-text-btn');
+        if (editTextBtn) {
+            editTextBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.toggleEditText();
+            });
+        }
+        
+        const retryBtn = document.getElementById('retry-ai-generation');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.processAIGeneration();
+            });
+        }
+        
+        const playAudioBtn = document.getElementById('play-generated-audio-btn');
+        if (playAudioBtn) {
+            playAudioBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.toggleAudioPlayback();
+            });
+        }
+    },
+    
+    processAIGeneration: async function() {
+        if (!this.currentPointId || this.currentPointId <= 0) {
+            this.showToast('{% trans "Save point first" %}', 'warning');
+            return;
+        }
+        
+        if (this.currentGenerationType === 'audio') {
+            if (!this.generatedText || this.generatedText.trim() === '') {
+                this.showToast('{% trans "Load text for audio generation first" %}', 'warning');
+                return;
+            }
+            
+            if (this.generatedText.length > 5000) {
+                this.showToast('{% trans "Text too long (maximum 5000 characters)" %}', 'warning');
+                return;
+            }
+        }
+        
+        if (this.isGeneratingAudio) {
+            return;
+        }
+        
+        this.showGenerationProgress('{% trans "Preparing..." %}');
+        
+        try {
+            let textToGenerate = this.generatedText;
+            
+            if (this.currentGenerationType === 'both') {
+                this.showGenerationProgress('{% trans "Yandex GPT creating description..." %}');
+                textToGenerate = await this.generateDescription();
+                
+                this.generatedText = textToGenerate;
+                document.getElementById('point-description').value = textToGenerate;
+                this.showToast('✅ {% trans "Description generated successfully" %}', 'success');
+            }
+            
+            if (textToGenerate) {
+                const audioUrl = await this.generateAudioFromText(textToGenerate);
+                
+                if (window.audioGenerationManager) {
+                    window.audioGenerationManager.currentAudioUrl = audioUrl;
+                }
+                
+            } else {
+                throw new Error('{% trans "No text for audio generation" %}');
+            }
+            
+        } catch (error) {
+            this.showGenerationError(error.message || '{% trans "Unknown error" %}');
+            this.showToast(`{% trans "Error:" %} ${error.message}`, 'danger');
+        } finally {
+            this.hideGenerationProgress();
+        }
+    },
+    
+    generateDescription: async function() {
+        const latInput = document.getElementById('point-lat');
+        const lngInput = document.getElementById('point-lng');
+        
+        if (!latInput || !lngInput) {
+            throw new Error('{% trans "Coordinate fields not found in form" %}');
+        }
+        
+        const lat = parseFloat(latInput.value);
+        const lng = parseFloat(lngInput.value);
+        
+        if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+            throw new Error('{% trans "Specify point coordinates first" %}');
+        }
+        
+        this.isGeneratingText = true;
+        this.showGenerationProgress('{% trans "Yandex GPT creating tour text..." %}');
+        
+        try {
+            const csrftoken = this.getCookie('csrftoken');
+            const style = document.getElementById('description-style').value;
+            const length = document.getElementById('description-length').value;
+            const address = document.getElementById('point-address').value || '';
+            
+            const response = await fetch(`/api/ai-audio/generate-location-description/${this.currentPointId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    style: style,
+                    save_to_point: false,
+                    address: address,
+                    length: length,
+                    lat: lat,
+                    lng: lng
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                this.generatedText = data.description;
+                this.updateTextPreview(data.description);
+                this.showToast('✅ {% trans "Tour text created!" %}', 'success');
+                return data.description;
+            } else {
+                throw new Error(data.error || '{% trans "Server error" %}');
+            }
+            
+        } catch (error) {
+            throw error;
+        } finally {
+            this.isGeneratingText = false;
+        }
+    },
+    
+    generateAudioFromText: async function(text) {
+        this.isGeneratingAudio = true;
+        this.showGenerationProgress('{% trans "SpeechKit generating audio..." %}');
+        
+        try {
+            const csrftoken = this.getCookie('csrftoken');
+            
+            const voice = document.getElementById('ai-voice-select').value;
+            const language = document.getElementById('ai-language-select').value;
+            const role = document.getElementById('ai-role-select').value;
+            const speed = parseFloat(document.getElementById('speed-slider').value);
+            const pitch = parseInt(document.getElementById('pitch-slider').value);
+            
+            const formatInputs = document.getElementsByName('audio-format');
+            let format = 'mp3';
+            for (let input of formatInputs) {
+                if (input.checked) {
+                    format = input.value;
+                    break;
+                }
+            }
+            
+            const ttsLanguage = language.split('-')[0];
+            
+            let ttsVoice = 'ermil';
+            const voicesForLanguage = this.voiceMapByLanguage[language] || this.voiceMapByLanguage['ru-RU'];
+            const voiceInfo = voicesForLanguage.find(v => v.name === voice);
+            if (voiceInfo) {
+                ttsVoice = voiceInfo.code;
+            }
+            
+            const emotionMapping = {
+                'neutral': 'neutral',
+                'happy': 'good',
+                'angry': 'evil'
+            };
+            
+            const emotion = emotionMapping[role] || 'neutral';
+            
+            let expressiveness = 50;
+            if (role === 'happy') expressiveness = 80;
+            if (role === 'angry') expressiveness = 70;
+            
+            let voiceType = 'male_guide_ru';
+            if (voice === 'Dasha' || voice === 'Julia' || voice === 'Lera' || voice === 'Marina' || 
+                voice === 'Masha' || voice === 'Amira' || voice === 'Zhanar' || voice === 'Saule' || 
+                voice === 'Yuldus' || voice === 'Zamira' || voice === 'Nigora' || voice === 'Lea' || 
+                voice === 'Naomi') {
+                voiceType = 'female_guide_ru';
+            }
+            
+            const response = await fetch(`/api/ai-audio/generate/${this.currentPointId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    text: text,
+                    voice_type: voiceType,
+                    language: ttsLanguage,
+                    expressiveness: expressiveness,
+                    generation_type: this.currentGenerationType,
+                    voice: ttsVoice,
+                    emotion: emotion,
+                    speed: speed,
+                    pitch: pitch,
+                    format: format
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.status === 'success') {
+                this.pointAudio = {
+                    url: data.audio_url,
+                    filename: `{% trans "AudioGuide" %}_${voice}_${new Date().toLocaleDateString('en-US')}.${format}`,
+                    is_ai_generated: true
+                };
+                
+                this.showAudioPlayer();
+                this.showAIGenerationSuccess();
+                
+                if (window.routeEditor && typeof window.routeEditor.updatePointAudio === 'function') {
+                    window.routeEditor.updatePointAudio(this.currentPointId, data.audio_url);
+                }
+                
+                this.showToast(`✅ {% trans "Audio guide created with voice" %} ${voice}!`, 'success');
+                
+                return data.audio_url;
+            } else {
+                throw new Error(data.error || '{% trans "Server error during audio generation" %}');
+            }
+        } catch (error) {
+            throw error;
+        } finally {
+            this.isGeneratingAudio = false;
+        }
+    },
+    
+    showAIGenerationSuccess: function() {
+        const audioResult = document.getElementById('ai-audio-success');
+        if (audioResult) {
+            audioResult.style.display = 'block';
+        }
+    },
+    
+    toggleEditText: function() {
+        const preview = document.getElementById('ai-text-preview');
+        const editBtn = document.getElementById('edit-text-btn');
+        
+        if (!preview || !this.generatedText) {
+            this.showToast('{% trans "Load text first" %}', 'warning');
+            return;
+        }
+        
+        if (preview.getAttribute('contenteditable') === 'true') {
+            preview.setAttribute('contenteditable', 'false');
+            preview.classList.remove('border', 'border-primary');
+            
+            const textDiv = preview.querySelector('.ai-generated-text');
+            if (textDiv) {
+                this.generatedText = textDiv.textContent.trim();
+            }
+            
+            editBtn.innerHTML = '<i class="fas fa-edit me-1"></i>{% trans "Edit" %}';
+            editBtn.classList.remove('btn-success');
+            editBtn.classList.add('btn-outline-primary');
+            this.showToast('{% trans "Text saved" %}', 'info');
+        } else {
+            preview.setAttribute('contenteditable', 'true');
+            preview.classList.add('border', 'border-primary');
+            
+            const textDiv = preview.querySelector('.ai-generated-text');
+            if (textDiv) {
+                const range = document.createRange();
+                const sel = window.getSelection();
+                range.selectNodeContents(textDiv);
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+            
+            editBtn.innerHTML = '<i class="fas fa-save me-1"></i>{% trans "Save" %}';
+            editBtn.classList.remove('btn-outline-primary');
+            editBtn.classList.add('btn-success');
+        }
+    },
+    
+    loadExistingDescription: function() {
+        const description = document.getElementById('point-description').value.trim();
+        const preview = document.getElementById('ai-text-preview');
+        
+        if (description) {
+            this.generatedText = description;
+            preview.innerHTML = `<div class="ai-generated-text">${this.escapeHtml(description)}</div>`;
+            preview.setAttribute('contenteditable', 'false');
+            this.showToast('{% trans "Point description loaded" %}', 'success');
+        } else {
+            this.showEmptyTextPreview('{% trans "Point description is empty. Add description or choose another generation type." %}');
+            this.showToast('{% trans "Point description is empty" %}', 'warning');
+        }
+    },
+    
+    showEmptyTextPreview: function(message) {
+        const preview = document.getElementById('ai-text-preview');
+        
+        preview.innerHTML = `
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-comment-alt fa-2x mb-2"></i>
+                <div>${message}</div>
+            </div>
+        `;
+        preview.setAttribute('contenteditable', 'false');
+        this.generatedText = null;
+    },
+    
+    setupAudioElement: function() {
+        this.audioElement = document.createElement('audio');
+        this.audioElement.id = 'point-audio-element';
+        this.audioElement.style.display = 'none';
+        document.body.appendChild(this.audioElement);
+    },
+    
+    setupAudioHandlers: function() {
+        const audioToggle = document.getElementById('enable-audio-guide');
+        if (audioToggle) {
+            audioToggle.addEventListener('change', (e) => {
+                if (e.target.checked && !this.pointAudio) {
+                    this.showAudioRecorder();
+                } else if (!e.target.checked && this.pointAudio) {
+                    if (confirm('{% trans "Disabling audio will hide the player. Continue?" %}')) {
+                        this.hideAudioPlayer();
+                        this.pointAudio = null;
+                    } else {
+                        e.target.checked = true;
+                    }
+                }
+            });
+        }
+        
+        const recordBtn = document.getElementById('start-audio-record');
+        if (recordBtn) {
+            recordBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.startAudioRecording();
+            });
+        }
+        
+        const uploadBtn = document.getElementById('upload-audio-file');
+        if (uploadBtn) {
+            uploadBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('audio-file-input').click();
+            });
+        }
+        
+        const audioFileInput = document.getElementById('audio-file-input');
+        if (audioFileInput) {
+            audioFileInput.addEventListener('change', (e) => {
+                this.handleAudioUpload(e);
+            });
+        }
+        
+        const reRecordBtn = document.getElementById('re-record-audio');
+        if (reRecordBtn) {
+            reRecordBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.resetAudio();
+            });
+        }
+        
+        const removeBtn = document.getElementById('remove-audio');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.removeAudio();
+            });
+        }
+        
+        const playBtn = document.querySelector('.audio-play-btn');
+        if (playBtn) {
+            playBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.toggleAudioPlayback();
+            });
+        }
+    },
+    
+    show: function(pointIndex, pointData = null) {
+        this.currentPointIndex = pointIndex;
+        this.resetForm();
+        
+        if (pointData) {
+            this.currentPointId = pointData.id || null;
+            this.fillForm(pointData);
+        } else {
+            this.currentPointId = null;
+        }
+        
+        setTimeout(() => {
+            this.updateCoordinatesDisplay();
+        }, 100);
+        
+        const modal = new bootstrap.Modal(document.getElementById('point-editor-modal'));
+        modal.show();
+    },
+    
+    fillForm: function(pointData) {
+        document.getElementById('edit-point-id').value = pointData.id || '';
+        
+        // Обновляем currentPointId только если это реальный ID из базы
+        const originalId = pointData.id || '';
+        if (originalId && originalId > 0 && !isNaN(parseInt(originalId))) {
+            this.currentPointId = originalId;
+        } else {
+            this.currentPointId = null;
+        }
+        
+        document.getElementById('point-name').value = pointData.name || '';
+        document.getElementById('point-category').value = pointData.category || '';
+        document.getElementById('point-address').value = pointData.address || '';
+        
+        document.getElementById('point-lat').value = pointData.lat || pointData.latitude || '';
+        document.getElementById('point-lng').value = pointData.lng || pointData.longitude || '';
+        
+        document.getElementById('point-hint-author').value = pointData.hint_author || '';
+        document.getElementById('point-description').value = pointData.description || '';
+        document.getElementById('point-tags').value = pointData.tags ? pointData.tags.join(', ') : '';
+        
+        this.loadPhotosFromPoint(pointData);
+        
+        if (pointData.audio_url) {
+            this.pointAudio = {
+                url: pointData.audio_url,
+                filename: pointData.audio_filename || '{% trans "Point Audio Guide" %}',
+                is_ai_generated: pointData.ai_audio_generated || false
+            };
+            this.showAudioPlayer();
+            
+            if (pointData.ai_audio_generated) {
+                this.showAIGenerationSuccess();
+            }
+        } else {
+            this.showAudioRecorder();
+        }
+        
+        if (pointData.description) {
+            this.generatedText = pointData.description;
+            this.updateTextPreview(pointData.description);
+        } else {
+            this.showEmptyTextPreview('{% trans "Click \"Use Point Description\" or choose \"Generate Description and Audio\"" %}');
+        }
+        
+        const generateBtn = document.getElementById('ai-generate-main-btn');
+        if (generateBtn) {
+            generateBtn.disabled = !this.currentPointId || this.currentPointId <= 0;
+        }
+    },
+    
+    updateTextPreview: function(text) {
+        const preview = document.getElementById('ai-text-preview');
+        if (preview) {
+            preview.innerHTML = `<div class="ai-generated-text">${this.escapeHtml(text)}</div>`;
+            preview.setAttribute('contenteditable', 'false');
+        }
+    },
+    
+    toggleAudioPlayback: function() {
+        if (!this.audioElement || !this.pointAudio?.url) return;
+        
+        const playBtn = document.querySelector('.audio-play-btn');
+        const generatedPlayBtn = document.getElementById('play-generated-audio-btn');
+        
+        if (this.audioElement.paused) {
+            this.audioElement.src = this.pointAudio.url;
+            this.audioElement.play().then(() => {
+                if (playBtn) playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                if (generatedPlayBtn) generatedPlayBtn.innerHTML = '<i class="fas fa-pause me-1"></i>{% trans "Pause" %}';
+                this.setupAudioProgress();
+            }).catch(error => {
+                this.showToast('{% trans "Audio playback error" %}', 'danger');
+            });
+        } else {
+            this.audioElement.pause();
+            if (playBtn) playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            if (generatedPlayBtn) generatedPlayBtn.innerHTML = '<i class="fas fa-play me-1"></i>{% trans "Play" %}';
+        }
+    },
+    
+    setupAudioProgress: function() {
+        if (!this.audioElement) return;
+        
+        const progressBar = document.querySelector('.audio-progress');
+        const durationSpan = document.querySelector('.audio-duration');
+        
+        this.audioElement.addEventListener('timeupdate', () => {
+            if (this.audioElement.duration && progressBar) {
+                const progress = (this.audioElement.currentTime / this.audioElement.duration) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+            if (durationSpan) {
+                const formatTime = (seconds) => {
+                    if (isNaN(seconds)) return '0:00';
+                    const mins = Math.floor(seconds / 60);
+                    const secs = Math.floor(seconds % 60);
+                    return `${mins}:${secs.toString().padStart(2, '0')}`;
+                };
+                durationSpan.textContent = formatTime(this.audioElement.currentTime);
+            }
+        });
+        
+        this.audioElement.addEventListener('ended', () => {
+            const playBtn = document.querySelector('.audio-play-btn');
+            const generatedPlayBtn = document.getElementById('play-generated-audio-btn');
+            if (playBtn) playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            if (generatedPlayBtn) generatedPlayBtn.innerHTML = '<i class="fas fa-play me-1"></i>{% trans "Play" %}';
+            if (progressBar) progressBar.style.width = '0%';
+        });
+    },
+    
+    resetAudio: function() {
+        if (confirm('{% trans "Are you sure you want to re-record audio?" %}')) {
+            this.pointAudio = null;
+            if (this.audioElement) {
+                this.audioElement.pause();
+                this.audioElement.src = '';
+            }
+            this.showAudioRecorder();
+            this.showToast('{% trans "Audio reset. You can record new one." %}', 'info');
+        }
+    },
+    
+    removeAudio: function() {
+        if (confirm('{% trans "Are you sure you want to delete audio?" %}')) {
+            this.pointAudio = null;
+            if (this.audioElement) {
+                this.audioElement.pause();
+                this.audioElement.src = '';
+            }
+            this.showAudioRecorder();
+            
+            if (window.routeEditor?.updatePointAudio) {
+                window.routeEditor.updatePointAudio(this.currentPointId, null);
+            }
+            
+            this.showToast('{% trans "Audio deleted" %}', 'info');
+        }
+    },
+    
+    showAudioPlayer: function() {
+        document.getElementById('point-audio-player').style.display = 'block';
+        document.getElementById('point-audio-recorder').style.display = 'none';
+        
+        if (this.pointAudio?.filename) {
+            document.getElementById('audio-filename').textContent = this.pointAudio.filename;
+        }
+        
+        document.getElementById('enable-audio-guide').checked = true;
+        
+        const generatedPlayBtn = document.getElementById('play-generated-audio-btn');
+        if (generatedPlayBtn) {
+            generatedPlayBtn.innerHTML = '<i class="fas fa-play me-1"></i>{% trans "Play" %}';
+        }
+    },
+    
+    hideAudioPlayer: function() {
+        document.getElementById('point-audio-player').style.display = 'none';
+    },
+    
+    showAudioRecorder: function() {
+        document.getElementById('point-audio-player').style.display = 'none';
+        document.getElementById('point-audio-recorder').style.display = 'block';
+        document.getElementById('enable-audio-guide').checked = false;
+        
+        this.hideGenerationProgress();
+        this.hideAIGenerationSuccess();
+        this.hideGenerationError();
+    },
+    
+    startAudioRecording: function() {
+        document.getElementById('recording-indicator').style.display = 'block';
+        document.getElementById('recording-visualizer').style.display = 'block';
+        
+        let seconds = 0;
+        this.recordingTimer = setInterval(() => {
+            seconds++;
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            document.getElementById('recording-timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            
+            if (seconds >= 30) {
+                this.stopAudioRecording();
+            }
+        }, 1000);
+        
+        this.updateAudioVisualizer();
+    },
+    
+    stopAudioRecording: function() {
+        if (this.recordingTimer) {
+            clearInterval(this.recordingTimer);
+            this.recordingTimer = null;
+        }
+        
+        document.getElementById('recording-indicator').style.display = 'none';
+        document.getElementById('recording-visualizer').style.display = 'none';
+        
+        this.pointAudio = {
+            url: '#demo-audio',
+            filename: `{% trans "Recording" %}_${new Date().toLocaleTimeString('en-US')}.mp3`
+        };
+        
+        this.showAudioPlayer();
+        this.showToast('{% trans "Recording completed (demo)" %}', 'success');
+    },
+    
+    updateAudioVisualizer: function() {
+        const visualizer = document.getElementById('live-visualizer');
+        if (!visualizer) return;
+        
+        visualizer.innerHTML = '';
+        
+        for (let i = 0; i < 40; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'audio-bar';
+            bar.style.height = `${Math.random() * 40 + 10}px`;
+            visualizer.appendChild(bar);
+        }
+        
+        if (this.visualizerInterval) {
+            clearInterval(this.visualizerInterval);
+        }
+        
+        this.visualizerInterval = setInterval(() => {
+            const bars = visualizer.querySelectorAll('.audio-bar');
+            bars.forEach(bar => {
+                bar.style.height = `${Math.random() * 40 + 10}px`;
+            });
+        }, 100);
+    },
+    
+    handleAudioUpload: function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        if (!this.validateAudioFile(file)) {
+            e.target.value = '';
+            return;
+        }
+        
+        this.pointAudio = {
+            file: file,
+            filename: file.name,
+            url: URL.createObjectURL(file),
+            is_ai_generated: false
+        };
+        
+        this.showAudioPlayer();
+        this.showToast('{% trans "Audio file uploaded" %}', 'success');
+        e.target.value = '';
+    },
+    
+    showGenerationProgress: function(message = '{% trans "Generating..." %}') {
+        const progressStatus = document.getElementById('progress-status');
+        if (progressStatus) {
+            progressStatus.textContent = message;
+        }
+        
+        const progressEl = document.getElementById('ai-generation-progress');
+        if (progressEl) {
+            progressEl.style.display = 'block';
+        }
+        
+        const generateBtn = document.getElementById('ai-generate-main-btn');
+        if (generateBtn) {
+            generateBtn.disabled = true;
+        }
+        
+        this.hideAIGenerationSuccess();
+        this.hideGenerationError();
+    },
+    
+    hideGenerationProgress: function() {
+        const progressEl = document.getElementById('ai-generation-progress');
+        if (progressEl) {
+            progressEl.style.display = 'none';
+        }
+        
+        const generateBtn = document.getElementById('ai-generate-main-btn');
+        if (generateBtn) {
+            generateBtn.disabled = false;
+        }
+    },
+    
+    hideAIGenerationSuccess: function() {
+        const audioResult = document.getElementById('ai-audio-success');
+        if (audioResult) {
+            audioResult.style.display = 'none';
+        }
+    },
+    
+    showGenerationError: function(errorMessage) {
+        const errorMsgEl = document.getElementById('ai-error-message');
+        if (errorMsgEl) {
+            errorMsgEl.textContent = errorMessage;
+        }
+        
+        const errorEl = document.getElementById('ai-generation-error');
+        if (errorEl) {
+            errorEl.style.display = 'block';
+        }
+    },
+    
+    hideGenerationError: function() {
+        const errorEl = document.getElementById('ai-generation-error');
+        if (errorEl) {
+            errorEl.style.display = 'none';
+        }
+    },
+    
+    validateAudioFile: function(file) {
+        const validTypes = ['audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/x-m4a'];
+        if (!validTypes.includes(file.type)) {
+            this.showToast('{% trans "Unsupported audio format" %}', 'warning');
+            return false;
+        }
+        
+        if (file.size > 50 * 1024 * 1024) {
+            this.showToast('{% trans "File size should not exceed 50MB" %}', 'warning');
+            return false;
+        }
+        
+        return true;
+    },
+    
+    resetForm: function() {
+        const form = document.getElementById('point-form');
+        if (form) {
+            form.reset();
+        }
+        
+        this.pointPhotos = [];
+        this.pointAudio = null;
+        this.generatedText = null;
+        this.currentPointId = null;
+        
+        this.updatePhotosGrid();
+        
+        if (this.audioElement) {
+            this.audioElement.pause();
+            this.audioElement.src = '';
+        }
+        this.showAudioRecorder();
+        
+        this.showEmptyTextPreview('{% trans "Click \"Use Point Description\" or choose \"Generate Description and Audio\"" %}');
+        this.hideGenerationProgress();
+        this.hideAIGenerationSuccess();
+        this.hideGenerationError();
+        
+        const speedSlider = document.getElementById('speed-slider');
+        const speedValue = document.getElementById('speed-value');
+        if (speedSlider && speedValue) {
+            speedSlider.value = 1;
+            speedValue.textContent = '1.0x';
+        }
+        
+        const pitchSlider = document.getElementById('pitch-slider');
+        const pitchValue = document.getElementById('pitch-value');
+        if (pitchSlider && pitchValue) {
+            pitchSlider.value = 0;
+            pitchValue.textContent = '0';
+        }
+        
+        const generateAudioRadio = document.getElementById('generate-audio');
+        if (generateAudioRadio) {
+            generateAudioRadio.checked = true;
+        }
+        
+        const audioFromDescriptionSection = document.getElementById('audio-from-description-section');
+        if (audioFromDescriptionSection) {
+            audioFromDescriptionSection.style.display = 'block';
+        }
+        
+        const generateDescriptionSection = document.getElementById('generate-description-section');
+        if (generateDescriptionSection) {
+            generateDescriptionSection.style.display = 'none';
+        }
+        
+        const generateBtnText = document.getElementById('generate-btn-text');
+        if (generateBtnText) {
+            generateBtnText.textContent = '{% trans "Generate Audio" %}';
+        }
+        
+        const categorySelect = document.getElementById('point-category');
+        if (categorySelect) {
+            categorySelect.value = '';
+        }
+        
+        const voiceSelect = document.getElementById('ai-voice-select');
+        if (voiceSelect) {
+            voiceSelect.value = 'Ermil';
+        }
+        
+        const languageSelect = document.getElementById('ai-language-select');
+        if (languageSelect) {
+            languageSelect.value = 'ru-RU';
+        }
+        
+        const roleSelect = document.getElementById('ai-role-select');
+        if (roleSelect) {
+            roleSelect.value = 'neutral';
+        }
+        
+        const formatMp3 = document.getElementById('format-mp3');
+        if (formatMp3) {
+            formatMp3.checked = true;
+        }
+        
+        const audioToggle = document.getElementById('enable-audio-guide');
+        if (audioToggle) {
+            audioToggle.checked = true;
+        }
+        
+        if (this.recordingTimer) {
+            clearInterval(this.recordingTimer);
+            this.recordingTimer = null;
+        }
+        
+        if (this.visualizerInterval) {
+            clearInterval(this.visualizerInterval);
+            this.visualizerInterval = null;
+        }
+    },
+    
+    collectPointFormData: function() {
+      const formData = new FormData();
+      
+      const fields = {
+          name: document.getElementById('point-name').value || 'Untitled',
+          category: document.getElementById('point-category').value || '',
+          address: document.getElementById('point-address').value || '',
+          lat: document.getElementById('point-lat').value || 0,
+          lng: document.getElementById('point-lng').value || 0,
+          hint_author: document.getElementById('point-hint-author').value || '',
+          description: document.getElementById('point-description').value || ''
+      };
+      
+      Object.entries(fields).forEach(([key, value]) => {
+          formData.append(key, value);
+      });
+      
+      const tags = document.getElementById('point-tags').value
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(tag => tag.length > 0);
+      if (tags.length > 0) {
+          formData.append('tags', JSON.stringify(tags));
+      }
+      
+      const newPhotos = this.pointPhotos.filter(photo => photo.file);
+      console.log('New photos to upload:', newPhotos.length);
+      newPhotos.forEach((photo, index) => {
+          formData.append('photos', photo.file);
+          console.log(`Added photo ${index}:`, photo.file.name, photo.file.size);
+      });
+      
+      const existingPhotos = this.pointPhotos.filter(photo => !photo.file && photo.preview && 
+          (photo.preview.startsWith('http') || photo.preview.startsWith('/')));
+      if (existingPhotos.length > 0) {
+          const photoUrls = existingPhotos.map(photo => photo.preview);
+          formData.append('existing_photos', JSON.stringify(photoUrls));
+          console.log('Existing photos URLs:', photoUrls);
+      }
+      
+      if (this.pointAudio) {
+          if (this.pointAudio.file) {
+              formData.append('audio', this.pointAudio.file);
+              console.log('Added audio file:', this.pointAudio.file.name);
+          } else if (this.pointAudio.url && this.pointAudio.url !== '#demo-audio') {
+              formData.append('audio_url', this.pointAudio.url);
+              formData.append('audio_filename', this.pointAudio.filename || 'audio');
+              formData.append('ai_audio_generated', this.pointAudio.is_ai_generated || false);
+              console.log('Added audio URL:', this.pointAudio.url);
+          }
+      }
+      
+      return formData;
+  },
+    
+    validatePointForm: function() {
+        const name = document.getElementById('point-name').value.trim();
+        const lat = document.getElementById('point-lat').value;
+        const lng = document.getElementById('point-lng').value;
+        
+        if (!name) {
+            this.showToast('{% trans "Enter point name" %}', 'warning');
+            return false;
+        }
+        
+        if (!lat || !lng || isNaN(parseFloat(lat)) || isNaN(parseFloat(lng))) {
+            this.showToast('{% trans "Invalid point coordinates" %}', 'warning');
+            return false;
+        }
+        
+        return true;
+    },
+    
+    savePoint: async function() {
+      const routeId = window.routeEditor?.currentRouteId;
+      if (!routeId) {
+          this.showToast('No active route selected', 'warning');
+          return;
+      }
+
+      const method = this.currentPointId ? 'PUT' : 'POST';
+      const url = this.currentPointId
+          ? `/routes/api/points/${this.currentPointId}/`
+          : `/routes/api/points/`;
+
+      const tagsInput = document.getElementById('point-tags');
+      const tags = tagsInput
+          ? tagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag)
+          : [];
+
+      const formData = new FormData();
+      formData.append('route_id', routeId);
+      formData.append('name', document.getElementById('point-name').value.trim());
+      formData.append('address', document.getElementById('point-address').value);
+      formData.append('lat', document.getElementById('point-lat').value);
+      formData.append('lng', document.getElementById('point-lng').value);
+      formData.append('description', document.getElementById('point-description').value);
+      formData.append('category', document.getElementById('point-category').value);
+      formData.append('hint_author', document.getElementById('point-hint-author').value);
+      formData.append('tags', JSON.stringify(tags));
+
+      // --- Сохраняем СУЩЕСТВУЮЩИЕ фото как JSON ---
+      const existingPhotos = this.pointPhotos
+          .filter(p => !p.file && p.preview?.startsWith('/media/'))
+          .map(p => ({ url: p.preview }));
+      formData.append('existing_photos_json', JSON.stringify(existingPhotos));
+
+      // --- Добавляем НОВЫЕ фото как файлы ---
+      let fileIndex = 0;
+      this.pointPhotos.forEach(photo => {
+          if (photo.file) {
+              formData.append('photos', photo.file); // ← одинаковый ключ для всех
+              fileIndex++;
+          }
+      });
+
+      // CSRF
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      const headers = new Headers();
+      headers.append('X-CSRFToken', csrfToken);
+
+      try {
+          const response = await fetch(url, {
+              method: method,
+              headers: headers,
+              body: formData
+          });
+
+          if (response.ok) {
+              this.showToast('Point saved successfully!', 'success');
+              this.hide();
+              if (window.routeEditor && typeof window.routeEditor.loadRoute === 'function') {
+                  window.routeEditor.loadRoute(routeId);
+              }
+          } else {
+              const errorText = await response.text();
+              console.error('Save error:', errorText);
+              this.showToast('Failed to save point', 'error');
+          }
+      } catch (error) {
+          console.error('Fetch error:', error);
+          this.showToast('Network error', 'error');
+      }
+  },
+    
+    escapeHtml: function(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    },
+    
+    getCookie: function(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  },
+    
+    showToast: function(message, type = 'info') {
+        if (window.routeEditor && typeof window.routeEditor.showToast === 'function') {
+            window.routeEditor.showToast(message, type);
+        } else {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+            toast.setAttribute('role', 'alert');
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.pointEditor && typeof window.pointEditor.init === 'function') {
+        window.pointEditor.init();
+    }
+});
+</script>

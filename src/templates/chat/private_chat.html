@@ -1,0 +1,1446 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block title %}{% trans "Chat with" %} {{ other_user.username }} - Waylines{% endblock %}
+{% block content %}
+<style>
+body {
+  overflow: hidden;
+  height: 100vh;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+main {
+  min-height: calc(100vh - 56px - 60px) !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+.container-fluid.h-100 {
+  height: calc(100vh - 56px - 60px) !important;
+  overflow: hidden;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+footer {
+  position: relative !important;
+  height: 60px !important;
+  margin-top: 0 !important;
+  z-index: 1 !important;
+}
+</style>
+<div id="notifications" class="notifications-container"></div>
+<div class="container-fluid h-100 p-0">
+  <div class="row g-0 h-100">
+    <div class="col-12 h-100" id="chat-main-col">
+      <div class="chat-container h-100 d-flex flex-column">
+        <div class="chat-header bg-white border-bottom p-3 shadow-sm" style="flex-shrink: 0;">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <a href="{% url 'chat:chat_dashboard' %}" class="btn btn-sm btn-outline-secondary me-3">
+                <i class="fas fa-arrow-left"></i>
+              </a>
+              <button class="btn btn-sm btn-outline-info me-3 d-md-none" onclick="toggleUserInfo()">
+                <i class="fas fa-info-circle"></i>
+              </button>
+              <div class="position-relative me-3">
+                <div class="user-avatar">
+                  {% if other_user.profile.avatar %}
+                    <img src="{{ other_user.profile.avatar.url }}" 
+                         alt="{{ other_user.username }}"
+                         onerror="handleAvatarError(this)"
+                         class="img-fluid rounded-circle">
+                  {% else %}
+                    {{ other_user.username|first|upper }}
+                  {% endif %}
+                </div>
+                <div class="user-status {% if other_user.is_online %}online{% else %}offline{% endif %}"
+                     id="user-status-indicator"></div>
+              </div>
+              <div>
+                <h5 class="mb-1 fw-bold">{{ other_user.username }}</h5>
+                <small class="text-muted" id="last-activity">
+                  <i class="fas fa-circle me-1" style="font-size: 8px;"></i>
+                  <span id="activity-text">
+                    {% if other_user.is_online %}
+                      {% trans "Online" %}
+                    {% else %}
+                      {% trans "Was" %} {{ other_user.last_seen|timesince }} {% trans "ago" %}
+                    {% endif %}
+                  </span>
+                </small>
+              </div>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown"
+                      style="width: 40px; height: 40px;">
+                <i class="fas fa-ellipsis-v text-muted"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                <li><a class="dropdown-item" href="#" onclick="toggleUserInfo()">
+                  <i class="fas fa-info-circle me-2"></i> {% trans "User Info" %}
+                </a></li>
+                <li><a class="dropdown-item" href="{% url 'user_profile' other_user.username %}">
+                  <i class="fas fa-user me-2"></i> {% trans "Profile" %}
+                </a></li>
+                <li><a class="dropdown-item" href="#" onclick="blockUser()">
+                  <i class="fas fa-ban me-2"></i> {% trans "Block" %}
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" onclick="refreshChat()">
+                  <i class="fas fa-sync-alt me-2"></i> {% trans "Refresh Chat" %}
+                </a></li>
+                <li><a class="dropdown-item" href="{% url 'chat:chat_dashboard' %}">
+                  <i class="fas fa-comments me-2"></i> {% trans "All Chats" %}
+                </a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="chat-messages p-3" id="chat-messages" 
+             style="flex: 1 1 auto; overflow-y: auto; min-height: 0; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+          {% for message in messages %}
+          <div class="message-wrapper mb-3 {% if message.sender == request.user %}own-message{% endif %}" 
+               data-message-id="{{ message.id }}">
+            {% if message.sender != request.user %}
+            <div class="message-avatar me-2" style="align-self: flex-start;">
+              <div class="user-avatar small">
+                {% if message.sender.profile.avatar %}
+                  <img src="{{ message.sender.profile.avatar.url }}" 
+                       alt="{{ message.sender.username }}"
+                       onerror="handleAvatarError(this)"
+                       class="img-fluid rounded-circle">
+                {% else %}
+                  {{ message.sender.username|first|upper }}
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+            <div class="message-bubble {% if message.sender == request.user %}own-bubble{% else %}other-bubble{% endif %}">
+              {% if message.sender != request.user %}
+              <div class="message-sender mb-1">
+                <small class="text-primary fw-bold">{{ message.sender.username }}</small>
+              </div>
+              {% endif %}
+              <div class="message-content">
+                {% if message.message_type == 'text' %}
+                  {{ message.content|linebreaks }}
+                {% elif message.message_type == 'image' %}
+                  <div class="media-message">
+                    <img src="{{ message.content }}" alt="{% trans 'Image' %}" class="img-fluid rounded" style="max-width: 300px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="media-error" style="display: none; padding: 20px; text-align: center; color: #6c757d;">
+                      <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                      <p>{% trans "Failed to load image" %}</p>
+                    </div>
+                  </div>
+                {% elif message.message_type == 'video' %}
+                  <div class="media-message">
+                    <video controls class="img-fluid rounded" style="max-width: 300px;">
+                      <source src="{{ message.content }}" type="video/mp4">
+                      {% trans "Your browser does not support video." %}
+                    </video>
+                  </div>
+                {% elif message.message_type == 'audio' %}
+                  <div class="media-message">
+                    <audio controls class="w-100">
+                      <source src="{{ message.content }}" type="audio/mpeg">
+                      {% trans "Your browser does not support audio." %}
+                    </audio>
+                  </div>
+                {% elif message.message_type == 'voice' %}
+                  <div class="voice-message d-flex align-items-center">
+                    <button class="btn btn-sm btn-outline-primary play-voice-btn me-2" data-audio-url="{{ message.content }}">
+                      <i class="fas fa-play"></i>
+                    </button>
+                    <div class="voice-waveform flex-grow-1 me-2">
+                      <div class="waveform-bar"></div>
+                      <div class="waveform-bar"></div>
+                      <div class="waveform-bar"></div>
+                      <div class="waveform-bar"></div>
+                      <div class="waveform-bar"></div>
+                    </div>
+                    <small class="text-muted voice-duration">0:00</small>
+                  </div>
+                {% endif %}
+              </div>
+              <div class="message-time text-end mt-1">
+                <small class="text-muted">{{ message.created_at|date:"H:i" }}</small>
+                {% if message.sender == request.user %}
+                <i class="fas fa-check-double text-primary ms-1" style="font-size: 10px;"></i>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center text-muted py-5" id="empty-chat-message">
+            <div class="empty-state-icon mb-4">
+              <i class="fas fa-comments fa-4x text-light"></i>
+            </div>
+            <h4 class="fw-light">{% trans "Start a conversation" %}</h4>
+            <p class="text-muted">{% trans "Send your first message to" %} {{ other_user.username }}</p>
+          </div>
+          {% endfor %}
+        </div>
+        <div id="chat-loading" class="text-center py-3 bg-white border-top" style="display: none; flex-shrink: 0;">
+          <div class="spinner-border spinner-border-sm text-primary" role="status">
+            <span class="visually-hidden">{% trans "Loading..." %}</span>
+          </div>
+          <small class="text-muted ms-2">{% trans "Loading messages..." %}</small>
+        </div>
+        <div id="typing-indicator" class="px-4 py-2 bg-white border-top" style="display: none; flex-shrink: 0;">
+          <div class="typing-dots">
+            <small class="text-muted">
+              <i class="fas fa-pencil-alt me-2"></i>
+              <span id="typing-user">{{ other_user.username }}</span> {% trans "is typing" %}
+              <span class="typing-animation"></span>
+            </small>
+          </div>
+        </div>
+        <div class="chat-input bg-white border-top p-3 shadow-sm" style="flex-shrink: 0;">
+          <div id="media-preview" class="mb-3" style="display: none;">
+            <div class="d-flex align-items-center bg-light rounded p-2">
+              <div id="preview-content" class="flex-grow-1"></div>
+              <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="clearMedia()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <form id="chat-form" class="d-flex align-items-end gap-2" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="conversation_id" value="{{ conversation.id }}">
+            <div class="flex-grow-1 position-relative">
+              <div class="input-group">
+                <div class="btn-group me-2">
+                  <button type="button" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 40px; height: 40px;" data-bs-toggle="dropdown">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                  <ul class="dropdown-menu shadow border-0 p-2">
+                    <li>
+                      <button type="button" class="dropdown-item d-flex align-items-center py-2" onclick="triggerFileInput('image')">
+                        <i class="fas fa-image text-success me-2"></i>
+                        <span>{% trans "Photo" %}</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button type="button" class="dropdown-item d-flex align-items-center py-2" onclick="triggerFileInput('video')">
+                        <i class="fas fa-video text-info me-2"></i>
+                        <span>{% trans "Video" %}</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button type="button" class="dropdown-item d-flex align-items-center py-2" onclick="triggerFileInput('audio')">
+                        <i class="fas fa-music text-warning me-2"></i>
+                        <span>{% trans "Audio" %}</span>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+                <input type="text" 
+                       class="form-control border-end-0" 
+                       id="chat-message-input" 
+                       name="message"
+                       placeholder="{% trans 'Write a message...' %}" 
+                       maxlength="1000"
+                       autocomplete="off"
+                       style="border-radius: 25px; padding: 12px 20px; border: 1px solid #e0e0e0;">
+                <button type="button" class="btn btn-outline-secondary border-start-0" 
+                        style="border-radius: 0 25px 25px 0; border: 1px solid #e0e0e0;">
+                  <i class="fas fa-smile"></i>
+                </button>
+              </div>
+              <input type="file" id="file-input" name="media_file" accept="image/*,video/*,audio/*" style="display: none;">
+              <input type="file" id="image-input" name="media_file" accept="image/*" style="display: none;">
+              <input type="file" id="video-input" name="media_file" accept="video/*" style="display: none;">
+              <input type="file" id="audio-input" name="media_file" accept="audio/*" style="display: none;">
+            </div>
+            <button type="button" class="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center voice-toggle-btn" 
+                    id="voice-toggle-btn"
+                    style="width: 50px; height: 50px;"
+                    onmousedown="startVoiceRecording()" 
+                    onmouseup="stopVoiceRecording()"
+                    onmouseleave="stopVoiceRecording()"
+                    ontouchstart="startVoiceRecording()" 
+                    ontouchend="stopVoiceRecording()">
+              <i class="fas fa-microphone"></i>
+            </button>
+            <button type="submit" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" 
+                    id="chat-message-submit"
+                    style="width: 50px; height: 50px;">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+          <div id="voice-recording-indicator" class="mt-3 text-center" style="display: none; flex-shrink: 0;">
+            <div class="d-flex align-items-center justify-content-center">
+              <div class="recording-animation me-3">
+                <div class="pulse"></div>
+                <i class="fas fa-microphone text-danger"></i>
+              </div>
+              <div class="recording-info">
+                <div class="recording-timer">
+                  <span id="voice-recording-time">0:00</span>
+                </div>
+                <small class="text-muted">{% trans "Recording voice message..." %}</small>
+              </div>
+              <button type="button" class="btn btn-danger btn-sm ms-3" onclick="cancelVoiceRecording()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mt-2 d-flex justify-content-between align-items-center px-2" style="flex-shrink: 0;">
+            <small class="text-muted" id="char-counter">0/1000</small>
+            <small class="text-muted">
+              <i class="fas fa-bolt me-1 text-success"></i>
+              <span id="connection-status">{% trans "Connecting..." %}</span>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="user-info-sidebar-overlay" id="user-info-overlay" style="display: none;"></div>
+<div class="user-info-sidebar" id="user-info-sidebar">
+  <div class="user-info-content">
+    <div class="user-info-header">
+      <h5 class="fw-bold mb-0">{% trans "User Info" %}</h5>
+      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleUserInfo()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="user-info-body">
+      <div class="text-center mb-4">
+        <div class="position-relative mx-auto mb-3">
+          <div class="user-avatar large">
+            {% if other_user.profile.avatar %}
+              <img src="{{ other_user.profile.avatar.url }}" 
+                   alt="{{ other_user.username }}"
+                   onerror="handleAvatarError(this)"
+                   class="img-fluid rounded-circle">
+            {% else %}
+              {{ other_user.username|first|upper }}
+            {% endif %}
+          </div>
+          <div class="user-status {% if other_user.is_online %}online{% else %}offline{% endif %}"
+               style="width: 20px; height: 20px; border-width: 3px;"></div>
+        </div>
+        <h5 class="fw-bold">{{ other_user.username }}</h5>
+        <p class="text-muted mb-3">{% trans "Waylines user" %}</p>
+        <div class="online-status">
+          <span class="badge {% if other_user.is_online %}bg-success{% else %}bg-secondary{% endif %} bg-opacity-10 {% if other_user.is_online %}text-success{% else %}text-secondary{% endif %} px-3 py-2 rounded-pill" id="online-status">
+            <i class="fas fa-circle me-1" style="font-size: 8px;"></i>
+            {% if other_user.is_online %}{% trans "Online" %}{% else %}{% trans "Offline" %}{% endif %}
+          </span>
+        </div>
+      </div>
+      <div class="mb-4">
+        <h6 class="fw-semibold text-uppercase small mb-3">{% trans "General Info" %}</h6>
+        <div class="info-grid">
+          <div class="info-item d-flex justify-content-between align-items-center py-2 border-bottom">
+            <span class="text-muted">{% trans "Routes" %}</span>
+            <strong class="text-primary">{{ other_user.routes.count }}</strong>
+          </div>
+          <div class="info-item d-flex justify-content-between align-items-center py-2 border-bottom">
+            <span class="text-muted">{% trans "Friends" %}</span>
+            <strong class="text-primary">{{ accepted_friends_count }}</strong>
+          </div>
+          <div class="info-item d-flex justify-content-between align-items-center py-2 border-bottom">
+            <span class="text-muted">{% trans "Status" %}</span>
+            <strong class="{% if other_user.is_online %}text-success{% else %}text-muted{% endif %}" id="last-seen">
+              {% if other_user.is_online %}{% trans "Online" %}{% else %}{% trans "Offline" %}{% endif %}
+            </strong>
+          </div>
+          <div class="info-item d-flex justify-content-between align-items-center py-2">
+            <span class="text-muted">{% trans "In chat since" %}</span>
+            <strong>{{ conversation.created_at|date:"d.m.Y" }}</strong>
+          </div>
+        </div>
+      </div>
+      <div class="mb-4">
+        <h6 class="fw-semibold text-uppercase small mb-3">{% trans "Actions" %}</h6>
+        <div class="d-grid gap-2">
+          <a href="{% url 'user_profile' other_user.username %}" class="btn btn-outline-primary btn-sm py-2">
+            <i class="fas fa-user me-2"></i> {% trans "Profile" %}
+          </a>
+          <a href="{% url 'all_routes' %}?author={{ other_user.username }}" class="btn btn-outline-success btn-sm py-2">
+            <i class="fas fa-route me-2"></i> {% trans "Routes" %}
+          </a>
+          <button class="btn btn-outline-info btn-sm py-2" onclick="startRouteChat()">
+            <i class="fas fa-map-marked-alt me-2"></i> {% trans "Shared Route" %}
+          </button>
+        </div>
+      </div>
+      <div class="mt-auto">
+        <div class="d-grid gap-2">
+          <button class="btn btn-warning btn-sm py-2" onclick="refreshChat()">
+            <i class="fas fa-sync-alt me-2"></i> {% trans "Refresh Chat" %}
+          </button>
+          <a href="{% url 'chat:chat_dashboard' %}" class="btn btn-outline-secondary btn-sm py-2">
+            <i class="fas fa-comments me-2"></i> {% trans "All Chats" %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_css %}
+<style>
+:root {
+  --primary-blue: #1a73e8;
+  --primary-dark: #0d47a1;
+  --primary-light: #e8f0fe;
+  --secondary-blue: #4285f4;
+  --accent-blue: #8ab4f8;
+  --success: #34a853;
+  --warning: #fbbc05;
+  --danger: #ea4335;
+  --bg-light: #f8f9fa;
+  --border-light: #e0e0e0;
+  --text-dark: #202124;
+  --text-muted: #5f6368;
+}
+html, body {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+main {
+  min-height: calc(100vh - 56px - 60px) !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+.container-fluid.h-100 {
+  height: calc(100vh - 56px - 60px) !important;
+  max-height: calc(100vh - 56px - 60px);
+  overflow: hidden;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+footer {
+  height: 60px !important;
+  position: relative !important;
+  margin-top: 0 !important;
+  z-index: 1 !important;
+}
+.chat-container {
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-light);
+}
+.chat-header,
+.chat-input,
+#typing-indicator,
+#chat-loading {
+  flex-shrink: 0 !important;
+}
+.chat-messages {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  color: white;
+  font-size: 18px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.user-avatar.small {
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+  border-width: 1px;
+}
+.user-avatar.large {
+  width: 100px;
+  height: 100px;
+  font-size: 32px;
+  border-width: 3px;
+}
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.user-status {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+.user-status.online {
+  background: var(--success);
+}
+.user-status.offline {
+  background: var(--text-muted);
+}
+.message-wrapper {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.message-wrapper.own-message {
+  flex-direction: row-reverse;
+}
+.message-wrapper.own-message .message-avatar {
+  margin-left: 8px;
+  margin-right: 0;
+}
+.message-bubble {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  position: relative;
+  animation: messageSlideIn 0.3s ease-out;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.own-bubble {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  color: white;
+  border-bottom-right-radius: 6px;
+}
+.other-bubble {
+  background: white;
+  color: var(--text-dark);
+  border-bottom-left-radius: 6px;
+  border: 1px solid var(--border-light);
+}
+.message-content {
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+.message-time {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+.message-sender {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+.chat-messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+.notifications-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1060;
+  max-width: 350px;
+  width: 100%;
+}
+.notification {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid;
+  transform: translateX(400px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
+  overflow: hidden;
+}
+.notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+.notification.hide {
+  transform: translateX(400px);
+  opacity: 0;
+}
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.typing-animation::after {
+  content: '...';
+  animation: typing 1.5s infinite;
+}
+@keyframes typing {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+.user-info-sidebar {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 350px;
+  height: 100vh;
+  background: white;
+  box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+  z-index: 1040;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+}
+.user-info-sidebar.active {
+  right: 0;
+}
+.user-info-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1039;
+  display: none;
+}
+@media (max-width: 768px) {
+  .container-fluid.h-100 {
+    height: calc(100vh - 56px - 50px) !important;
+  }
+  footer {
+    height: 50px !important;
+  }
+  .chat-messages {
+    padding: 12px;
+  }
+  .message-bubble {
+    max-width: 85%;
+  }
+  .user-info-sidebar {
+    width: 100%;
+    right: -100%;
+  }
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  .user-avatar.small {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+  .chat-header {
+    padding: 16px !important;
+  }
+  .chat-input {
+    padding: 16px !important;
+  }
+}
+@media (max-width: 576px) {
+  .container-fluid.h-100 {
+    height: calc(100vh - 56px - 40px) !important;
+  }
+  footer {
+    height: 40px !important;
+  }
+  .message-bubble {
+    max-width: 90%;
+  }
+  .chat-input {
+    padding: 12px !important;
+  }
+}
+#chat-message-input {
+  flex: 1;
+}
+.container-fluid.p-0 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+#chat-main-col,
+.row.h-100 {
+  height: 100% !important;
+}
+body.chat-page {
+  padding-bottom: 0 !important;
+}
+main.py-4 {
+  padding-bottom: 0 !important;
+}
+</style>
+{% endblock %}
+{% block extra_js %}
+<script>
+const conversationId = {{ conversation.id }};
+const currentUserId = {{ request.user.id }};
+const currentUsername = "{{ request.user.username }}";
+const otherUserId = {{ other_user.id }};
+const otherUsername = "{{ other_user.username }}";
+let isSending = false;
+let firebaseChat;
+let mediaFile = null;
+let mediaType = null;
+let voiceBlob = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let recordingTimer = null;
+let recordingStartTime = null;
+let isRecording = false;
+let currentAudio = null;
+function handleAvatarError(imgElement) {
+  const parent = imgElement.parentElement;
+  if (parent && parent.classList.contains('user-avatar')) {
+    const username = imgElement.alt || otherUsername;
+    parent.innerHTML = username.charAt(0).toUpperCase();
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.user-avatar img').forEach(img => {
+    img.onerror = function() {
+      handleAvatarError(this);
+    };
+  });
+  const chatForm = document.querySelector('#chat-form');
+  if (chatForm) {
+    chatForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      handleMessageSubmit(e);
+    });
+  }
+  setupFixedHeight();
+  initializeFirebaseChat();
+  setupEventListeners();
+  updateCharCounter();
+  document.querySelector('#chat-message-input').focus();
+  setTimeout(scrollToBottom, 100);
+  document.body.classList.add('chat-page');
+});
+function setupFixedHeight() {
+  function updateHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    const navbar = document.querySelector('nav.navbar');
+    const footer = document.querySelector('footer');
+    const navbarHeight = navbar ? navbar.offsetHeight : 56;
+    const footerHeight = footer ? footer.offsetHeight : 60;
+    const totalHeight = navbarHeight + footerHeight;
+    const container = document.querySelector('.container-fluid.h-100');
+    if (container) {
+      const containerHeight = window.innerHeight - totalHeight;
+      container.style.height = `${containerHeight}px`;
+      container.style.maxHeight = `${containerHeight}px`;
+    }
+    const messagesContainer = document.querySelector('#chat-messages');
+    if (messagesContainer) {
+      const headerHeight = document.querySelector('.chat-header').offsetHeight;
+      const inputHeight = document.querySelector('.chat-input').offsetHeight;
+      const availableHeight = window.innerHeight - totalHeight - headerHeight - inputHeight;
+      messagesContainer.style.height = `${availableHeight}px`;
+      messagesContainer.style.maxHeight = `${availableHeight}px`;
+    }
+    if (footer) {
+      footer.style.position = 'relative';
+      footer.style.bottom = '0';
+    }
+  }
+  updateHeight();
+  window.addEventListener('resize', updateHeight);
+  window.addEventListener('orientationchange', updateHeight);
+  const observer = new MutationObserver(function() {
+    setTimeout(updateHeight, 100);
+  });
+  const typingIndicator = document.getElementById('typing-indicator');
+  if (typingIndicator) {
+    observer.observe(typingIndicator, {
+      attributes: true,
+      attributeFilter: ['style']
+    });
+  }
+  const mediaPreview = document.getElementById('media-preview');
+  if (mediaPreview) {
+    observer.observe(mediaPreview, {
+      attributes: true,
+      attributeFilter: ['style']
+    });
+  }
+}
+function initializeFirebaseChat() {
+  try {
+    firebaseChat = new FirebaseChat(conversationId, {
+      id: currentUserId,
+      username: currentUsername
+    });
+    updateConnectionStatus('connected', '{% trans "Connected" %}');
+  } catch (error) {
+    updateConnectionStatus('error', '{% trans "Connection failed" %}');
+    showError('{% trans "Failed to connect to chat" %}');
+  }
+}
+class FirebaseChat {
+  constructor(conversationId, currentUser) {
+    this.conversationId = conversationId;
+    this.currentUser = currentUser;
+    this.database = firebase.database();
+    this.messagesRef = this.database.ref(`chats/${conversationId}/messages`);
+    this.typingRef = this.database.ref(`chats/${conversationId}/typing`);
+    this.usersRef = this.database.ref(`chats/${conversationId}/users`);
+    this.connectedRef = this.database.ref('.info/connected');
+    this.init();
+  }
+  async init() {
+    await this.setupConnectionMonitoring();
+    await this.setupMessagesListener();
+    await this.setupTypingListener();
+    await this.setUserOnline();
+    await this.loadMessageHistory();
+  }
+  async setupConnectionMonitoring() {
+    this.connectedRef.on('value', (snap) => {
+      if (snap.val() === true) {
+        updateConnectionStatus('connected', '{% trans "Connected" %}');
+      } else {
+        updateConnectionStatus('disconnected', '{% trans "Reconnecting..." %}');
+      }
+    });
+  }
+  async setupMessagesListener() {
+    this.messagesRef.orderByChild('timestamp').on('child_added', (snapshot) => {
+      const message = snapshot.val();
+      this.addMessageToChat(message);
+    });
+  }
+  async setupTypingListener() {
+    this.typingRef.on('child_changed', (snapshot) => {
+      const typingData = snapshot.val();
+      if (typingData.isTyping && typingData.userId !== this.currentUser.id) {
+        showTypingIndicator(typingData.username);
+      } else {
+        hideTypingIndicator();
+      }
+    });
+  }
+  async setUserOnline() {
+    this.usersRef.child(this.currentUser.id).set({
+      userId: this.currentUser.id,
+      username: this.currentUser.username,
+      lastSeen: Date.now(),
+      isOnline: true
+    });
+    this.usersRef.on('child_changed', (snapshot) => {
+      const userData = snapshot.val();
+      if (userData.userId === otherUserId) {
+        updateUserStatus(userData);
+      }
+    });
+    this.usersRef.child(otherUserId).once('value').then((snapshot) => {
+      const userData = snapshot.val();
+      if (userData) {
+        updateUserStatus(userData);
+      }
+    });
+  }
+  async loadMessageHistory() {
+    try {
+      const snapshot = await this.messagesRef.orderByChild('timestamp').limitToLast(50).once('value');
+      const messages = [];
+      snapshot.forEach((childSnapshot) => {
+        const message = childSnapshot.val();
+        messages.push(message);
+      });
+      messages.sort((a, b) => a.timestamp - b.timestamp);
+      this.renderMessages(messages);
+    } catch (error) {
+      showError('{% trans "Failed to load message history" %}');
+    }
+  }
+  async sendMessage(messageText, messageType = 'text', mediaFile = null) {
+    if (isSending) {
+      showWarning('{% trans "Message is sending..." %}');
+      return false;
+    }
+    isSending = true;
+    const messageInput = document.querySelector('#chat-message-input');
+    const submitBtn = document.querySelector('#chat-message-submit');
+    messageInput.disabled = true;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    try {
+      let mediaUrl = null;
+      if (mediaFile) {
+        mediaUrl = await this.uploadMediaToServer(mediaFile, messageType);
+        if (!mediaUrl) {
+          throw new Error('{% trans "Failed to upload media file" %}');
+        }
+      }
+      const messageId = Date.now().toString();
+      const messageData = {
+        id: messageId,
+        content: messageText || (mediaUrl ? '' : ''),
+        sender: this.currentUser.username,
+        sender_id: this.currentUser.id,
+        sender_avatar: getCurrentUserAvatar(),
+        timestamp: Date.now(),
+        created_at: getCurrentTime(),
+        message_type: messageType
+      };
+      if (mediaUrl) {
+        messageData.content = mediaUrl;
+      }
+      this.addMessageToChat({
+        ...messageData,
+        is_own: true,
+        is_temp: true
+      });
+      await this.messagesRef.child(messageId).set(messageData);
+      messageInput.value = '';
+      updateCharCounter();
+      this.setTyping(false);
+      clearMedia();
+      return true;
+    } catch (error) {
+      showError('{% trans "Failed to send message" %}');
+      return false;
+    } finally {
+      isSending = false;
+      messageInput.disabled = false;
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+    }
+  }
+  async uploadMediaToServer(file, messageType) {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('media_file', file);
+      formData.append('conversation_id', conversationId);
+      formData.append('message_type', messageType);
+      fetch('/chat/upload-media/', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCSRFToken(),
+        },
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('{% trans "Network error" %}');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success && data.file_url) {
+          resolve(data.file_url);
+        } else {
+          reject(new Error(data.error || '{% trans "Failed to upload file" %}'));
+        }
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
+  }
+  setTyping(isTyping) {
+    this.typingRef.child(this.currentUser.id).set({
+      isTyping: isTyping,
+      userId: this.currentUser.id,
+      username: this.currentUser.username,
+      timestamp: Date.now()
+    });
+  }
+  renderMessages(messages) {
+    const messagesContainer = document.querySelector('#chat-messages');
+    messagesContainer.innerHTML = '';
+    if (messages.length === 0) {
+      this.showEmptyChatMessage();
+      return;
+    }
+    messages.forEach(messageData => {
+      this.addMessageToChat(messageData);
+    });
+    setTimeout(scrollToBottom, 100);
+  }
+  addMessageToChat(messageData) {
+    const messagesContainer = document.querySelector('#chat-messages');
+    const emptyMessage = messagesContainer.querySelector('#empty-chat-message');
+    if (emptyMessage) {
+      emptyMessage.remove();
+    }
+    const existingMessage = messagesContainer.querySelector(`[data-message-id="${messageData.id}"]`);
+    if (existingMessage) {
+      if (messageData.is_temp) {
+        existingMessage.remove();
+      } else {
+        return;
+      }
+    }
+    const messageWrapper = document.createElement('div');
+    const isOwn = messageData.sender_id == currentUserId;
+    messageWrapper.className = `message-wrapper mb-3 ${isOwn ? 'own-message' : ''}`;
+    messageWrapper.dataset.messageId = messageData.id;
+    const senderName = isOwn ? '{% trans "You" %}' : messageData.sender;
+    const avatarHtml = isOwn ? '' : this.getAvatarHtml(messageData.sender, messageData.sender_avatar);
+    let messageContent = '';
+    switch(messageData.message_type) {
+      case 'text':
+        messageContent = `<div class="message-content">${escapeHtml(messageData.content).replace(/\n/g, '<br>')}</div>`;
+        break;
+      case 'image':
+        messageContent = `
+          <div class="message-content">
+            <div class="media-message">
+              <img src="${messageData.content}" alt="{% trans 'Image' %}" class="img-fluid rounded" style="max-width: 300px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div class="media-error" style="display: none; padding: 20px; text-align: center; color: #6c757d;">
+                <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                <p>{% trans "Failed to load image" %}</p>
+              </div>
+            </div>
+          </div>
+        `;
+        break;
+      case 'video':
+        messageContent = `
+          <div class="message-content">
+            <div class="media-message">
+              <video controls class="img-fluid rounded" style="max-width: 300px;">
+                <source src="${messageData.content}" type="video/mp4">
+                {% trans "Your browser does not support video." %}
+              </video>
+            </div>
+          </div>
+        `;
+        break;
+      case 'audio':
+        messageContent = `
+          <div class="message-content">
+            <div class="media-message">
+              <audio controls class="w-100">
+                <source src="${messageData.content}" type="audio/mpeg">
+                {% trans "Your browser does not support audio." %}
+              </audio>
+            </div>
+          </div>
+        `;
+        break;
+      case 'voice':
+        messageContent = `
+          <div class="message-content">
+            <div class="voice-message d-flex align-items-center">
+              <button class="btn btn-sm btn-outline-primary play-voice-btn me-2" data-audio-url="${messageData.content}">
+                <i class="fas fa-play"></i>
+              </button>
+              <div class="voice-waveform flex-grow-1 me-2">
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+              </div>
+              <small class="text-muted voice-duration">0:00</small>
+            </div>
+          </div>
+        `;
+        break;
+      default:
+        messageContent = `<div class="message-content">${escapeHtml(messageData.content).replace(/\n/g, '<br>')}</div>`;
+    }
+    messageWrapper.innerHTML = `
+      ${!isOwn ? `
+        <div class="message-avatar me-2" style="align-self: flex-start;">
+          ${avatarHtml}
+        </div>
+      ` : ''}
+      <div class="message-bubble ${isOwn ? 'own-bubble' : 'other-bubble'}">
+        ${!isOwn ? `<div class="message-sender mb-1"><small class="text-primary fw-bold">${escapeHtml(senderName)}</small></div>` : ''}
+        ${messageContent}
+        <div class="message-time text-end mt-1">
+          <small class="${isOwn ? 'text-light' : 'text-muted'}">${messageData.created_at}</small>
+          ${isOwn ? '<i class="fas fa-check-double text-light ms-1" style="font-size: 10px;"></i>' : ''}
+        </div>
+      </div>
+    `;
+    if (!messageData.is_temp || messageData.is_own) {
+      messageWrapper.style.animation = 'messageSlideIn 0.3s ease-out';
+    }
+    messagesContainer.appendChild(messageWrapper);
+    if (messageData.is_temp || messageData.is_own || messagesContainer.scrollTop > messagesContainer.scrollHeight - messagesContainer.clientHeight - 100) {
+      setTimeout(scrollToBottom, 50);
+    }
+    const avatarImg = messageWrapper.querySelector('.user-avatar img');
+    if (avatarImg) {
+      avatarImg.onerror = function() {
+        handleAvatarError(this);
+      };
+    }
+    if (messageData.message_type === 'voice') {
+      const playBtn = messageWrapper.querySelector('.play-voice-btn');
+      if (playBtn) {
+        playBtn.addEventListener('click', function() {
+          playVoiceMessage(this.dataset.audioUrl, this);
+        });
+      }
+    }
+  }
+  getAvatarHtml(username, avatarUrl = null) {
+    if (avatarUrl) {
+      return `
+        <div class="user-avatar small">
+          <img src="${avatarUrl}" 
+               alt="${username}"
+               onerror="handleAvatarError(this)"
+               class="img-fluid rounded-circle">
+        </div>
+      `;
+    }
+    return `
+      <div class="user-avatar small">
+        ${username ? username.charAt(0).toUpperCase() : '?'}
+      </div>
+    `;
+  }
+  showEmptyChatMessage() {
+    const messagesContainer = document.querySelector('#chat-messages');
+    messagesContainer.innerHTML = `
+      <div class="text-center text-muted py-5" id="empty-chat-message">
+        <div class="empty-state-icon mb-4">
+          <i class="fas fa-comments fa-4x text-light"></i>
+        </div>
+        <h4 class="fw-light">{% trans "Start a conversation" %}</h4>
+        <p class="text-muted">{% trans "Send your first message to" %} ${otherUsername}</p>
+      </div>
+    `;
+  }
+  destroy() {
+    if (this.messagesRef) this.messagesRef.off();
+    if (this.typingRef) this.typingRef.off();
+    if (this.usersRef) this.usersRef.off();
+    if (this.connectedRef) this.connectedRef.off();
+  }
+}
+function getCurrentUserAvatar() {
+  return null;
+}
+function setupEventListeners() {
+  const messageInput = document.querySelector('#chat-message-input');
+  let typingTimer;
+  messageInput.addEventListener('input', function() {
+    if (firebaseChat && messageInput.value.trim().length > 0) {
+      firebaseChat.setTyping(true);
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => {
+        if (firebaseChat) {
+          firebaseChat.setTyping(false);
+        }
+      }, 1000);
+    }
+    updateCharCounter();
+  });
+  messageInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleMessageSubmit(e);
+    }
+  });
+  document.getElementById('file-input').addEventListener('change', handleFileSelect);
+  document.getElementById('image-input').addEventListener('change', handleFileSelect);
+  document.getElementById('video-input').addEventListener('change', handleFileSelect);
+  document.getElementById('audio-input').addEventListener('change', handleFileSelect);
+}
+async function handleMessageSubmit(e) {
+  e.preventDefault();
+  const messageInput = document.querySelector('#chat-message-input');
+  const message = messageInput.value.trim();
+  if (!message && !mediaFile) {
+    showWarning('{% trans "Enter a message or attach a file" %}');
+    messageInput.focus();
+    return;
+  }
+  if (!firebaseChat) {
+    showError('{% trans "Chat is not initialized. Please refresh the page." %}');
+    return;
+  }
+  await firebaseChat.sendMessage(message, mediaType || 'text', mediaFile);
+}
+function triggerFileInput(type) {
+  mediaType = type;
+  switch(type) {
+    case 'image':
+      document.getElementById('image-input').click();
+      break;
+    case 'video':
+      document.getElementById('video-input').click();
+      break;
+    case 'audio':
+      document.getElementById('audio-input').click();
+      break;
+    default:
+      document.getElementById('file-input').click();
+  }
+}
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  mediaFile = file;
+  if (file.type.startsWith('image/')) {
+    mediaType = 'image';
+  } else if (file.type.startsWith('video/')) {
+    mediaType = 'video';
+  } else if (file.type.startsWith('audio/')) {
+    mediaType = 'audio';
+  } else {
+    showError('{% trans "Unsupported file type" %}');
+    clearMedia();
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showError('{% trans "File is too large. Maximum size: 10MB" %}');
+    clearMedia();
+    return;
+  }
+  showMediaPreview(file, mediaType);
+  event.target.value = '';
+}
+function showMediaPreview(file, type) {
+  const preview = document.getElementById('media-preview');
+  const previewContent = document.getElementById('preview-content');
+  preview.style.display = 'block';
+  if (type === 'image') {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      previewContent.innerHTML = `<img src="${e.target.result}" alt="{% trans 'Preview' %}" style="max-width: 150px; max-height: 150px; border-radius: 8px;">`;
+    };
+    reader.readAsDataURL(file);
+  } else if (type === 'video') {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      previewContent.innerHTML = `
+        <video controls style="max-width: 150px; max-height: 150px;">
+          <source src="${e.target.result}" type="${file.type}">
+          {% trans "Your browser does not support video." %}
+        </video>
+        <div class="mt-1"><small>${file.name}</small></div>
+      `;
+    };
+    reader.readAsDataURL(file);
+  } else if (type === 'audio') {
+    previewContent.innerHTML = `
+      <div class="d-flex align-items-center">
+        <i class="fas fa-music text-warning me-2"></i>
+        <div>
+          <div><strong>{% trans "Audio file" %}</strong></div>
+          <small>${file.name}</small>
+        </div>
+      </div>
+    `;
+  }
+}
+function clearMedia() {
+  mediaFile = null;
+  mediaType = null;
+  document.getElementById('media-preview').style.display = 'none';
+  document.getElementById('preview-content').innerHTML = '';
+  document.getElementById('file-input').value = '';
+  document.getElementById('image-input').value = '';
+  document.getElementById('video-input').value = '';
+  document.getElementById('audio-input').value = '';
+}
+function showTypingIndicator(username) {
+  const typingIndicator = document.getElementById('typing-indicator');
+  const typingUser = document.getElementById('typing-user');
+  if (typingIndicator && typingUser) {
+    typingUser.textContent = username;
+    typingIndicator.style.display = 'block';
+    setTimeout(setupFixedHeight, 100);
+    setTimeout(scrollToBottom, 100);
+  }
+}
+function hideTypingIndicator() {
+  const typingIndicator = document.getElementById('typing-indicator');
+  if (typingIndicator) {
+    typingIndicator.style.display = 'none';
+    setTimeout(setupFixedHeight, 100);
+  }
+}
+function updateCharCounter() {
+  const input = document.querySelector('#chat-message-input');
+  const counter = document.querySelector('#char-counter');
+  const length = input.value.length;
+  counter.textContent = `${length}/1000`;
+  counter.className = length > 950 ? 'text-danger' : length > 800 ? 'text-warning' : length > 0 ? 'text-success' : 'text-muted';
+}
+function updateConnectionStatus(status, message) {
+  const statusElement = document.getElementById('connection-status');
+  if (statusElement) {
+    statusElement.textContent = message;
+    statusElement.className = status === 'connected' ? 'text-success' : 
+                            status === 'disconnected' ? 'text-warning' : 'text-danger';
+  }
+}
+function scrollToBottom() {
+  const messagesContainer = document.querySelector('#chat-messages');
+  if (messagesContainer) {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+}
+function getCurrentTime() {
+  return new Date().toLocaleTimeString('en-US', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+}
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+function getCSRFToken() {
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+  return csrfToken ? csrfToken.value : '';
+}
+function refreshChat() {
+  if (firebaseChat) {
+    firebaseChat.loadMessageHistory();
+    showInfo('{% trans "Chat refreshed" %}');
+  } else {
+    showError('{% trans "Chat is not initialized" %}');
+  }
+}
+function blockUser() {
+  if (confirm(`{% trans "Are you sure you want to block" %} ${otherUsername}?`)) {
+    showInfo('{% trans "Block feature is under development" %}');
+  }
+}
+function startRouteChat() {
+  showInfo('{% trans "Shared route feature is under development" %}');
+}
+function toggleUserInfo() {
+  const sidebar = document.getElementById('user-info-sidebar');
+  const overlay = document.getElementById('user-info-overlay');
+  const body = document.body;
+  if (sidebar.classList.contains('active')) {
+    sidebar.classList.remove('active');
+    overlay.style.display = 'none';
+    body.classList.remove('sidebar-open');
+  } else {
+    sidebar.classList.add('active');
+    overlay.style.display = 'block';
+    body.classList.add('sidebar-open');
+    overlay.onclick = function() {
+      toggleUserInfo();
+    };
+  }
+}
+function updateUserStatus(userData) {
+  const isOnline = userData.isOnline;
+  const lastSeen = userData.lastSeen;
+  const statusIndicator = document.getElementById('user-status-indicator');
+  const activityIcon = document.querySelector('#last-activity i');
+  const activityText = document.getElementById('activity-text');
+  const lastSeenElement = document.getElementById('last-seen');
+  const onlineStatusElement = document.getElementById('online-status');
+  if (isOnline) {
+    if (statusIndicator) statusIndicator.className = 'user-status online';
+    if (activityIcon) {
+      activityIcon.className = 'fas fa-circle me-1';
+      activityIcon.style.color = 'var(--success)';
+    }
+    if (activityText) activityText.textContent = '{% trans "Online" %}';
+    if (lastSeenElement) {
+      lastSeenElement.textContent = '{% trans "Online" %}';
+      lastSeenElement.className = 'text-success';
+    }
+    if (onlineStatusElement) {
+      onlineStatusElement.className = 'badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill';
+      onlineStatusElement.innerHTML = '<i class="fas fa-circle me-1" style="font-size: 8px;"></i>{% trans "Online" %}';
+    }
+  } else {
+    if (statusIndicator) statusIndicator.className = 'user-status offline';
+    if (activityIcon) {
+      activityIcon.className = 'fas fa-circle me-1';
+      activityIcon.style.color = 'var(--text-muted)';
+    }
+    const timeAgo = getTimeAgo(lastSeen);
+    if (activityText) activityText.textContent = `{% trans "Was" %} ${timeAgo} {% trans "ago" %}`;
+    if (lastSeenElement) {
+      lastSeenElement.textContent = timeAgo;
+      lastSeenElement.className = 'text-muted';
+    }
+    if (onlineStatusElement) {
+      onlineStatusElement.className = 'badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill';
+      onlineStatusElement.innerHTML = '<i class="fas fa-circle me-1" style="font-size: 8px;"></i>{% trans "Offline" %}';
+    }
+  }
+}
+function getTimeAgo(timestamp) {
+  const now = Date.now();
+  const diff = now - timestamp;
+  const minutes = Math.floor(diff / (1000 * 60));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (minutes < 1) return '{% trans "just now" %}';
+  if (minutes < 60) return `${minutes} {% trans "min" %}`;
+  if (hours < 24) return `${hours} {% trans "h" %}`;
+  return `${days} {% trans "d" %}`;
+}
+function showError(message) { showNotification(message, 'error'); }
+function showSuccess(message) { showNotification(message, 'success'); }
+function showWarning(message) { showNotification(message, 'warning'); }
+function showInfo(message) { showNotification(message, 'info'); }
+function showNotification(message, type = 'info') {
+  const notifications = document.getElementById('notifications');
+  const notificationId = 'notification-' + Date.now();
+  const typeConfig = {
+    'success': { class: 'notification-success', icon: 'fa-check-circle', duration: 3000 },
+    'error': { class: 'notification-error', icon: 'fa-exclamation-circle', duration: 5000 },
+    'warning': { class: 'notification-warning', icon: 'fa-exclamation-triangle', duration: 4000 },
+    'info': { class: 'notification-info', icon: 'fa-info-circle', duration: 3000 }
+  };
+  const config = typeConfig[type] || typeConfig.info;
+  const notification = document.createElement('div');
+  notification.id = notificationId;
+  notification.className = `notification ${config.class}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      <div class="notification-icon"><i class="fas ${config.icon}"></i></div>
+      <div class="notification-message">${escapeHtml(message)}</div>
+      <button type="button" class="notification-close" onclick="closeNotification('${notificationId}')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="notification-progress"></div>
+  `;
+  notifications.appendChild(notification);
+  setTimeout(() => notification.classList.add('show'), 10);
+  setTimeout(() => closeNotification(notificationId), config.duration);
+}
+function closeNotification(notificationId) {
+  const notification = document.getElementById(notificationId);
+  if (notification) {
+    notification.classList.remove('show');
+    notification.classList.add('hide');
+    setTimeout(() => notification.remove(), 400);
+  }
+}
+window.addEventListener('beforeunload', function() {
+  if (firebaseChat) {
+    firebaseChat.destroy();
+  }
+});
+</script>
+{% endblock %}

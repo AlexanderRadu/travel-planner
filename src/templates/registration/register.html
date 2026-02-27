@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Sign up" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow border-0">
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <h2 class="h3 mb-3 font-weight-normal">{% trans "Sign up" %}</h2>
+            <p class="text-muted">{% trans "Create a new account" %}</p>
+          </div>
+
+          {% if messages %}
+          <div class="mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% trans 'Close' %}"></button>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+              <p class="mb-0">{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="id_username" class="form-label">{% trans "Username" %} *</label>
+                <input type="text"
+                       name="username"
+                       id="id_username"
+                       class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                       placeholder="{% trans 'Choose a username' %}"
+                       value="{{ form.username.value|default:'' }}"
+                       required>
+                {% if form.username.errors %}
+                <div class="invalid-feedback">
+                  {% for error in form.username.errors %}
+                  {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+                <small class="form-text text-muted">
+                  {% trans "Letters, digits and @/./+/-/_ only" %}
+                </small>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="id_email" class="form-label">{% trans "Email" %} *</label>
+                <input type="email"
+                       name="email"
+                       id="id_email"
+                       class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                       placeholder="{% trans 'Enter your email' %}"
+                       value="{{ form.email.value|default:'' }}"
+                       required>
+                {% if form.email.errors %}
+                <div class="invalid-feedback">
+                  {% for error in form.email.errors %}
+                  {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="id_first_name" class="form-label">{% trans "First name" %}</label>
+                <input type="text"
+                       name="first_name"
+                       id="id_first_name"
+                       class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                       placeholder="{% trans 'Your first name' %}"
+                       value="{{ form.first_name.value|default:'' }}">
+                {% if form.first_name.errors %}
+                <div class="invalid-feedback">
+                  {% for error in form.first_name.errors %}
+                  {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="id_last_name" class="form-label">{% trans "Last name" %}</label>
+                <input type="text"
+                       name="last_name"
+                       id="id_last_name"
+                       class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                       placeholder="{% trans 'Your last name' %}"
+                       value="{{ form.last_name.value|default:'' }}">
+                {% if form.last_name.errors %}
+                <div class="invalid-feedback">
+                  {% for error in form.last_name.errors %}
+                  {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="id_password1" class="form-label">{% trans "Password" %} *</label>
+                <input type="password"
+                       name="password1"
+                       id="id_password1"
+                       class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                       placeholder="{% trans 'Create a password' %}"
+                       required>
+                {% if form.password1.errors %}
+                <div class="invalid-feedback">
+                  {% for error in form.password1.errors %}
+                  {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+                <small class="form-text text-muted">
+                  {% trans "Your password must contain at least 8 characters, can’t be too common, and can’t be entirely numeric." %}
+                </small>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="id_password2" class="form-label">{% trans "Confirm password" %} *</label>
+                <input type="password"
+                       name="password2"
+                       id="id_password2"
+                       class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                       placeholder="{% trans 'Repeat password' %}"
+                       required>
+                {% if form.password2.errors %}
+                <div class="invalid-feedback">
+                  {% for error in form.password2.errors %}
+                  {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="form-check">
+                <input class="form-check-input {% if form.terms.errors %}is-invalid{% endif %}"
+                       type="checkbox"
+                       name="terms"
+                       id="id_terms"
+                       {% if form.terms.value %}checked{% endif %}
+                       required>
+                <label class="form-check-label" for="id_terms">
+                  {% blocktrans %}I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>{% endblocktrans %} *
+                </label>
+                {% if form.terms.errors %}
+                <div class="invalid-feedback">
+                  {% for error in form.terms.errors %}
+                  {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="d-grid gap-2 mb-4">
+              <button type="submit" class="btn btn-primary btn-lg">{% trans "Sign up" %}</button>
+            </div>
+
+            <div class="text-center">
+              <p class="mb-0">{% trans "Already have an account?" %}</p>
+              <a href="{% url 'login' %}" class="btn btn-link">{% trans "Sign in" %}</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.invalid-feedback {
+  display: block;
+}
+
+.form-check-input.is-invalid ~ .form-check-label {
+  color: #dc3545;
+}
+
+.form-check-input.is-invalid ~ .invalid-feedback {
+  display: block;
+}
+
+.alert {
+  border-radius: 8px;
+}
+</style>
+{% endblock %}

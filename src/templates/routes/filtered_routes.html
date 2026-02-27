@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans with title=page_title %}{{ title }} - Waylines{% endblocktrans %}{% endblock %}
+
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+  <div class="container mt-3">
+    <div class="alert alert-info alert-dismissible fade show">
+      <i class="fas fa-info-circle me-2"></i>
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  </div>
+  {% endfor %}
+{% endif %}
+
+<div class="container-fluid px-4 py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'all_routes' %}">{% trans "Routes" %}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">{{ page_title }}</h1>
+      <p class="text-muted mb-0">
+        {% blocktrans count count=total_count %}
+          Found {{ count }} route
+        {% plural %}
+          Found {{ count }} routes
+        {% endblocktrans %}
+      </p>
+    </div>
+    <a href="{% url 'all_routes' %}" class="btn btn-outline-primary btn-sm">
+      <i class="fas fa-arrow-left me-2"></i>{% trans "All routes" %}
+    </a>
+  </div>
+
+  <div class="row g-4">
+    {% if show_filters %}
+    <div class="col-xl-3 col-lg-3">
+      <div class="card border-0 shadow-sm h-100" style="position: sticky; top: 20px;">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="card-title mb-0">{% trans "Filters" %}</h5>
+        </div>
+        <div class="card-body p-3">
+          <form method="get" id="filter-form">
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">{% trans "Search" %}</label>
+              <input type="text" name="q" class="form-control form-control-sm"
+                     value="{{ search_query|default:'' }}"
+                     placeholder="{% trans "Name, description..." %}">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">{% trans "Route type" %}</label>
+              <select name="type" class="form-select form-select-sm">
+                <option value="">{% trans "All types" %}</option>
+                {% for value, label in route_types %}
+                <option value="{{ value }}"
+                        {% if selected_type == value %}selected{% endif %}>
+                  {{ label }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">{% trans "Sort by" %}</label>
+              <select name="sort" class="form-select form-select-sm" id="sort-select">
+                <option value="newest" {% if current_sort == 'newest' or not current_sort %}selected{% endif %}>
+                  {% trans "Newest first" %}
+                </option>
+                <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>
+                  {% trans "By popularity" %}
+                </option>
+                <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>
+                  {% trans "By rating" %}
+                </option>
+              </select>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-sm">{% trans "Apply" %}</button>
+              <a href="{% url 'all_routes' %}" class="btn btn-outline-secondary btn-sm">{% trans "Reset" %}</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="{% if show_filters %}col-xl-9 col-lg-9{% else %}col-12{% endif %}">
+      {% if routes %}
+        <div class="row g-4" id="routes-grid">
+          {% for route in routes %}
+          <div class="col-12 col-sm-6 col-xl-4">
+            {% include 'routes/partials/route_card.html' with route=route %}
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-5">
+          <i class="fas fa-search fa-2x text-muted mb-3"></i>
+          <h4 class="mb-2">{% trans "No routes found" %}</h4>
+          <p class="text-muted mb-3">{% trans "Try adjusting your search criteria" %}</p>
+          <a href="{% url 'all_routes' %}" class="btn btn-outline-primary btn-sm">{% trans "Reset filters" %}</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if routes and routes.has_other_pages %}
+<div class="container-fluid px-4 mt-4">
+  <div class="row">
+    <div class="col-12">
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          {% if routes.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ routes.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+              <i class="fas fa-chevron-left"></i>
+            </a>
+          </li>
+          {% endif %}
+
+          {% for num in routes.paginator.page_range %}
+            {% if routes.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > routes.number|add:"-3" and num < routes.number|add:"3" %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if routes.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ routes.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<style>
+.container-fluid {
+  max-width: 1800px;
+  margin: 0 auto;
+  min-height: calc(100vh - 200px);
+}
+
+.row.g-4 {
+  margin-right: -0.75rem;
+  margin-left: -0.75rem;
+}
+
+.row.g-4 > .col-12.col-sm-6.col-xl-4 {
+  min-width: 280px;
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.route-card-full {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  background: #fff;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.route-card-full:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  border-color: var(--bs-primary);
+}
+
+.card[style*="sticky"] {
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+}
+
+.card[style*="sticky"] .card-header {
+  padding: 1rem;
+  background: #f8f9fa;
+}
+
+.card[style*="sticky"] .card-body {
+  padding: 1rem;
+}
+
+.route-card-animate {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.route-card-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 1399px) {
+  .col-xl-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
+}
+
+@media (max-width: 1199px) {
+  .route-card-full {
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 991px) {
+  .col-lg-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+  .col-lg-9 {
+    flex: 0 0 75%;
+    max-width: 75%;
+  }
+  .col-sm-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  .route-card-full {
+    min-height: 380px;
+  }
+}
+
+@media (max-width: 767px) {
+  .col-lg-3, .col-lg-9 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  .col-sm-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  .route-card-full {
+    min-height: auto;
+    height: auto;
+  }
+}
+
+@media (max-width: 575px) {
+  .container-fluid {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const sortSelect = document.getElementById('sort-select');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', function() {
+      this.form.submit();
+    });
+  }
+
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('route-card-visible');
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.col-12.col-sm-6.col-xl-4').forEach((card, index) => {
+    card.classList.add('route-card-animate');
+    card.style.transitionDelay = (index * 0.1) + 's';
+    observer.observe(card);
+  });
+
+  const paginationLinks = document.querySelectorAll('.pagination a');
+  paginationLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const url = this.href;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        window.location.href = url;
+      }, 300);
+    });
+  });
+
+  const typeSelect = document.querySelector('select[name="type"]');
+  if (typeSelect) {
+    typeSelect.addEventListener('change', function() {
+      const url = new URL(window.location);
+      url.searchParams.set('page', '1');
+      window.location.href = url.toString();
+    });
+  });
+});
+
+function updatePageParam(page) {
+  const url = new URL(window.location);
+  url.searchParams.set('page', page);
+  return url.toString();
+}
+</script>
+{% endblock %}

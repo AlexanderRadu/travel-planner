@@ -1,0 +1,418 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Profile - Waylines" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-lg-4">
+      <div class="card mb-4">
+        <div class="card-body text-center">
+          <div class="mb-3">
+            {% if profile.avatar %}
+            <img src="{{ profile.avatar.url }}" class="rounded-circle"
+                 style="width: 120px; height: 120px; object-fit: cover;" alt="{{ user.username }}">
+            {% else %}
+            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto"
+                 style="width: 120px; height: 120px;">
+              <i class="fas fa-user fa-3x text-muted"></i>
+            </div>
+            {% endif %}
+          </div>
+
+          <h4 class="card-title" id="current-username">{{ user.username }}</h4>
+
+          {% if user.first_name or user.last_name %}
+          <p class="card-text">
+            {{ user.first_name }} {{ user.last_name }}
+          </p>
+          {% endif %}
+
+          {% if profile.bio %}
+          <p class="card-text text-muted">{{ profile.bio }}</p>
+          {% endif %}
+
+          {% if profile.location %}
+          <p class="card-text">
+            <i class="fas fa-map-marker-alt text-muted"></i>
+            {{ profile.location }}
+          </p>
+          {% endif %}
+
+          <div class="d-flex justify-content-center gap-3 mb-3">
+            <div class="text-center">
+              <div class="h5 mb-0">{{ routes_count }}</div>
+              <small class="text-muted">{% trans "Routes" %}</small>
+            </div>
+            <div class="text-center">
+              <div class="h5 mb-0">{{ friends_count }}</div>
+              <small class="text-muted">{% trans "Friends" %}</small>
+            </div>
+            <div class="text-center">
+              <div class="h5 mb-0">{{ total_distance|floatformat:0 }}</div>
+              <small class="text-muted">{% trans "km traveled" %}</small>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <a href="{% url 'user_profile' user.username %}" class="btn btn-outline-primary">
+              <i class="fas fa-eye"></i> {% trans "Public profile" %}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">{% trans "Statistics" %}</h5>
+        </div>
+        <div class="card-body">
+          <div class="stat-item mb-2">
+            <small class="text-muted">{% trans "Registered" %}</small>
+            <div>{{ user.date_joined|date:"d.m.Y" }}</div>
+          </div>
+          <div class="stat-item mb-2">
+            <small class="text-muted">{% trans "Total routes" %}</small>
+            <div>{{ routes_count }}</div>
+          </div>
+          <div class="stat-item mb-2">
+            <small class="text-muted">{% trans "Favorites" %}</small>
+            <div>{{ favorites_count }}</div>
+          </div>
+          <div class="stat-item">
+            <small class="text-muted">{% trans "Total distance" %}</small>
+            <div>{{ total_distance|floatformat:1 }} {% trans "km" %}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">{% trans "Edit profile" %}</h5>
+          {% if not can_change_username %}
+          <span class="badge bg-warning">
+            <i class="fas fa-clock"></i>
+            {% blocktrans with days=username_change_days_left %}Username change available in {{ days }} days{% endblocktrans %}
+          </span>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data" id="profile-form">
+            {% csrf_token %}
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="username" class="form-label">{% trans "Username" %}</label>
+                  <input type="text"
+                         id="username"
+                         name="username"
+                         class="form-control {% if not can_change_username %}bg-light text-muted{% endif %}"
+                         value="{{ user.username }}"
+                         required
+                         maxlength="150"
+                         pattern="[a-zA-Z0-9_]+"
+                         title="{% trans "Only letters, digits, and underscores allowed" %}"
+                         {% if not can_change_username %}readonly{% endif %}>
+                  <div class="form-text">
+                    {% if can_change_username %}
+                    {% trans "Only letters, digits, and underscores (_). Maximum 150 characters." %}
+                    <div class="text-warning small mt-1">
+                      <i class="fas fa-info-circle"></i>
+                      {% trans "Username can be changed once every 30 days" %}
+                    </div>
+                    {% else %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-triangle"></i>
+                      {% blocktrans with days=username_change_days_left %}
+                        You will be able to change your username in {{ days }} days
+                      {% endblocktrans %}
+                    </div>
+                    {% endif %}
+                    <div id="username-feedback" class="text-danger small mt-1"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="email" class="form-label">{% trans "Email" %}</label>
+                  <input type="email"
+                         id="email"
+                         name="email"
+                         class="form-control"
+                         value="{{ user.email }}">
+                  <div class="form-text">{% trans "Notifications will be sent to this email" %}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="first_name" class="form-label">{% trans "First name" %}</label>
+                  <input type="text"
+                         id="first_name"
+                         name="first_name"
+                         class="form-control"
+                         value="{{ user.first_name }}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="last_name" class="form-label">{% trans "Last name" %}</label>
+                  <input type="text"
+                         id="last_name"
+                         name="last_name"
+                         class="form-control"
+                         value="{{ user.last_name }}">
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="avatar" class="form-label">{% trans "Avatar" %}</label>
+              <input type="file"
+                     id="avatar"
+                     class="form-control"
+                     name="avatar"
+                     accept="image/*">
+              {% if profile.avatar %}
+              <div class="form-text mt-2">
+                <div class="form-check">
+                  <input class="form-check-input"
+                         type="checkbox"
+                         name="remove_avatar"
+                         id="remove_avatar"
+                         value="1">
+                  <label class="form-check-label text-danger" for="remove_avatar">
+                    <i class="fas fa-trash"></i> {% trans "Remove current avatar" %}
+                  </label>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="bio" class="form-label">{% trans "About me" %}</label>
+              <textarea id="bio"
+                        name="bio"
+                        class="form-control"
+                        rows="4"
+                        placeholder="{% trans "Tell us about yourself..." %}">{{ profile.bio }}</textarea>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="location" class="form-label">{% trans "Location" %}</label>
+                  <input type="text"
+                         id="location"
+                         name="location"
+                         class="form-control"
+                         value="{{ profile.location }}"
+                         placeholder="{% trans "City, country" %}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="website" class="form-label">{% trans "Website" %}</label>
+                  <input type="url"
+                         id="website"
+                         name="website"
+                         class="form-control"
+                         value="{{ profile.website }}"
+                         placeholder="https://example.com">
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'home' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+              <button type="submit" class="btn btn-primary">{% trans "Save changes" %}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">{% trans "Recent routes" %}</h5>
+          <a href="{% url 'my_routes' %}" class="btn btn-sm btn-outline-primary">{% trans "All routes" %}</a>
+        </div>
+        <div class="card-body">
+          {% if recent_routes %}
+          <div class="list-group list-group-flush">
+            {% for route in recent_routes %}
+            <a href="{% url 'route_detail' route.id %}" class="list-group-item list-group-item-action">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">{{ route.name }}</h6>
+                <small class="text-muted">{% blocktrans with time=route.created_at|timesince %}{{ time }} ago{% endblocktrans %}</small>
+              </div>
+              <p class="mb-1 text-muted small">{{ route.short_description|default:route.description|truncatewords:10 }}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                  <i class="fas fa-route"></i> {{ route.total_distance|floatformat:1 }} {% trans "km" %}
+                </small>
+                <span class="badge bg-{% if route.is_active %}success{% else %}danger{% endif %}">
+                  {% if route.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}
+                </span>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <i class="fas fa-route fa-2x text-muted mb-3"></i>
+            <p class="text-muted">{% trans "You don't have any routes yet" %}</p>
+            <a href="{% url 'create_route' %}" class="btn btn-primary">{% trans "Create your first route" %}</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.form-check-input:checked {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.is-invalid {
+  border-color: #dc3545;
+}
+
+.is-valid {
+  border-color: #198754;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const usernameInput = document.getElementById('username');
+  const usernameFeedback = document.getElementById('username-feedback');
+  const currentUsername = document.getElementById('current-username');
+  const profileForm = document.getElementById('profile-form');
+  const canChangeUsername = {% if can_change_username %}true{% else %}false{% endif %};
+
+  function validateUsername() {
+    if (!canChangeUsername) {
+      usernameFeedback.textContent = '';
+      return true;
+    }
+
+    const username = usernameInput.value.trim();
+    const usernamePattern = /^[a-zA-Z0-9_]+$/;
+
+    usernameInput.classList.remove('is-invalid', 'is-valid');
+    usernameFeedback.textContent = '';
+
+    if (!username) {
+      usernameInput.classList.add('is-invalid');
+      usernameFeedback.textContent = "{% trans 'Username is required' %}";
+      return false;
+    }
+
+    if (username.length > 150) {
+      usernameInput.classList.add('is-invalid');
+      usernameFeedback.textContent = "{% trans 'Maximum length is 150 characters' %}";
+      return false;
+    }
+
+    if (!usernamePattern.test(username)) {
+      usernameInput.classList.add('is-invalid');
+      usernameFeedback.textContent = "{% trans 'Only Latin letters, digits, and underscores (_) are allowed' %}";
+      return false;
+    }
+
+    if (username.length < 3) {
+      usernameInput.classList.add('is-invalid');
+      usernameFeedback.textContent = "{% trans 'Minimum length is 3 characters' %}";
+      return false;
+    }
+
+    if (username === '{{ user.username }}') {
+      usernameInput.classList.add('is-valid');
+      return true;
+    }
+
+    checkUsernameAvailability(username);
+
+    return true;
+  }
+
+  function checkUsernameAvailability(username) {
+    if (username === '{{ user.username }}') {
+      usernameInput.classList.remove('is-invalid');
+      usernameFeedback.textContent = '';
+      return;
+    }
+
+    fetch(`/api/check-username/?username=${encodeURIComponent(username)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.exists) {
+        usernameInput.classList.add('is-invalid');
+        usernameFeedback.textContent = "{% trans 'This username is already taken' %}";
+      } else {
+        usernameInput.classList.add('is-valid');
+        usernameFeedback.textContent = "{% trans 'Username is available' %}";
+      }
+    })
+    .catch(error => {
+      console.error('Error checking username:', error);
+      usernameInput.classList.remove('is-invalid');
+    });
+  }
+
+  if (canChangeUsername) {
+    usernameInput.addEventListener('input', validateUsername);
+    usernameInput.addEventListener('blur', validateUsername);
+  }
+
+  profileForm.addEventListener('submit', function(event) {
+    if (canChangeUsername && !validateUsername()) {
+      event.preventDefault();
+      usernameInput.focus();
+      return false;
+    }
+
+    if (canChangeUsername && usernameInput.value !== '{{ user.username }}') {
+      if (!confirm("{% trans 'Warning! After changing your username:\\n\\n1. You will need to use the new username to log in\\n2. Your profile link will change\\n3. Friends may not find you immediately by the new name\\n4. Next change will be available in 30 days\\n\\nAre you sure you want to change your username?' %}")) {
+        event.preventDefault();
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  if (canChangeUsername) {
+    usernameInput.addEventListener('input', function() {
+      currentUsername.textContent = this.value || '{{ user.username }}';
+    });
+  }
+
+  if (!canChangeUsername) {
+    usernameInput.addEventListener('click', function() {
+      alert("{% blocktrans with days=username_change_days_left %}Username can only be changed once every 30 days. Next change will be available in {{ days }} days.{% endblocktrans %}");
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,1522 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block title %}{% trans "Messages" %} - Waylines{% endblock %}
+{% block extra_css %}
+<style>
+  :root {
+    --primary-blue: #1a73e8;
+    --primary-dark: #0d47a1;
+    --primary-light: #e8f0fe;
+    --secondary-blue: #4285f4;
+    --accent-blue: #8ab4f8;
+    --bg-light: #f8f9fa;
+    --border-light: #e0e0e0;
+    --text-dark: #202124;
+    --text-muted: #5f6368;
+    --success: #34a853;
+    --warning: #fbbc05;
+    --danger: #ea4335;
+  }
+  .container-fluid {
+    max-width: 1400px;
+  }
+  .chats-sidebar {
+    position: sticky;
+    top: 20px;
+    height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    overflow: hidden;
+    background: white;
+    border: 1px solid var(--border-light);
+  }
+  .profile-section {
+    flex-shrink: 0;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .conversations-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .conversations-header {
+    flex-shrink: 0;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    background: white;
+    z-index: 10;
+  }
+  .conversations-list-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+  .conversations-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+  }
+  .scrollable-container {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    background: white;
+    margin-bottom: 1.5rem;
+  }
+  .container-header {
+    flex-shrink: 0;
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border-light);
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .container-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  .container-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 1rem;
+  }
+  .routes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem 0;
+  }
+  .friends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem 0;
+  }
+  .route-card-grid {
+    height: 100%;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    cursor: pointer;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .route-card-grid:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(26, 115, 232, 0.15);
+    border-color: var(--primary-blue);
+  }
+  .route-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .route-card-info {
+    flex: 1;
+    padding-right: 30px;
+  }
+  .route-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .route-author {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .route-status {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .route-status.my-route {
+    background: rgba(66, 133, 244, 0.1);
+    color: var(--primary-blue);
+  }
+  .route-status.shared {
+    background: rgba(66, 133, 244, 0.1);
+    color: var(--primary-blue);
+  }
+  .route-status.public {
+    background: rgba(66, 133, 244, 0.1);
+    color: var(--primary-blue);
+  }
+  .route-description {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+  }
+  .route-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-light);
+  }
+  .route-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+  .friend-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+  }
+  .friend-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(26, 115, 232, 0.15);
+    border-color: var(--primary-blue);
+  }
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    font-size: 14px;
+    position: relative;
+    margin-right: 12px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .user-avatar.small {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+  .user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .user-avatar.large {
+    width: 60px;
+    height: 60px;
+    font-size: 20px;
+    margin-bottom: 12px;
+    margin-right: 0;
+  }
+  .user-status {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+  .user-status.online {
+    background: var(--success);
+  }
+  .user-status.offline {
+    background: var(--text-muted);
+  }
+  .conversation-item {
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    margin: 0.25rem 0.5rem;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  .conversation-item:hover {
+    background-color: var(--primary-light);
+    transform: translateX(2px);
+  }
+  .conversation-item.active {
+    background-color: var(--primary-light);
+    border-left-color: var(--primary-blue);
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.1);
+  }
+  .conversation-item.unread {
+    background-color: rgba(138, 180, 248, 0.1);
+    border-left-color: var(--accent-blue);
+  }
+  .conversation-item.unread .conversation-username {
+    font-weight: 700;
+    color: var(--primary-dark);
+  }
+  .conversation-item.unread .conversation-message {
+    color: var(--text-dark);
+    font-weight: 500;
+  }
+  .conversation-item.unread .conversation-time {
+    color: var(--primary-blue);
+    font-weight: 600;
+  }
+  .conversation-content {
+    flex: 1;
+    min-width: 0;
+    padding-right: 30px;
+  }
+  .conversation-username {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-dark);
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+  .conversation-message {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 2px;
+  }
+  .conversation-time {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .unread-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--danger);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s infinite;
+  }
+  .conversation-unread {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--danger);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s infinite;
+  }
+  .route-unread-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--danger);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s infinite;
+  }
+  .friend-unread-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--danger);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.4);
+    }
+    70% {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 6px rgba(234, 67, 53, 0);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(234, 67, 53, 0);
+    }
+  }
+  .friend-info {
+    width: 100%;
+    position: relative;
+    padding-top: 5px;
+  }
+  .friend-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+    word-break: break-word;
+  }
+  .search-box {
+    position: relative;
+  }
+  .search-box .input-group-text {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-right: none;
+    padding-left: 16px;
+  }
+  .search-box .form-control {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-left: none;
+    padding-left: 0;
+  }
+  .search-box .form-control:focus {
+    background: white;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    border-color: var(--primary-blue);
+  }
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+  }
+  .section-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .header-actions {
+    display: flex;
+    gap: 1rem;
+  }
+  .new-chat-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .new-chat-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #c5c5c5;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a5a5a5;
+  }
+  .conversations-list::-webkit-scrollbar,
+  .container-scrollable::-webkit-scrollbar {
+    width: 4px;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: white;
+    border: 1px solid var(--border-light);
+    margin-bottom: 1.5rem;
+  }
+  .empty-state-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  }
+  .empty-state-icon i {
+    color: white;
+    font-size: 2rem;
+  }
+  .empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+  }
+  .empty-state-text {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    max-width: 400px;
+    text-align: center;
+  }
+  @media (max-width: 1200px) {
+    .routes-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+    .friends-grid {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+  }
+  @media (max-width: 992px) {
+    .chats-sidebar {
+      height: auto;
+      position: static;
+      margin-bottom: 1.5rem;
+    }
+    .scrollable-container {
+      height: 350px;
+    }
+    .routes-grid,
+    .friends-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 768px) {
+    .scrollable-container {
+      height: 300px;
+    }
+    .container-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .header-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+  @media (max-width: 576px) {
+    .section-title {
+      font-size: 1.25rem;
+    }
+    .new-chat-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+  }
+  .modal-content {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .modal-header {
+    background: var(--primary-light);
+    border-bottom: 1px solid var(--border-light);
+  }
+  .friend-item {
+    margin-bottom: 0.5rem;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .friend-item:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-blue);
+  }
+  .no-results-message {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .route-card-grid.unread {
+    border-color: var(--accent-blue);
+    background: rgba(138, 180, 248, 0.05);
+  }
+  .route-card-grid.unread:hover {
+    border-color: var(--primary-blue);
+    background: rgba(138, 180, 248, 0.1);
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="section-title">{% trans "Messages" %}</h1>
+      <p class="section-subtitle">{% trans "Chat with friends and discuss routes" %}</p>
+    </div>
+    <div class="header-actions">
+      {% if friends %}
+      <button class="new-chat-btn" data-bs-toggle="modal" data-bs-target="#newChatModal">
+        <i class="fas fa-plus"></i>
+        <span>{% trans "Write" %}</span>
+      </button>
+      {% endif %}
+      <a href="{% url 'all_routes' %}" class="btn btn-outline-primary rounded-pill px-4">
+        <i class="fas fa-route me-1"></i>{% trans "All Routes" %}
+      </a>
+    </div>
+  </div>
+  <div class="row g-4">
+    <div class="col-xl-4 col-lg-5">
+      <div class="chats-sidebar">
+        <div class="profile-section">
+          <div class="d-flex align-items-center mb-3">
+            <div class="position-relative me-3">
+              <div class="user-avatar">
+                {% if user.profile.avatar %}
+                  <img src="{{ user.profile.avatar.url }}" 
+                       alt="{{ user.username }}"
+                       onerror="this.style.display='none'; this.parentElement.innerHTML='{{ user.username|first|upper }}';">
+                {% else %}
+                  {{ user.username|first|upper }}
+                {% endif %}
+              </div>
+              <div class="user-status online"></div>
+            </div>
+            <div class="flex-grow-1">
+              <h5 class="mb-1 fw-bold text-dark">{{ user.username }}</h5>
+              <small class="text-success d-flex align-items-center">
+                <i class="fas fa-circle me-1" style="font-size: 8px;"></i>
+                {% trans "Active now" %}
+              </small>
+            </div>
+          </div>
+          <div class="search-box mb-3">
+            <div class="input-group">
+              <span class="input-group-text bg-white border-0">
+                <i class="fas fa-search text-muted"></i>
+              </span>
+              <input type="text" class="form-control border-0" id="chatSearch" 
+                     placeholder="{% trans 'Search friends...' %}">
+            </div>
+          </div>
+        </div>
+        <div class="conversations-section">
+          <div class="conversations-header">
+            <h6 class="fw-bold mb-0 text-dark d-flex align-items-center">
+              <i class="fas fa-comments me-2" style="color: var(--primary-blue);"></i>
+              {% trans "Private Messages" %}
+              {% if total_unread_count > 0 %}
+              <span class="badge bg-danger ms-2" id="total-unread-count">{{ total_unread_count }}</span>
+              {% endif %}
+            </h6>
+          </div>
+          <div class="conversations-list-container">
+            {% if conversations_data %}
+            <div class="conversations-list" id="conversationsList">
+              {% for conv_data in conversations_data %}
+              <div class="conversation-item d-flex align-items-center {% if conv_data.unread_count > 0 %}unread{% endif %}"
+                   data-username="{{ conv_data.other_user.username|lower }}"
+                   data-user-id="{{ conv_data.other_user.id }}"
+                   data-conversation-id="{{ conv_data.conversation.id }}">
+                <div class="position-relative">
+                  <div class="user-avatar small">
+                    {% if conv_data.other_user.profile.avatar %}
+                      <img src="{{ conv_data.other_user.profile.avatar.url }}" 
+                           alt="{{ conv_data.other_user.username }}"
+                           onerror="this.style.display='none'; this.parentElement.innerHTML='{{ conv_data.other_user.username|first|upper }}';">
+                    {% else %}
+                      {{ conv_data.other_user.username|first|upper }}
+                    {% endif %}
+                  </div>
+                  <div class="user-status {% if conv_data.is_online %}online{% else %}offline{% endif %}"></div>
+                </div>
+                <div class="conversation-content">
+                  <div class="d-flex justify-content-between align-items-start mb-1">
+                    <div class="conversation-username">{{ conv_data.other_user.username }}</div>
+                    {% if conv_data.last_message %}
+                    <div class="conversation-time">
+                      {{ conv_data.last_message.created_at|date:"H:i" }}
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="conversation-message">
+                      {% if conv_data.last_message %}
+                        {% if conv_data.last_message.sender == user %}
+                          {% trans "You:" %} {{ conv_data.last_message.content|truncatechars:20 }}
+                        {% else %}
+                          {{ conv_data.last_message.content|truncatechars:20 }}
+                        {% endif %}
+                      {% else %}
+                        <span class="text-muted">{% trans "Start conversation" %}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                {% if conv_data.unread_count > 0 %}
+                <div class="conversation-unread" id="unread-conv-{{ conv_data.conversation.id }}">
+                  {{ conv_data.unread_count }}
+                </div>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+              {% if friends_without_chats %}
+              <div class="conversations-list" id="conversationsList">
+                {% for friend in friends_without_chats %}
+                <div class="conversation-item d-flex align-items-center"
+                     data-username="{{ friend.username|lower }}"
+                     data-user-id="{{ friend.id }}">
+                  <div class="position-relative">
+                    <div class="user-avatar small">
+                      {% if friend.profile.avatar %}
+                        <img src="{{ friend.profile.avatar.url }}" 
+                             alt="{{ friend.username }}"
+                             onerror="this.style.display='none'; this.parentElement.innerHTML='{{ friend.username|first|upper }}';">
+                      {% else %}
+                        {{ friend.username|first|upper }}
+                      {% endif %}
+                    </div>
+                    <div class="user-status offline"></div>
+                  </div>
+                  <div class="conversation-content">
+                    <div class="conversation-username">{{ friend.username }}</div>
+                    <div class="conversation-message text-muted">
+                      {% trans "Start conversation" %}
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <div class="empty-state">
+                <div class="empty-state-icon">
+                  <i class="fas fa-comments"></i>
+                </div>
+                <h6 class="empty-state-title">{% trans "No messages" %}</h6>
+                <p class="empty-state-text">{% trans "Start chatting with friends" %}</p>
+                <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#newChatModal">
+                  <i class="fas fa-plus me-1"></i>{% trans "Write" %}
+                </button>
+              </div>
+              {% endif %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-8 col-lg-7">
+      {% if user_routes_chats %}
+      <div class="scrollable-container">
+        <div class="container-header">
+          <h5 class="container-title">
+            <i class="fas fa-route me-2" style="color: var(--primary-blue);"></i>
+            {% trans "My Routes" %}
+            <span class="badge bg-primary ms-2">{{ user_routes_chats.count }}</span>
+          </h5>
+        </div>
+        <div class="container-scrollable">
+          <div class="routes-grid">
+            {% for chat in user_routes_chats %}
+            {% with route=chat.route %}
+            <div class="route-card-grid position-relative {% if chat.unread_count > 0 %}unread{% endif %}" 
+                 onclick="window.location.href='{% url 'chat:route_chat' route.id %}'"
+                 data-route-id="{{ route.id }}"
+                 data-chat-id="{{ chat.id }}">
+              {% if chat.unread_count > 0 %}
+              <div class="route-unread-badge" id="unread-route-{{ route.id }}">
+                {{ chat.unread_count }}
+              </div>
+              {% endif %}
+              <div class="route-card-header">
+                <div class="route-card-info">
+                  <div class="route-name">
+                    {{ route.name|truncatechars:30 }}
+                    {% if chat.unread_count > 0 %}
+                    <span class="badge bg-danger ms-2">{{ chat.unread_count }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="route-author">
+                    <i class="fas fa-user me-1"></i>
+                    {{ route.author.username }}
+                  </div>
+                </div>
+                <span class="route-status my-route">{% trans "Mine" %}</span>
+              </div>
+              {% if route.description %}
+              <div class="route-description">
+                {{ route.description|truncatechars:80 }}
+              </div>
+              {% endif %}
+              <div class="route-meta">
+                <div class="route-meta-item">
+                  <i class="fas fa-calendar"></i>
+                  {{ route.created_at|date:"d.m.Y" }}
+                </div>
+                <div class="route-meta-item">
+                  <i class="fas fa-comments"></i>
+                  {% if chat.unread_count > 0 %}
+                  <span class="text-danger fw-bold">{{ chat.unread_count }} {% trans "new" %}</span>
+                  {% else %}
+                  {% trans "Discussion" %}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endwith %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% if participant_chats or public_chats %}
+      <div class="scrollable-container">
+        <div class="container-header">
+          <h5 class="container-title">
+            <i class="fas fa-users me-2" style="color: var(--primary-blue);"></i>
+            {% trans "Shared Routes" %}
+            <span class="badge bg-primary ms-2">
+              {% with pc=participant_chats.count pc2=public_chats.count %}
+                {{ pc|add:pc2 }}
+              {% endwith %}
+            </span>
+          </h5>
+        </div>
+        <div class="container-scrollable">
+          <div class="routes-grid">
+            {% for chat in participant_chats %}
+            {% with route=chat.route %}
+            <div class="route-card-grid position-relative {% if chat.unread_count > 0 %}unread{% endif %}" 
+                 onclick="window.location.href='{% url 'chat:route_chat' route.id %}'"
+                 data-route-id="{{ route.id }}"
+                 data-chat-id="{{ chat.id }}">
+              {% if chat.unread_count > 0 %}
+              <div class="route-unread-badge" id="unread-route-{{ route.id }}">
+                {{ chat.unread_count }}
+              </div>
+              {% endif %}
+              <div class="route-card-header">
+                <div class="route-card-info">
+                  <div class="route-name">
+                    {{ route.name|truncatechars:30 }}
+                    {% if chat.unread_count > 0 %}
+                    <span class="badge bg-danger ms-2">{{ chat.unread_count }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="route-author">
+                    <i class="fas fa-user me-1"></i>
+                    {{ route.author.username }}
+                  </div>
+                </div>
+                <span class="route-status shared">{% trans "Shared" %}</span>
+              </div>
+              {% if route.description %}
+              <div class="route-description">
+                {{ route.description|truncatechars:80 }}
+              </div>
+              {% endif %}
+              <div class="route-meta">
+                <div class="route-meta-item">
+                  <i class="fas fa-calendar"></i>
+                  {{ route.created_at|date:"d.m.Y" }}
+                </div>
+                <div class="route-meta-item">
+                  <i class="fas fa-comments"></i>
+                  {% if chat.unread_count > 0 %}
+                  <span class="text-danger fw-bold">{{ chat.unread_count }} {% trans "new" %}</span>
+                  {% else %}
+                  {% trans "Discussion" %}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endwith %}
+            {% endfor %}
+            {% for chat in public_chats %}
+            {% with route=chat.route %}
+            <div class="route-card-grid position-relative {% if chat.unread_count > 0 %}unread{% endif %}" 
+                 onclick="window.location.href='{% url 'chat:route_chat' route.id %}'"
+                 data-route-id="{{ route.id }}"
+                 data-chat-id="{{ chat.id }}">
+              {% if chat.unread_count > 0 %}
+              <div class="route-unread-badge" id="unread-route-{{ route.id }}">
+                {{ chat.unread_count }}
+              </div>
+              {% endif %}
+              <div class="route-card-header">
+                <div class="route-card-info">
+                  <div class="route-name">
+                    {{ route.name|truncatechars:30 }}
+                    {% if chat.unread_count > 0 %}
+                    <span class="badge bg-danger ms-2">{{ chat.unread_count }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="route-author">
+                    <i class="fas fa-user me-1"></i>
+                    {{ route.author.username }}
+                  </div>
+                </div>
+                <span class="route-status public">{% trans "Public" %}</span>
+              </div>
+              {% if route.description %}
+              <div class="route-description">
+                {{ route.description|truncatechars:80 }}
+              </div>
+              {% endif %}
+              <div class="route-meta">
+                <div class="route-meta-item">
+                  <i class="fas fa-calendar"></i>
+                  {{ route.created_at|date:"d.m.Y" }}
+                </div>
+                <div class="route-meta-item">
+                  <i class="fas fa-comments"></i>
+                  {% if chat.unread_count > 0 %}
+                  <span class="text-danger fw-bold">{{ chat.unread_count }} {% trans "new" %}</span>
+                  {% else %}
+                  {% trans "Discussion" %}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endwith %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% if friends %}
+      <div class="scrollable-container">
+        <div class="container-header">
+          <h5 class="container-title">
+            <i class="fas fa-user-friends me-2" style="color: var(--primary-blue);"></i>
+            {% trans "Friends" %}
+            <span class="badge bg-primary ms-2">{{ friends.count }}</span>
+          </h5>
+        </div>
+        <div class="container-scrollable">
+          <div class="friends-grid">
+            {% for friend in friends|slice:":12" %}
+            <a href="{% url 'chat:private_chat' friend.id %}" class="friend-card" data-user-id="{{ friend.id }}">
+              <div class="user-avatar large">
+                {% if friend.profile.avatar %}
+                  <img src="{{ friend.profile.avatar.url }}" 
+                       alt="{{ friend.username }}"
+                       onerror="this.style.display='none'; this.parentElement.innerHTML='{{ friend.username|first|upper }}';">
+                {% else %}
+                  {{ friend.username|first|upper }}
+                {% endif %}
+                <div class="user-status offline"></div>
+              </div>
+              <div class="friend-info">
+                <div class="friend-name">{{ friend.username|truncatechars:15 }}</div>
+                {% if friend.unread_count and friend.unread_count > 0 %}
+                <div class="friend-unread-badge" id="unread-friend-{{ friend.id }}">
+                  {{ friend.unread_count }}
+                </div>
+                {% endif %}
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% if not user_routes_chats and not participant_chats and not public_chats and not friends %}
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i class="fas fa-route"></i>
+        </div>
+        <h3 class="empty-state-title">{% trans "No messages" %}</h3>
+        <p class="empty-state-text">
+          {% trans "Create a route or add friends to start chatting" %}
+        </p>
+        <div class="d-flex gap-3 justify-content-center">
+          <a href="{% url 'create_route' %}" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-plus me-2"></i>{% trans "Create Route" %}
+          </a>
+          <a href="{% url 'find_friends' %}" class="btn btn-outline-primary rounded-pill px-4">
+            <i class="fas fa-user-plus me-2"></i>{% trans "Find Friends" %}
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="newChatModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-3">
+      <div class="modal-header border-0 p-4 pb-0">
+        <h5 class="modal-title fw-bold text-dark">{% trans "Select a friend" %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        {% if friends %}
+        <div class="search-box mb-4">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-0">
+              <i class="fas fa-search text-muted"></i>
+            </span>
+            <input type="text" class="form-control border-0" id="friendSearch" 
+                   placeholder="{% trans 'Start typing friend name...' %}">
+          </div>
+        </div>
+        <div class="friends-list" style="max-height: 400px; overflow-y: auto;" id="modalFriendsList">
+          {% for friend in friends %}
+          <div class="conversation-item d-flex align-items-center p-3 mb-2 rounded-3 friend-item"
+               onclick="window.location.href='{% url 'chat:private_chat' friend.id %}'"
+               style="cursor: pointer;"
+               data-username="{{ friend.username|lower }}"
+               data-user-id="{{ friend.id }}">
+            <div class="position-relative">
+              <div class="user-avatar small">
+                {% if friend.profile.avatar %}
+                  <img src="{{ friend.profile.avatar.url }}" 
+                       alt="{{ friend.username }}"
+                       onerror="this.style.display='none'; this.parentElement.innerHTML='{{ friend.username|first|upper }}';">
+                {% else %}
+                  {{ friend.username|first|upper }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="conversation-content">
+              <div class="conversation-username">{{ friend.username }}</div>
+            </div>
+            <i class="fas fa-chevron-right text-muted ms-2"></i>
+            {% if friend.unread_count and friend.unread_count > 0 %}
+            <div class="conversation-unread">
+              {{ friend.unread_count }}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h6 class="empty-state-title">{% trans "You have no friends yet" %}</h6>
+          <p class="empty-state-text">{% trans "Find friends to start chatting" %}</p>
+          <a href="{% url 'find_friends' %}" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-user-plus me-2"></i>{% trans "Find Friends" %}
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+  if (typeof firebase === 'undefined') {
+    console.log('Firebase not loaded, loading...');
+    const script1 = document.createElement('script');
+    script1.src = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
+    const script2 = document.createElement('script');
+    script2.src = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js';
+    const script3 = document.createElement('script');
+    script3.src = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js';
+    script3.onload = function() {
+      console.log('Firebase SDK loaded, initializing...');
+      initFirebase();
+    };
+    document.head.appendChild(script1);
+    document.head.appendChild(script2);
+    document.head.appendChild(script3);
+  } else {
+    console.log('Firebase already loaded, initializing...');
+    initFirebase();
+  }
+  function initFirebase() {
+    if (!firebase.apps.length) {
+      const firebaseConfig = {
+        apiKey: "AIzaSyDwAp4Qe5kIlOSewu7FLMj7IHDi4ofQI7E",
+        authDomain: "project-e123e.firebaseapp.com",
+        databaseURL: "https://project-e123e-default-rtdb.firebaseio.com",
+        projectId: "project-e123e",
+        storageBucket: "project-e123e.firebasestorage.app",
+        messagingSenderId: "849440145534",
+        appId: "1:849440145534:web:9873b2bc94bf0db959982f",
+        measurementId: "G-WG5K1M2D1V"
+      };
+      try {
+        firebase.initializeApp(firebaseConfig);
+        console.log('✅ Firebase initialized in dashboard!');
+        setTimeout(() => {
+          setupFirebaseListeners();
+        }, 1000);
+      } catch (error) {
+        console.error('Firebase init error:', error);
+      }
+    } else {
+      console.log('✅ Firebase already initialized');
+      setupFirebaseListeners();
+    }
+  }
+  let currentUserId = '{{ user.id }}';
+  let currentUsername = '{{ user.username }}';
+  function setupFirebaseListeners() {
+    try {
+      console.log('Setting up Firebase listeners...');
+      setupFriendStatusListeners();
+      setupMessageListeners();
+      updateMyOnlineStatus();
+      console.log('✅ Firebase listeners ready');
+    } catch (error) {
+      console.error('Firebase listener setup error:', error);
+    }
+  }
+  function setupFriendStatusListeners() {
+    if (!firebase.database) {
+      console.warn('Firebase Database unavailable');
+      return;
+    }
+    const database = firebase.database();
+    const friendIds = [];
+    document.querySelectorAll('[data-user-id]').forEach(el => {
+      const id = el.getAttribute('data-user-id');
+      if (id && id !== currentUserId && !friendIds.includes(id)) {
+        friendIds.push(id);
+      }
+    });
+    document.querySelectorAll('.friend-card[data-user-id]').forEach(card => {
+      const id = card.getAttribute('data-user-id');
+      if (id && !friendIds.includes(id)) {
+        friendIds.push(id);
+      }
+    });
+    console.log(`Tracking status of ${friendIds.length} friends:`, friendIds);
+    friendIds.forEach(friendId => {
+      const friendStatusRef = database.ref(`status/${friendId}`);
+      friendStatusRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        updateFriendStatusUI(friendId, data);
+      }, (error) => {
+        console.error(`Status listener error for friend ${friendId}:`, error);
+      });
+    });
+  }
+  function updateFriendStatusUI(friendId, statusData) {
+    if (!statusData) {
+      setFriendStatus(friendId, false);
+      return;
+    }
+    const isOnline = statusData.status === 'online';
+    setFriendStatus(friendId, isOnline);
+  }
+  function setFriendStatus(friendId, isOnline) {
+    const statusElements = document.querySelectorAll(`[data-user-id="${friendId}"] .user-status`);
+    statusElements.forEach(el => {
+      if (isOnline) {
+        el.classList.remove('offline');
+        el.classList.add('online');
+        el.title = '{% trans "Online" %}';
+      } else {
+        el.classList.remove('online');
+        el.classList.add('offline');
+        el.title = '{% trans "Offline" %}';
+      }
+    });
+    const modalStatusElements = document.querySelectorAll(`#modal-status-${friendId}, .friend-item[data-user-id="${friendId}"] .user-status`);
+    modalStatusElements.forEach(el => {
+      if (isOnline) {
+        el.classList.remove('offline');
+        el.classList.add('online');
+      } else {
+        el.classList.remove('online');
+        el.classList.add('offline');
+      }
+    });
+  }
+  function updateMyOnlineStatus() {
+    if (!firebase.database) return;
+    const database = firebase.database();
+    const userStatusRef = database.ref(`status/${currentUserId}`);
+    userStatusRef.set({
+      status: 'online',
+      username: currentUsername,
+      userId: currentUserId,
+      lastSeen: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+      console.log('✅ Status set to online');
+    }).catch(error => {
+      console.error('Status update error:', error);
+    });
+    userStatusRef.onDisconnect().set({
+      status: 'offline',
+      username: currentUsername,
+      userId: currentUserId,
+      lastSeen: firebase.database.ServerValue.TIMESTAMP
+    });
+  }
+  function setupMessageListeners() {
+    if (!firebase.firestore) {
+      console.warn('Firestore unavailable');
+      return;
+    }
+    const firestore = firebase.firestore();
+    const conversationIds = [];
+    const routeIds = [];
+    document.querySelectorAll('[data-conversation-id]').forEach(el => {
+      const id = el.getAttribute('data-conversation-id');
+      if (id && !conversationIds.includes(id)) {
+        conversationIds.push(id);
+      }
+    });
+    document.querySelectorAll('[data-route-id]').forEach(el => {
+      const id = el.getAttribute('data-route-id');
+      if (id && !routeIds.includes(id)) {
+        routeIds.push(id);
+      }
+    });
+    console.log(`Listening to ${conversationIds.length} conversations and ${routeIds.length} routes`);
+    conversationIds.forEach(convId => {
+      const convRef = firestore.collection('conversations').doc(convId.toString());
+      convRef.onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (data && data.lastMessage) {
+            if (data.lastMessage.senderId !== currentUserId && data.unreadCount > 0) {
+              console.log('New unread message in conversation:', convId);
+              updateConversationUnreadCount(convId, data.unreadCount);
+              updateTotalUnreadCountFromFirebase();
+            }
+          }
+        }
+      });
+    });
+    routeIds.forEach(routeId => {
+      const routeRef = firestore.collection('route_chats').doc(`route_${routeId}`);
+      routeRef.onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (data && data.lastMessage) {
+            if (data.lastMessage.senderId !== currentUserId && data.unreadCount > 0) {
+              console.log('New unread message in route:', routeId);
+              updateRouteUnreadCount(routeId, data.unreadCount);
+              updateTotalUnreadCountFromFirebase();
+            }
+          }
+        }
+      });
+    });
+  }
+  function updateConversationUnreadCount(conversationId, count) {
+    const conversationItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+    if (!conversationItem) return;
+    let unreadBadge = conversationItem.querySelector('.conversation-unread');
+    if (count > 0) {
+      conversationItem.classList.add('unread');
+      if (!unreadBadge) {
+        unreadBadge = document.createElement('div');
+        unreadBadge.className = 'conversation-unread';
+        unreadBadge.id = `unread-conv-${conversationId}`;
+        conversationItem.appendChild(unreadBadge);
+      }
+      unreadBadge.textContent = count;
+      unreadBadge.style.animation = 'pulse 2s infinite';
+    } else {
+      conversationItem.classList.remove('unread');
+      if (unreadBadge) {
+        unreadBadge.remove();
+      }
+    }
+  }
+  function updateRouteUnreadCount(routeId, count) {
+    const routeCard = document.querySelector(`[data-route-id="${routeId}"]`);
+    if (!routeCard) return;
+    let unreadBadge = routeCard.querySelector('.route-unread-badge');
+    const routeNameElement = routeCard.querySelector('.route-name');
+    const metaElement = routeCard.querySelector('.route-meta-item:last-child span');
+    if (count > 0) {
+      routeCard.classList.add('unread');
+      if (!unreadBadge) {
+        unreadBadge = document.createElement('div');
+        unreadBadge.className = 'route-unread-badge';
+        unreadBadge.id = `unread-route-${routeId}`;
+        routeCard.appendChild(unreadBadge);
+      }
+      unreadBadge.textContent = count;
+      unreadBadge.style.animation = 'pulse 2s infinite';
+      let nameBadge = routeNameElement.querySelector('.badge.bg-danger');
+      if (!nameBadge) {
+        nameBadge = document.createElement('span');
+        nameBadge.className = 'badge bg-danger ms-2';
+        routeNameElement.appendChild(nameBadge);
+      }
+      nameBadge.textContent = count;
+      if (metaElement) {
+        metaElement.textContent = `${count} {% trans "new" %}`;
+        metaElement.classList.add('text-danger', 'fw-bold');
+      }
+    } else {
+      routeCard.classList.remove('unread');
+      if (unreadBadge) {
+        unreadBadge.remove();
+      }
+      const nameBadge = routeNameElement.querySelector('.badge.bg-danger');
+      if (nameBadge) {
+        nameBadge.remove();
+      }
+      if (metaElement) {
+        metaElement.textContent = '{% trans "Discussion" %}';
+        metaElement.classList.remove('text-danger', 'fw-bold');
+      }
+    }
+  }
+  function updateTotalUnreadCountFromFirebase() {
+    updateUnreadCounts();
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Messages dashboard loaded');
+    initUnreadBadges();
+    const chatSearch = document.getElementById('chatSearch');
+    if (chatSearch) {
+      chatSearch.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        const conversationItems = document.querySelectorAll('#conversationsList .conversation-item');
+        conversationItems.forEach((item) => {
+          const username = item.getAttribute('data-username');
+          if (username && username.includes(searchTerm)) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    }
+    const friendSearch = document.getElementById('friendSearch');
+    if (friendSearch) {
+      friendSearch.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        const friendItems = document.querySelectorAll('#modalFriendsList .friend-item');
+        friendItems.forEach((item) => {
+          const username = item.getAttribute('data-username');
+          if (username && username.includes(searchTerm)) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    }
+    const newChatModal = document.getElementById('newChatModal');
+    if (newChatModal) {
+      newChatModal.addEventListener('shown.bs.modal', function () {
+        const friendSearch = document.getElementById('friendSearch');
+        if (friendSearch) {
+          setTimeout(() => {
+            friendSearch.focus();
+          }, 100);
+        }
+      });
+    }
+    document.querySelectorAll('.conversation-item[data-conversation-id]').forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const conversationId = this.getAttribute('data-conversation-id');
+        const userId = this.getAttribute('data-user-id');
+        if (userId) {
+          markConversationAsRead(conversationId, userId);
+          window.location.href = `/chat/private/${userId}/`;
+        }
+      });
+    });
+    document.querySelectorAll('.conversation-item:not([data-conversation-id])').forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const userId = this.getAttribute('data-user-id');
+        if (userId) {
+          window.location.href = `/chat/private/${userId}/`;
+        }
+      });
+    });
+    function markConversationAsRead(conversationId, userId) {
+      fetch(`/chat/mark_read/${conversationId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCSRFToken(),
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const conversationItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+          if (conversationItem) {
+            conversationItem.classList.remove('unread');
+            const unreadBadge = conversationItem.querySelector('.conversation-unread');
+            if (unreadBadge) {
+              unreadBadge.remove();
+            }
+            updateUnreadCounts();
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Mark as read error:', error);
+      });
+    }
+    function updateUnreadCounts() {
+      fetch('/chat/get_unread_counts/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          updateTotalUnreadCount(data.total_unread);
+          if (data.conversations) {
+            data.conversations.forEach(conv => {
+              updateConversationUnreadCount(conv.id, conv.unread_count);
+            });
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Unread count fetch error:', error);
+      });
+    }
+    function updateTotalUnreadCount(count) {
+      let totalUnreadElement = document.getElementById('total-unread-count');
+      const header = document.querySelector('.conversations-header h6');
+      if (count > 0) {
+        if (!totalUnreadElement) {
+          totalUnreadElement = document.createElement('span');
+          totalUnreadElement.className = 'badge bg-danger ms-2';
+          totalUnreadElement.id = 'total-unread-count';
+          if (header) {
+            header.appendChild(totalUnreadElement);
+          }
+        }
+        totalUnreadElement.textContent = count;
+        totalUnreadElement.style.display = 'inline-block';
+        document.title = `(${count}) {% trans "Messages" %} - Waylines`;
+      } else if (totalUnreadElement) {
+        totalUnreadElement.style.display = 'none';
+        document.title = '{% trans "Messages" %} - Waylines';
+      }
+    }
+    function getCSRFToken() {
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+      return csrfToken ? csrfToken.value : '';
+    }
+    function initUnreadBadges() {
+      const unreadBadges = document.querySelectorAll('.conversation-unread, .route-unread-badge, .friend-unread-badge');
+      unreadBadges.forEach(badge => {
+        badge.style.animation = 'pulse 2s infinite';
+      });
+      updateUnreadCounts();
+    }
+    let messageCheckInterval;
+    function startMessageChecking() {
+      messageCheckInterval = setInterval(() => {
+        updateUnreadCounts();
+      }, 30000);
+    }
+    function stopMessageChecking() {
+      if (messageCheckInterval) {
+        clearInterval(messageCheckInterval);
+      }
+    }
+    startMessageChecking();
+    window.addEventListener('beforeunload', function() {
+      stopMessageChecking();
+    });
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList' || mutation.type === 'characterData') {
+          const totalUnreadElement = document.getElementById('total-unread-count');
+          const unreadCount = totalUnreadElement ? parseInt(totalUnreadElement.textContent) || 0 : 0;
+          if (unreadCount > 0) {
+            document.title = `(${unreadCount}) {% trans "Messages" %} - Waylines`;
+          } else {
+            document.title = '{% trans "Messages" %} - Waylines';
+          }
+        }
+      });
+    });
+    const totalUnreadElement = document.getElementById('total-unread-count');
+    if (totalUnreadElement) {
+      observer.observe(totalUnreadElement, {
+        childList: true,
+        characterData: true,
+        subtree: true
+      });
+    }
+    console.log('✅ Messages dashboard initialized');
+  });
+</script>
+{% endblock %}

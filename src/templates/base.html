@@ -1,0 +1,843 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Waylines - Route Platform{% endblock %}</title>
+
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/leaflet.css' %}" rel="stylesheet">
+  <link href="{% static 'css/fontawesome-all.min.css' %}" rel="stylesheet">
+
+  <script src="{% static 'vendor/firebase/firebase-app-compat.js' %}"></script>
+  <script src="{% static 'vendor/firebase/firebase-database-compat.js' %}"></script>
+  <script src="{% static 'vendor/firebase/firebase-auth-compat.js' %}"></script>
+
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #6c757d;
+      --light-bg: #f8f9fa;
+      --border-color: #e9ecef;
+      --footer-height: 65px;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding-bottom: var(--footer-height);
+    }
+
+    .page-wrapper {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 70px - var(--footer-height));
+      padding-top: 70px;
+    }
+
+    main {
+      flex: 1 0 auto;
+      padding-bottom: 20px;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: var(--footer-height);
+      background: #212529;
+      color: white;
+      z-index: 1020;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+    }
+
+    .footer .container {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-content {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .footer-logo {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-description {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin: 0;
+      line-height: 1.3;
+      display: none;
+    }
+
+    .footer-copyright {
+      font-size: 0.9rem;
+      margin: 0;
+      opacity: 0.8;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .navbar {
+      height: 70px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1030;
+      background: white !important;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--primary-color) !important;
+      margin-right: 2rem;
+    }
+
+    .navbar-brand i {
+      margin-right: 8px;
+    }
+
+    .navbar-search {
+      flex: 1;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .navbar-search .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .navbar-search .form-control {
+      width: 100%;
+      padding: 10px 50px 10px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #f8f9fa;
+      transition: all 0.2s ease;
+    }
+
+    .navbar-search .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .navbar-search .search-button {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-link {
+      font-weight: 500;
+      color: var(--secondary-color);
+      padding: 0.5rem 1rem !important;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-link.active {
+      color: var(--primary-color);
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    .nav-link:not(.active):hover {
+      color: var(--primary-color);
+      background: var(--light-bg);
+    }
+
+    .navbar-nav {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      gap: 5px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+    }
+
+    .dropdown-menu {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      margin-top: 8px;
+    }
+
+    .dropdown-item {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .dropdown-item:hover {
+      background: var(--light-bg);
+      color: var(--primary-color);
+    }
+
+    .badge-notification {
+      position: relative;
+      top: -10px;
+      right: -2px;
+      font-size: 0.6rem;
+      padding: 0.2em 0.4em;
+      min-width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body.map-page {
+      overflow: hidden;
+      padding-bottom: 0;
+    }
+
+    body.map-page .page-wrapper {
+      padding: 0;
+      min-height: calc(100vh - 70px);
+      height: calc(100vh - 70px);
+    }
+
+    body.map-page main {
+      height: 100%;
+      padding-bottom: 0;
+    }
+
+    body.map-page .footer {
+      display: none;
+    }
+
+    body.map-page #map {
+      height: 100%;
+      width: 100%;
+    }
+
+    .nav-item.dropdown {
+      position: relative;
+    }
+
+    .custom-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      min-width: 280px;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
+      margin-top: 5px;
+    }
+
+    #friendsMenu,
+    #profileMenu {
+      right: 0;
+      transform: translateX(0);
+    }
+
+    .custom-dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-item .btn-group {
+      flex-shrink: 0;
+    }
+
+    .dropdown-item .btn-group .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .dropdown-item strong {
+      font-size: 0.9rem;
+    }
+
+    .dropdown-item .text-muted {
+      font-size: 0.8rem;
+    }
+
+    .dropdown-header {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      color: #495057;
+    }
+
+    .notifications-container {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 1060;
+    }
+
+    .notification {
+      background: white;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-left: 4px solid var(--primary-color);
+      max-width: 350px;
+      animation: slideIn 0.3s ease;
+    }
+
+    .notification-info { border-left-color: #17a2b8; }
+    .notification-success { border-left-color: #28a745; }
+    .notification-warning { border-left-color: #ffc107; }
+    .notification-error { border-left-color: #dc3545; }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @media (max-width: 992px) {
+      .navbar {
+        height: auto;
+        padding: 0.75rem 0;
+      }
+      .navbar-search {
+        margin: 0.75rem 0;
+        max-width: 100%;
+        order: 3;
+      }
+      .page-wrapper {
+        padding-top: 120px;
+        min-height: calc(100vh - 120px - var(--footer-height));
+      }
+      .navbar-collapse {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .custom-dropdown-menu {
+        position: static;
+        width: 100%;
+        min-width: auto;
+      }
+      .nav-link.dropdown-toggle i.fa-users {
+        margin-left: auto;
+      }
+    }
+
+    @media (min-width: 768px) and (max-width: 992px) {
+      .footer-description {
+        display: inline;
+        margin-left: 15px;
+      }
+      .footer-content {
+        justify-content: space-between;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .footer-description {
+        display: inline;
+        margin-left: 15px;
+      }
+      .footer-content {
+        justify-content: space-between;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar-search .form-control {
+        padding-left: 36px;
+        padding-right: 40px;
+        font-size: 0.85rem;
+      }
+      .navbar-search .search-button {
+        right: 10px;
+      }
+      .footer {
+        height: 60px;
+      }
+      .footer-content {
+        justify-content: space-between;
+        flex-wrap: nowrap;
+      }
+      .footer-brand {
+        flex-shrink: 0;
+      }
+      .footer-logo {
+        font-size: 1rem;
+      }
+      .footer-description {
+        display: none !important;
+      }
+      .footer-copyright {
+        font-size: 0.8rem;
+        white-space: nowrap;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .footer {
+        padding: 0 10px;
+        height: 55px;
+      }
+      .footer-logo {
+        font-size: 0.95rem;
+      }
+      .footer-copyright {
+        font-size: 0.75rem;
+      }
+      .custom-dropdown-menu {
+        min-width: 200px;
+      }
+      .dropdown-item .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .dropdown-item .btn-group {
+        margin-top: 5px;
+        align-self: flex-end;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .footer-logo i {
+        display: none;
+      }
+      .footer-logo span {
+        font-size: 0.9rem;
+      }
+      .footer-copyright {
+        font-size: 0.7rem;
+      }
+    }
+
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .navbar-collapse {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .nav-link {
+      min-height: 40px;
+    }
+
+    .nav-link.dropdown-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem !important;
+    }
+
+    .nav-link.dropdown-toggle i.fa-users {
+      font-size: 1.1rem;
+    }
+
+    .flag-icon {
+      width: 16px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      #languageDropdown .nav-link span {
+        display: none !important;
+      }
+    }
+
+    #languageMenu {
+      min-width: 180px !important;
+    }
+
+    .dropdown-item .fa-check {
+      font-size: 0.9rem;
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% csrf_token %}
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-white">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'home' %}">
+        <i class="fas fa-route"></i> Waylines
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <form class="navbar-search" method="get" action="{% url 'search' %}" id="searchForm">
+          <div class="search-wrapper">
+            <input type="text" name="q" class="form-control"
+              placeholder="{% trans 'Search routes' %}"
+              value="{{ request.GET.q }}"
+              id="searchInput"
+              autocomplete="off">
+            <button type="submit" class="search-button" aria-label="{% trans 'Search' %}">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </form>
+
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link{% if request.resolver_match.url_name == 'all_routes' or request.resolver_match.url_name == 'home' %} active{% endif %}"
+            href="{% url 'all_routes' %}">
+              <i class="fas fa-globe"></i> {% trans "All routes" %}
+            </a>
+          </li>
+
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link{% if request.resolver_match.url_name == 'shared_routes' %} active{% endif %}"
+            href="{% url 'shared_routes' %}">
+              <i class="fas fa-share-alt"></i> {% trans "Shared with me" %}
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link{% if request.resolver_match.url_name == 'my_routes' %} active{% endif %}"
+            href="{% url 'my_routes' %}">
+              <i class="fas fa-user"></i> {% trans "My routes" %}
+            </a>
+          </li>
+          {% endif %}
+
+          <li class="nav-item">
+            <a class="nav-link{% if 'chat' in request.resolver_match.namespaces or 'chat' in request.resolver_match.url_name %} active{% endif %}"
+            href="{% url 'chat:chat_dashboard' %}">
+              <i class="fas fa-comments"></i> {% trans "Chats" %}
+              {% if user.is_authenticated %}
+              <span class="badge bg-danger badge-notification" id="global-unread-count" style="display: none;">0</span>
+              {% endif %}
+            </a>
+          </li>
+
+          {% if user.is_authenticated %}
+          <li class="nav-item dropdown" id="friendsDropdown" style="margin-left: 10px;">
+            <a class="nav-link dropdown-toggle"
+            href="#"
+            onclick="toggleDropdown('friendsMenu'); return false;">
+              <i class="fas fa-users"></i>
+              {% if pending_requests_count %}
+              <span class="badge bg-danger badge-notification">{{ pending_requests_count }}</span>
+              {% endif %}
+            </a>
+            <div class="custom-dropdown-menu" id="friendsMenu">
+              <h6 class="dropdown-header">{% trans "Friend requests" %}</h6>
+              {% for request in pending_friend_requests %}
+              <div class="dropdown-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>{{ request.from_user.username }}</strong>
+                    <small class="text-muted d-block">{% blocktrans with time=request.created_at|timesince %}{{ time }} ago{% endblocktrans %}</small>
+                  </div>
+                  <div class="btn-group btn-group-sm">
+                    <form method="post" action="{% url 'accept_friend_request' request.id %}" style="display: inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-check"></i></button>
+                    </form>
+                    <form method="post" action="{% url 'reject_friend_request' request.id %}" style="display: inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              {% empty %}
+              <div class="dropdown-item text-muted">{% trans "No new requests" %}</div>
+              {% endfor %}
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{% url 'friends' %}"><i class="fas fa-list"></i> {% trans "All friends" %}</a>
+              <a class="dropdown-item" href="{% url 'find_friends' %}"><i class="fas fa-user-plus"></i> {% trans "Find friends" %}</a>
+            </div>
+          </li>
+
+          <li class="nav-item dropdown" id="profileDropdown">
+            <a class="nav-link dropdown-toggle"
+            href="#"
+            onclick="toggleDropdown('profileMenu'); return false;">
+              <i class="fas fa-user"></i> {{ user.username|truncatechars:12 }}
+            </a>
+            <div class="custom-dropdown-menu" id="profileMenu">
+              <a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> {% trans "Profile" %}</a>
+              <a class="dropdown-item" href="{% url 'create_route' %}"><i class="fas fa-plus"></i> {% trans "Create route" %}</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> {% trans "Log out" %}</a>
+            </div>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link{% if request.resolver_match.url_name == 'login' %} active{% endif %}" href="{% url 'login' %}">
+              <i class="fas fa-sign-in-alt"></i> {% trans "Log in" %}
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link{% if request.resolver_match.url_name == 'register' %} active{% endif %}" href="{% url 'register' %}">
+              <i class="fas fa-user-plus"></i> {% trans "Register" %}
+            </a>
+          </li>
+          {% endif %}
+
+          <li class="nav-item dropdown" id="languageDropdown">
+            <a class="nav-link dropdown-toggle" href="#" onclick="toggleDropdown('languageMenu'); return false;">
+              <i class="fas fa-globe"></i>
+              <span class="d-none d-md-inline">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% if LANGUAGE_CODE == 'en' %}English
+                {% elif LANGUAGE_CODE == 'es' %}Español
+                {% elif LANGUAGE_CODE == 'de' %}Deutsch
+                {% elif LANGUAGE_CODE == 'fr' %}Français
+                {% elif LANGUAGE_CODE == 'ru' %}Русский
+                {% else %}English{% endif %}
+              </span>
+            </a>
+            <div class="custom-dropdown-menu" id="languageMenu">
+              <form action="{% url 'set_language' %}" method="post" id="languageForm">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <a class="dropdown-item" href="#" onclick="setLanguage('en')">
+                  <i class="flag-icon {% if LANGUAGE_CODE == 'en' %}fas fa-check text-primary{% else %}far fa-circle{% endif %} me-2"></i>
+                  English
+                </a>
+                <a class="dropdown-item" href="#" onclick="setLanguage('es')">
+                  <i class="flag-icon {% if LANGUAGE_CODE == 'es' %}fas fa-check text-primary{% else %}far fa-circle{% endif %} me-2"></i>
+                  Español
+                </a>
+                <a class="dropdown-item" href="#" onclick="setLanguage('de')">
+                  <i class="flag-icon {% if LANGUAGE_CODE == 'de' %}fas fa-check text-primary{% else %}far fa-circle{% endif %} me-2"></i>
+                  Deutsch
+                </a>
+                <a class="dropdown-item" href="#" onclick="setLanguage('fr')">
+                  <i class="flag-icon {% if LANGUAGE_CODE == 'fr' %}fas fa-check text-primary{% else %}far fa-circle{% endif %} me-2"></i>
+                  Français
+                </a>
+                <a class="dropdown-item" href="#" onclick="setLanguage('ru')">
+                  <i class="flag-icon {% if LANGUAGE_CODE == 'ru' %}fas fa-check text-primary{% else %}far fa-circle{% endif %} me-2"></i>
+                  Русский
+                </a>
+                <input type="hidden" name="language" id="selectedLanguage">
+              </form>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div id="notifications" class="notifications-container"></div>
+
+  <div class="page-wrapper">
+    <main>
+      <div class="page-content">
+        {% if messages %}
+        <div class="container mt-3">
+          {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <h5 class="footer-logo">
+            <i class="fas fa-route"></i>
+            <span>Waylines</span>
+          </h5>
+          <p class="footer-description">{% trans "Platform for creating and sharing routes" %}</p>
+        </div>
+        <div class="footer-copyright">
+          &copy; 2025 Waylines
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/leaflet.js' %}"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwAp4Qe5kIlOSewu7FLMj7IHDi4ofQI7E",
+      authDomain: "project-e123e.firebaseapp.com",
+      databaseURL: "https://project-e123e-default-rtdb.firebaseio.com",
+      projectId: "project-e123e",
+      storageBucket: "project-e123e.firebasestorage.app",
+      messagingSenderId: "849440145534",
+      appId: "1:849440145534:web:9873b2bc94bf0db959982f",
+      measurementId: "G-WG5K1M2D1V"
+    };
+    firebase.initializeApp(firebaseConfig);
+    console.log('✅ Firebase initialized!');
+  </script>
+
+  <script>
+    window.WAYLINES = {
+      currentUserId: {{ request.user.id|default:0 }},
+      currentUsername: "{{ request.user.username|default:'Anonymous'|escapejs }}",
+      csrfToken: "{{ csrf_token }}",
+    };
+
+    function toggleDropdown(menuId) {
+      const menu = document.getElementById(menuId);
+      document.querySelectorAll('.custom-dropdown-menu').forEach(m => {
+        if (m.id !== menuId) m.classList.remove('show');
+      });
+      menu.classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      const clickedInside = Array.from(document.querySelectorAll('.nav-link.dropdown-toggle, .custom-dropdown-menu'))
+        .some(el => el.contains(e.target));
+      if (!clickedInside) {
+        document.querySelectorAll('.custom-dropdown-menu').forEach(m => m.classList.remove('show'));
+      }
+    });
+
+    function showNotification(message, type = 'info') {
+      const container = document.getElementById('notifications');
+      if (!container) return;
+      const id = 'notif-' + Date.now();
+      const el = document.createElement('div');
+      el.id = id;
+      el.className = `notification notification-${type}`;
+      el.innerHTML = `
+        <div class="d-flex align-items-center">
+          <i class="fas fa-info-circle me-2"></i>
+          <div>${message}</div>
+          <button type="button" class="btn-close btn-sm ms-2" onclick="document.getElementById('${id}').remove()"></button>
+        </div>
+      `;
+      container.appendChild(el);
+      setTimeout(() => el.classList.add('show'), 10);
+      setTimeout(() => {
+        el.classList.remove('show');
+        setTimeout(() => el.remove(), 300);
+      }, 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('searchInput');
+      const searchForm = document.getElementById('searchForm');
+
+      if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+          if (!searchInput.value.trim()) {
+            e.preventDefault();
+            showNotification("{% trans 'Enter a search query' %}");
+            searchInput.focus();
+          }
+        });
+      }
+
+      document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey && e.key === 'k') || e.key === '/') {
+          e.preventDefault();
+          if (searchInput) {
+            searchInput.focus();
+            searchInput.select();
+          }
+        }
+      });
+    });
+
+    function setLanguage(langCode) {
+      document.getElementById('selectedLanguage').value = langCode;
+      document.getElementById('languageForm').submit();
+      
+      document.getElementById('languageMenu').classList.remove('show');
+      
+      const langNames = {
+        'en': 'English',
+        'es': 'Español',
+        'de': 'Deutsch',
+        'fr': 'Français',
+        'ru': 'Русский'
+      };
+      showNotification(`Language changed to ${langNames[langCode]}`, 'info');
+    }
+
+    document.addEventListener('click', function(e) {
+      const clickedInside = Array.from(document.querySelectorAll(
+        '.nav-link.dropdown-toggle, .custom-dropdown-menu, #languageMenu, #languageDropdown'
+      )).some(el => el.contains(e.target));
+      
+      if (!clickedInside) {
+        document.querySelectorAll('.custom-dropdown-menu').forEach(m => m.classList.remove('show'));
+      }
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

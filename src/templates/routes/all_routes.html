@@ -1,0 +1,389 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "All Routes - Waylines" %}{% endblock %}
+
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+  <div class="container mt-3">
+    <div class="alert alert-info alert-dismissible fade show">
+      <i class="fas fa-info-circle me-2"></i>
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  </div>
+  {% endfor %}
+{% endif %}
+
+<div class="container-fluid px-3 py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="h3 fw-bold mb-1">{% trans "All routes" %}</h1>
+      <p class="text-muted mb-0">
+        {% blocktrans count count=page_obj.paginator.count %}
+          Found {{ count }} route
+        {% plural %}
+          Found {{ count }} routes
+        {% endblocktrans %}
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-3 col-lg-3 pe-3">
+      <div class="card border-0 shadow-sm" style="position: sticky; top: 20px;">
+        <div class="card-header bg-white border-bottom py-2">
+          <h5 class="card-title mb-0">{% trans "Filters" %}</h5>
+        </div>
+        <div class="card-body p-2">
+          <form method="get" id="filter-form">
+            <div class="mb-2">
+              <label class="form-label small fw-semibold">{% trans "Search" %}</label>
+              <input type="text" name="q" class="form-control form-control-sm"
+                     value="{{ search_query|default:'' }}"
+                     placeholder="{% trans "Name, description..." %}">
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label small fw-semibold">{% trans "Route type" %}</label>
+              <select name="type" class="form-select form-select-sm">
+                <option value="">{% trans "All types" %}</option>
+                {% for value, label in route_types %}
+                <option value="{{ value }}"
+                        {% if selected_type == value %}selected{% endif %}>
+                  {{ label }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">{% trans "Sort by" %}</label>
+              <select name="sort" class="form-select form-select-sm" id="sort-select">
+                <option value="newest" {% if current_sort == 'newest' or not current_sort %}selected{% endif %}>
+                  {% trans "Newest first" %}
+                </option>
+                <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>
+                  {% trans "By popularity" %}
+                </option>
+                <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>
+                  {% trans "By rating" %}
+                </option>
+              </select>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-sm">{% trans "Apply" %}</button>
+              <a href="{% url 'all_routes' %}" class="btn btn-outline-secondary btn-sm">{% trans "Reset" %}</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-9 col-lg-9 ps-0">
+      {% if page_obj %}
+        <div class="row g-2">
+          {% for route in page_obj %}
+          <div class="col-12 col-sm-6 col-xl-4">
+            {% include 'routes/partials/route_card.html' with route=route %}
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-5">
+          <i class="fas fa-search fa-2x text-muted mb-3"></i>
+          <h4 class="mb-2">{% trans "No routes found" %}</h4>
+          <p class="text-muted mb-3">{% trans "Try adjusting your search criteria" %}</p>
+          <a href="{% url 'all_routes' %}" class="btn btn-outline-primary btn-sm">{% trans "Reset filters" %}</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<div class="container-fluid px-3 mt-3">
+  <div class="row">
+    <div class="col-12">
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center" id="pagination-container">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="#" data-page="{{ page_obj.previous_page_number }}">
+              <i class="fas fa-chevron-left"></i>
+            </a>
+          </li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+            <li class="page-item">
+              <a class="page-link" href="#" data-page="{{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="#" data-page="{{ page_obj.next_page_number }}">
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<style>
+.container-fluid {
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.row.g-2 {
+  margin-right: -0.25rem;
+  margin-left: -0.25rem;
+}
+
+.row.g-2 > .col-12.col-sm-6.col-xl-4 {
+  min-width: 280px;
+  padding-right: 0.25rem;
+  padding-left: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.route-card-full {
+  min-width: 280px !important;
+  height: 100%;
+  min-height: 390px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  background: #fff;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  margin-left: 0;
+}
+
+.route-card-full:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.route-image-container {
+  height: 165px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+  flex-shrink: 0;
+}
+
+.route-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+
+.route-card-full:hover .route-image-container img {
+  transform: scale(1.05);
+}
+
+.route-card-full .card-body {
+  padding: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+.route-card-full .card-text {
+  flex-grow: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+.route-card-full .card-footer {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.route-card-full .card-title {
+  font-size: 1rem;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.route-card-full .badge {
+  font-size: 0.75rem;
+  padding: 0.25em 0.5em;
+}
+
+.route-card-full small {
+  font-size: 0.8rem;
+}
+
+.route-card-full .btn {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.75rem;
+}
+
+.card[style*="sticky"] {
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+}
+
+.card[style*="sticky"] .card-header {
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+}
+
+.col-xl-3.pe-3 {
+  padding-right: 1rem !important;
+}
+
+.col-xl-9.ps-0 {
+  padding-left: 0 !important;
+}
+
+@media (max-width: 1399px) {
+  .col-xl-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
+}
+
+@media (max-width: 1199px) {
+  .route-card-full {
+    min-height: 370px;
+  }
+  .route-image-container {
+    height: 155px;
+  }
+}
+
+@media (max-width: 991px) {
+  .col-lg-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+  .col-lg-9 {
+    flex: 0 0 75%;
+    max-width: 75%;
+  }
+  .col-sm-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  .route-card-full {
+    min-height: 350px;
+  }
+  .route-image-container {
+    height: 145px;
+  }
+}
+
+@media (max-width: 767px) {
+  .col-lg-3, .col-lg-9 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  .col-sm-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  .route-card-full {
+    min-height: auto;
+    height: auto;
+  }
+  .route-image-container {
+    height: 160px;
+  }
+  .col-xl-3.pe-3 {
+    padding-right: 0.75rem !important;
+    margin-bottom: 1rem;
+  }
+  .col-xl-9.ps-0 {
+    padding-left: 0.75rem !important;
+  }
+}
+
+@media (max-width: 575px) {
+  .container-fluid {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  .route-image-container {
+    height: 145px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const sortSelect = document.getElementById('sort-select');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', function() {
+      this.form.submit();
+    });
+  }
+
+  const paginationLinks = document.querySelectorAll('#pagination-container a.page-link');
+  paginationLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const pageNumber = this.getAttribute('data-page');
+      if (!pageNumber) return;
+      const url = new URL(window.location);
+      url.searchParams.set('page', pageNumber);
+      window.location.href = url.toString();
+    });
+  });
+
+  const typeSelect = document.querySelector('select[name="type"]');
+  if (typeSelect) {
+    typeSelect.addEventListener('change', function() {
+      const url = new URL(window.location);
+      url.searchParams.set('page', '1');
+      window.location.href = url.toString();
+    });
+  }
+});
+
+function buildUrlWithParams(page) {
+  const url = new URL(window.location);
+  const params = {
+    q: "{{ search_query|escapejs }}",
+    type: "{{ selected_type|escapejs }}",
+    sort: "{{ current_sort|escapejs }}"
+  };
+  url.search = '';
+  Object.entries(params).forEach(([key, value]) => {
+    if (value && value !== 'None' && value !== '') {
+      url.searchParams.set(key, value);
+    }
+  });
+  url.searchParams.set('page', page);
+  return url.toString();
+}
+</script>
+{% endblock %}

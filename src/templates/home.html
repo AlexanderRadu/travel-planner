@@ -1,0 +1,812 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Home - Waylines" %}{% endblock %}
+
+{% block content %}
+<div class="hero-section text-dark position-relative overflow-hidden">
+  <div class="hero-bg-animation">
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+  </div>
+
+  <div class="container position-relative">
+    <div class="row align-items-center min-vh-90 py-5">
+      <div class="col-lg-6">
+        <div class="hero-content">
+          <div class="hero-badge mb-4">
+            <span class="badge bg-primary-soft text-primary px-3 py-2 rounded-pill fw-medium">
+              <i class="fas fa-compass me-2"></i>{% trans "Travel. It's worth it." %}
+            </span>
+          </div>
+
+          <h1 class="display-3 fw-black mb-4 hero-title">
+            {% trans "Discover new" %}
+            <span class="text-gradient-nature">{% trans "routes" %}</span>
+            {% trans "for your adventures" %}
+          </h1>
+
+          <p class="lead mb-4 fs-5 text-muted hero-subtitle">
+            {% trans "Create, save, and share the best routes with a community of travelers. Find inspiration in every direction." %}
+          </p>
+
+          <div class="hero-buttons d-flex flex-wrap gap-3">
+            {% if user.is_authenticated %}
+            <a href="{% url 'create_route' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-3 fw-semibold hover-lift">
+              <i class="fas fa-plus me-2"></i> {% trans "Create route" %}
+            </a>
+            <a href="{% url 'all_routes' %}" class="btn btn-outline-dark btn-lg px-5 py-3 rounded-3 border-2 fw-semibold hover-scale">
+              <i class="fas fa-compass me-2"></i> {% trans "Explore" %}
+            </a>
+            {% else %}
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-3 fw-semibold hover-lift">
+              <i class="fas fa-user-plus me-2"></i> {% trans "Get started for free" %}
+            </a>
+            <a href="{% url 'all_routes' %}" class="btn btn-outline-dark btn-lg px-5 py-3 rounded-3 border-2 fw-semibold hover-scale">
+              <i class="fas fa-play-circle me-2"></i> {% trans "Demo tour" %}
+            </a>
+            {% endif %}
+          </div>
+
+          <div class="hero-stats mt-5 pt-4">
+            <div class="row g-4">
+              <div class="col-4">
+                <div class="stat-item">
+                  <div class="stat-number h4 fw-black mb-1 text-primary">{{ total_routes }}+</div>
+                  <div class="stat-label small text-muted">{% trans "Routes" %}</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="stat-item">
+                  <div class="stat-number h4 fw-black mb-1 text-success">{{ total_users }}+</div>
+                  <div class="stat-label small text-muted">{% trans "Travelers" %}</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="stat-item">
+                  <div class="stat-number h4 fw-black mb-1 text-warning">{{ total_countries }}+</div>
+                  <div class="stat-label small text-muted">{% trans "Countries" %}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="hero-visual position-relative">
+          <div class="visual-container position-relative" style="height: 450px;">
+            <div class="hero-main-card position-absolute bg-white rounded-4 shadow-lg border">
+              <img src="{% static 'images/home-route.jpg' %}" alt="{% trans "Travel" %}" class="img-fluid rounded-3">
+            </div>
+
+            <div class="floating-card card-1">
+              <div class="card-content bg-white rounded-3 p-3 shadow-sm border">
+                <i class="fas fa-mountain text-success mb-2"></i>
+                <small class="text-dark fw-medium">{% trans "Mountain trails" %}</small>
+              </div>
+            </div>
+
+            <div class="floating-card card-2">
+              <div class="card-content bg-white rounded-3 p-3 shadow-sm border">
+                <i class="fas fa-city text-primary mb-2"></i>
+                <small class="text-dark fw-medium">{% trans "City routes" %}</small>
+              </div>
+            </div>
+
+            <div class="floating-card card-3">
+              <div class="card-content bg-white rounded-3 p-3 shadow-sm border">
+                <i class="fas fa-water text-info mb-2"></i>
+                <small class="text-dark fw-medium">{% trans "Coastal paths" %}</small>
+              </div>
+            </div>
+
+            <div class="floating-card card-4">
+              <div class="card-content bg-white rounded-3 p-3 shadow-sm border">
+                <i class="fas fa-tree text-success mb-2"></i>
+                <small class="text-dark fw-medium">{% trans "Forest trails" %}</small>
+              </div>
+            </div>
+
+            <div class="floating-card card-5">
+              <div class="card-content bg-white rounded-3 p-3 shadow-sm border">
+                <i class="fas fa-umbrella-beach text-warning mb-2"></i>
+                <small class="text-dark fw-medium">{% trans "Beach routes" %}</small>
+              </div>
+            </div>
+
+            <div class="floating-card card-6">
+              <div class="card-content bg-white rounded-3 p-3 shadow-sm border">
+                <i class="fas fa-campground text-danger mb-2"></i>
+                <small class="text-dark fw-medium">{% trans "Camping" %}</small>
+              </div>
+            </div>
+
+            <div class="floating-card card-7">
+              <div class="card-content bg-white rounded-3 p-3 shadow-sm border">
+                <i class="fas fa-landmark text-purple mb-2"></i>
+                <small class="text-dark fw-medium">{% trans "Historic paths" %}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <section class="py-6">
+    <div class="section-header text-center mb-6">
+      <div class="section-badge mb-3">
+        <span class="badge bg-primary-soft text-primary px-3 py-2 rounded-pill fw-medium">
+          <i class="fas fa-fire me-2"></i>{% trans "Popular" %}
+        </span>
+      </div>
+      <h2 class="fw-black display-4 mb-3">{% trans "Explore the best routes" %}</h2>
+      <p class="lead text-muted fs-5">{% trans "The most saved and recommended routes from the community" %}</p>
+    </div>
+
+    <div class="row g-4">
+      {% for route in popular_routes %}
+      <div class="col-xl-4 col-lg-6">
+        {% include 'routes/partials/route_card.html' with route=route %}
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="text-center text-muted py-6">
+          <div class="empty-state-icon mb-4">
+            <i class="fas fa-route fa-4x opacity-25"></i>
+          </div>
+          <h4 class="fw-bold mb-3 text-dark">{% trans "No routes yet" %}</h4>
+          <p class="mb-4 lead text-muted">{% trans "Be the first explorer and create the first route!" %}</p>
+          {% if user.is_authenticated %}
+          <a href="{% url 'create_route' %}" class="btn btn-primary btn-lg rounded-3 px-5 py-3">
+            <i class="fas fa-plus me-2"></i>{% trans "Create route" %}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if popular_routes %}
+    <div class="text-center mt-6">
+      <a href="{% url 'all_routes' %}" class="btn btn-outline-primary btn-lg rounded-3 px-5 py-3 border-2 fw-semibold hover-scale">
+        {% trans "View all routes" %} <i class="fas fa-arrow-right ms-2"></i>
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="py-6 bg-light-subtle rounded-4 my-4">
+    <div class="container">
+      <div class="section-header text-center mb-6">
+        <h2 class="fw-black display-4 mb-3">{% trans "Choose your travel style" %}</h2>
+        <p class="lead text-muted fs-5">{% trans "Routes for any mood and activity" %}</p>
+      </div>
+
+      <div class="row g-4 justify-content-center">
+        <div class="col-md-4">
+          <a href="{% url 'walking_routes' %}" class="text-decoration-none">
+            <div class="category-card card text-center h-100 border-0 bg-white shadow-sm hover-lift rounded-3 mx-auto">
+              <div class="card-body py-5 d-flex flex-column justify-content-center">
+                <div class="category-icon mb-4">
+                  <div class="icon-wrapper bg-success-soft rounded-3 mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="fas fa-hiking fa-2x text-success"></i>
+                  </div>
+                </div>
+                <h5 class="card-title fw-bold mb-2 text-dark">{% trans "Walking" %}</h5>
+                <p class="card-text text-muted mb-3">
+                  {% blocktrans count count=walking_count %}{{ count }} route{% plural %}{{ count }} routes{% endblocktrans %}
+                </p>
+                <div class="mt-auto">
+                  <span class="btn btn-outline-success btn-sm rounded-pill px-4">{% trans "Explore" %}</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-4">
+          <a href="{% url 'driving_routes' %}" class="text-decoration-none">
+            <div class="category-card card text-center h-100 border-0 bg-white shadow-sm hover-lift rounded-3 mx-auto">
+              <div class="card-body py-5 d-flex flex-column justify-content-center">
+                <div class="category-icon mb-4">
+                  <div class="icon-wrapper bg-primary-soft rounded-3 mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="fas fa-car fa-2x text-primary"></i>
+                  </div>
+                </div>
+                <h5 class="card-title fw-bold mb-2 text-dark">{% trans "Driving" %}</h5>
+                <p class="card-text text-muted mb-3">
+                  {% blocktrans count count=driving_count %}{{ count }} route{% plural %}{{ count }} routes{% endblocktrans %}
+                </p>
+                <div class="mt-auto">
+                  <span class="btn btn-outline-primary btn-sm rounded-pill px-4">{% trans "Explore" %}</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-4">
+          <a href="{% url 'cycling_routes' %}" class="text-decoration-none">
+            <div class="category-card card text-center h-100 border-0 bg-white shadow-sm hover-lift rounded-3 mx-auto">
+              <div class="card-body py-5 d-flex flex-column justify-content-center">
+                <div class="category-icon mb-4">
+                  <div class="icon-wrapper bg-warning-soft rounded-3 mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="fas fa-bicycle fa-2x text-warning"></i>
+                  </div>
+                </div>
+                <h5 class="card-title fw-bold mb-2 text-dark">{% trans "Cycling" %}</h5>
+                <p class="card-text text-muted mb-3">
+                  {% blocktrans count count=cycling_count %}{{ count }} route{% plural %}{{ count }} routes{% endblocktrans %}
+                </p>
+                <div class="mt-auto">
+                  <span class="btn btn-outline-warning btn-sm rounded-pill px-4">{% trans "Explore" %}</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-6 text-center">
+    <div class="cta-section bg-light-subtle rounded-4 p-6 position-relative overflow-hidden border">
+      <div class="position-relative">
+        <h2 class="fw-black display-5 text-dark mb-4">{% trans "Start your journey" %}</h2>
+        <p class="lead text-muted mb-5 fs-5">
+          {% trans "Join the traveler community and discover the world in a new way" %}
+        </p>
+
+        <div class="cta-buttons">
+          {% if user.is_authenticated %}
+          <a href="{% url 'create_route' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-3 fw-semibold me-3 hover-lift">
+            <i class="fas fa-plus me-2"></i>{% trans "Create route" %}
+          </a>
+          <a href="{% url 'all_routes' %}" class="btn btn-outline-dark btn-lg px-5 py-3 rounded-3 border-2 fw-semibold hover-scale">
+            <i class="fas fa-compass me-2"></i>{% trans "Find inspiration" %}
+          </a>
+          {% else %}
+          <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-3 fw-semibold me-3 hover-lift">
+            <i class="fas fa-user-plus me-2"></i>{% trans "Join for free" %}
+          </a>
+          <a href="{% url 'all_routes' %}" class="btn btn-outline-dark btn-lg px-5 py-3 rounded-3 border-2 fw-semibold hover-scale">
+            <i class="fas fa-play me-2"></i>{% trans "Watch demo" %}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary-color: #3b82f6;
+    --primary-soft: rgba(59, 130, 246, 0.1);
+    --success-soft: rgba(34, 197, 94, 0.1);
+    --warning-soft: rgba(245, 158, 11, 0.1);
+    --info-soft: rgba(14, 165, 233, 0.1);
+    --danger-soft: rgba(239, 68, 68, 0.1);
+    --purple-soft: rgba(147, 51, 234, 0.1);
+    --text-purple: #8b5cf6;
+  }
+
+  .hero-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .min-vh-90 {
+    min-height: 90vh;
+  }
+
+  .hero-bg-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .bg-grid {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+  }
+
+  .bg-glow {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+    animation: glowMove 20s ease-in-out infinite;
+  }
+
+  @keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+  }
+
+  @keyframes glowMove {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(100px, -50px) scale(1.1); }
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    line-height: 1.1;
+  }
+
+  .text-gradient-nature {
+    background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+
+  .hover-scale {
+    transition: all 0.3s ease;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  .hero-visual {
+    position: relative;
+    height: 550px;
+    width: 100%;
+  }
+
+  .visual-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .hero-main-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 225px;
+    z-index: 1;
+    padding: 8px;
+    overflow: hidden;
+  }
+
+  .hero-main-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1rem !important;
+  }
+
+  .floating-card {
+    position: absolute;
+    z-index: 2;
+    width: 120px;
+    pointer-events: none;
+  }
+
+  .card-1 {
+    top: 20%;
+    left: 5%;
+    animation: floatLeft 6s ease-in-out infinite;
+  }
+
+  .card-2 {
+    top: 45%;
+    left: 8%;
+    animation: floatLeft 5s ease-in-out infinite 1s;
+  }
+
+  .card-3 {
+    top: 70%;
+    left: 3%;
+    animation: floatLeft 7s ease-in-out infinite 0.5s;
+  }
+
+  .card-4 {
+    top: 15%;
+    right: 5%;
+    animation: floatRight 6.5s ease-in-out infinite 0.8s;
+  }
+
+  .card-5 {
+    top: 40%;
+    right: 8%;
+    animation: floatRight 5.5s ease-in-out infinite 1.2s;
+  }
+
+  .card-6 {
+    top: 65%;
+    right: 3%;
+    animation: floatRight 4.5s ease-in-out infinite 0.3s;
+  }
+
+  .card-7 {
+    top: 80%;
+    right: 10%;
+    animation: floatRight 5.8s ease-in-out infinite 1.5s;
+  }
+
+  @keyframes floatLeft {
+    0%, 100% { transform: translate(0, 0) rotate(-2deg); }
+    50% { transform: translate(8px, -20px) rotate(2deg); }
+  }
+
+  @keyframes floatRight {
+    0%, 100% { transform: translate(0, 0) rotate(2deg); }
+    50% { transform: translate(-8px, -20px) rotate(-2deg); }
+  }
+
+  .card-content {
+    text-align: center;
+    padding: 14px 10px !important;
+    background: rgba(255, 255, 255, 0.97) !important;
+    backdrop-filter: blur(5px);
+    border-radius: 1rem !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .card-content i {
+    font-size: 1.8rem !important;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .card-content small {
+    font-size: 0.8rem !important;
+    display: block;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .bg-gradient-nature {
+    background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+  }
+
+  .bg-primary-soft {
+    background: var(--primary-soft);
+  }
+
+  .bg-success-soft {
+    background: var(--success-soft);
+  }
+
+  .bg-warning-soft {
+    background: var(--warning-soft);
+  }
+
+  .bg-info-soft {
+    background: var(--info-soft);
+  }
+
+  .bg-danger-soft {
+    background: var(--danger-soft);
+  }
+
+  .bg-purple-soft {
+    background: var(--purple-soft);
+  }
+
+  .bg-light-subtle {
+    background-color: #f8fafc;
+  }
+
+  .text-purple {
+    color: var(--text-purple);
+  }
+
+  .category-card {
+    margin: 0 auto;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .category-card .card-body {
+    min-height: 380px;
+    padding: 4rem 3rem !important;
+  }
+
+  .category-icon {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem !important;
+  }
+
+  .icon-wrapper {
+    width: 120px !important;
+    height: 120px !important;
+    border-radius: 1.5rem !important;
+  }
+
+  .category-icon i {
+    font-size: 3rem !important;
+  }
+
+  .category-card h5 {
+    font-size: 1.8rem !important;
+    min-height: 3.5rem;
+    margin-bottom: 1rem !important;
+  }
+
+  .category-card .card-text {
+    font-size: 1.3rem !important;
+    min-height: 3rem;
+    margin-bottom: 2.5rem !important;
+  }
+
+  .category-card .btn {
+    padding: 0.75rem 2.5rem !important;
+    font-size: 1.1rem !important;
+    border-radius: 50rem !important;
+  }
+
+  .row.justify-content-center.g-4 {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    width: calc(100% + 2rem);
+  }
+
+  .row.justify-content-center.g-4 > [class*="col-"] {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    display: flex;
+    justify-content: center;
+  }
+
+  .col-md-4 {
+    flex: 0 0 auto;
+    width: 33.33333333%;
+  }
+
+  .py-6 {
+    padding-top: 6rem !important;
+    padding-bottom: 6rem !important;
+  }
+
+  .mb-6 {
+    margin-bottom: 6rem !important;
+  }
+
+  .fw-black {
+    font-weight: 900;
+  }
+
+  .rounded-4 {
+    border-radius: 1.5rem !important;
+  }
+
+  .shadow-sm {
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12) !important;
+  }
+
+  .category-card {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+  }
+
+  @media (max-width: 1400px) {
+    .category-card .card-body {
+      min-height: 350px;
+      padding: 3.5rem 2.5rem !important;
+    }
+
+    .category-icon {
+      min-height: 110px;
+    }
+
+    .icon-wrapper {
+      width: 110px !important;
+      height: 110px !important;
+    }
+
+    .category-icon i {
+      font-size: 2.8rem !important;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .category-card .card-body {
+      min-height: 320px;
+      padding: 3rem 2rem !important;
+    }
+
+    .category-card h5 {
+      font-size: 1.6rem !important;
+    }
+
+    .category-card .card-text {
+      font-size: 1.2rem !important;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .category-card {
+      max-width: 100% !important;
+    }
+
+    .category-card .card-body {
+      min-height: 300px;
+      padding: 2.5rem 2rem !important;
+    }
+
+    .col-md-4 {
+      width: 100% !important;
+      max-width: 450px !important;
+      margin-bottom: 2rem;
+    }
+
+    .row.justify-content-center.g-4 > [class*="col-"]:last-child {
+      margin-bottom: 0;
+    }
+
+    .hero-visual {
+      height: 450px;
+    }
+
+    .visual-container {
+      height: 380px;
+    }
+
+    .hero-main-card {
+      position: relative;
+      top: auto;
+      left: auto;
+      transform: none;
+      width: 320px;
+      height: 180px;
+      margin: 0 auto;
+    }
+
+    .floating-card {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .category-card .card-body {
+      min-height: 280px;
+      padding: 2.5rem 1.5rem !important;
+    }
+
+    .category-icon {
+      min-height: 100px;
+      margin-bottom: 1.5rem !important;
+    }
+
+    .icon-wrapper {
+      width: 100px !important;
+      height: 100px !important;
+    }
+
+    .category-icon i {
+      font-size: 2.5rem !important;
+    }
+
+    .category-card h5 {
+      font-size: 1.5rem !important;
+    }
+
+    .category-card .card-text {
+      font-size: 1.1rem !important;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+    }
+
+    .hero-visual {
+      height: 400px;
+      margin-top: 2rem;
+    }
+
+    .visual-container {
+      height: 320px;
+    }
+
+    .hero-main-card {
+      width: 300px;
+      height: 169px;
+    }
+
+    .hero-buttons {
+      justify-content: center;
+    }
+
+    .hero-buttons .btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    .hero-stats .col-4 {
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .category-card .card-body {
+      min-height: 260px;
+      padding: 2rem 1.5rem !important;
+    }
+
+    .category-icon {
+      min-height: 90px;
+    }
+
+    .icon-wrapper {
+      width: 90px !important;
+      height: 90px !important;
+      border-radius: 1.2rem !important;
+    }
+
+    .category-icon i {
+      font-size: 2.2rem !important;
+    }
+
+    .category-card h5 {
+      font-size: 1.4rem !important;
+      min-height: 3rem;
+    }
+
+    .category-card .card-text {
+      font-size: 1rem !important;
+      min-height: 2.5rem;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem !important;
+    }
+
+    .hero-visual {
+      height: 350px;
+    }
+
+    .visual-container {
+      height: 280px;
+    }
+
+    .hero-main-card {
+      width: 280px;
+      height: 158px;
+    }
+
+    .hero-stats .col-4 {
+      margin-bottom: 1rem;
+    }
+  }
+</style>
+{% endblock %}

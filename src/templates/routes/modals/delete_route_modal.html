@@ -1,0 +1,384 @@
+{% load i18n %}
+<div class="modal fade" id="deleteRouteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-danger text-white border-0">
+        <div class="d-flex align-items-center w-100">
+          <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+          <div class="flex-grow-1">
+            <h5 class="modal-title mb-0 fw-bold">{% trans "Delete route" %}</h5>
+            <p class="mb-0 small opacity-75">{% trans "This action is irreversible" %}</p>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{% trans 'Close' %}"></button>
+        </div>
+      </div>
+      <div class="modal-body p-4">
+        <div class="text-center mb-4">
+          <div class="rounded-circle bg-danger bg-opacity-10 p-4 d-inline-flex mb-3">
+            <i class="fas fa-trash-alt fa-3x text-danger"></i>
+          </div>
+          <h4 class="fw-bold text-dark mb-2">{% trans "Permanently delete this route?" %}</h4>
+          <p class="text-muted mb-4">
+            {% trans "You are about to delete the route" %}
+            <strong class="text-danger" id="routeNameToDelete"></strong>.
+            {% trans "All associated data will be permanently removed." %}
+          </p>
+        </div>
+
+        <div class="alert alert-warning border-warning">
+          <div class="d-flex">
+            <i class="fas fa-exclamation-circle fa-lg text-warning mt-1 me-3"></i>
+            <div>
+              <h6 class="fw-bold mb-2">{% trans "The following will be deleted:" %}</h6>
+              <ul class="mb-0 small">
+                <li>{% trans "All route photos will be deleted from media storage" %}</li>
+                <li>{% trans "All route points and their photos will be removed" %}</li>
+                <li>{% trans "All audio guides will be deleted" %}</li>
+                <li>{% trans "All cache and temporary files will be cleared" %}</li>
+                <li>{% trans "This action cannot be undone" %}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div id="deletion-progress" class="mt-4" style="display: none;">
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="small fw-bold">{% trans "Deletion in progress..." %}</span>
+              <span id="progress-percentage" class="small fw-bold">0%</span>
+            </div>
+            <div class="progress" style="height: 8px;">
+              <div id="progress-bar" class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+          <div id="deletion-status" class="text-center small text-muted">
+            {% trans "Starting deletion process..." %}
+          </div>
+        </div>
+
+        <div id="deletion-success" class="alert alert-success border-success mt-3" style="display: none;">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle fa-lg text-success me-3"></i>
+            <div>
+              <strong>{% trans "Success!" %}</strong>
+              <p class="mb-0" id="success-message"></p>
+            </div>
+          </div>
+        </div>
+
+        <div id="deletion-error" class="alert alert-danger border-danger mt-3" style="display: none;">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-circle fa-lg text-danger me-3"></i>
+            <div>
+              <strong>{% trans "Error!" %}</strong>
+              <p class="mb-0" id="error-message"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="confirmation-section mt-4">
+          <div class="alert alert-light border">
+            <div class="d-flex align-items-start">
+              <i class="fas fa-keyboard me-2 text-danger mt-1"></i>
+              <div>
+                <p class="mb-2"><strong>{% trans "Please confirm deletion" %}</strong></p>
+                <p class="small mb-0">
+                  {% trans "To delete this route, type the route name below to confirm:" %}
+                </p>
+                <div class="mt-2">
+                  <input type="text" class="form-control form-control-sm" id="confirmRouteName" placeholder='{% trans "Type route name here..." %}' style="border-radius: 20px; border: 2px solid #e9ecef;">
+                  <div class="invalid-feedback small" id="confirmError" style="display: none;">
+                    <i class="fas fa-exclamation-circle me-1"></i>
+                    {% trans "Route name does not match" %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 bg-light">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="cancel-delete">
+          <i class="fas fa-times me-2"></i>{% trans "Cancel" %}
+        </button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+          <i class="fas fa-trash me-2"></i>{% trans "Delete route" %}
+        </button>
+        <button type="button" class="btn btn-success" id="close-after-success" style="display: none;">
+          <i class="fas fa-check me-2"></i>{% trans "Close" %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function initializeDeleteModal() {
+    const deleteRouteModal = document.getElementById('deleteRouteModal');
+    if (!deleteRouteModal) return;
+
+    let routeIdToDelete = null;
+    let routeNameToDelete = '';
+
+    window.setupRouteDeletion = function(routeId, routeName) {
+        routeIdToDelete = routeId;
+        routeNameToDelete = routeName;
+        
+        resetModalState();
+        
+        const routeNameElement = document.getElementById('routeNameToDelete');
+        if (routeNameElement) {
+            routeNameElement.textContent = routeName;
+        }
+        
+        const confirmInput = document.getElementById('confirmRouteName');
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        const confirmError = document.getElementById('confirmError');
+        
+        if (confirmInput && confirmBtn) {
+            confirmInput.value = '';
+            confirmBtn.disabled = true;
+            
+            confirmInput.addEventListener('input', function() {
+                const isMatch = this.value.trim() === routeNameToDelete;
+                confirmBtn.disabled = !isMatch;
+                
+                if (this.value.trim() && !isMatch) {
+                    this.classList.add('is-invalid');
+                    if (confirmError) confirmError.style.display = 'block';
+                } else {
+                    this.classList.remove('is-invalid');
+                    if (confirmError) confirmError.style.display = 'none';
+                }
+            });
+        }
+    };
+
+    function resetModalState() {
+        const progressDiv = document.getElementById('deletion-progress');
+        const successDiv = document.getElementById('deletion-success');
+        const errorDiv = document.getElementById('deletion-error');
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        const cancelBtn = document.getElementById('cancel-delete');
+        const closeSuccessBtn = document.getElementById('close-after-success');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercentage = document.getElementById('progress-percentage');
+        const deletionStatus = document.getElementById('deletion-status');
+        
+        if (progressDiv) progressDiv.style.display = 'none';
+        if (successDiv) successDiv.style.display = 'none';
+        if (errorDiv) errorDiv.style.display = 'none';
+        if (confirmBtn) {
+            confirmBtn.style.display = 'block';
+            confirmBtn.disabled = true;
+        }
+        if (cancelBtn) cancelBtn.style.display = 'block';
+        if (closeSuccessBtn) closeSuccessBtn.style.display = 'none';
+        if (progressBar) {
+            progressBar.style.width = '0%';
+            progressBar.setAttribute('aria-valuenow', 0);
+        }
+        if (progressPercentage) progressPercentage.textContent = '0%';
+        if (deletionStatus) deletionStatus.textContent = "{% trans 'Starting deletion process...' %}";
+        
+        const confirmInput = document.getElementById('confirmRouteName');
+        if (confirmInput) {
+            confirmInput.value = '';
+            confirmInput.classList.remove('is-invalid');
+        }
+        
+        const confirmError = document.getElementById('confirmError');
+        if (confirmError) confirmError.style.display = 'none';
+    }
+
+    function updateProgress(percentage, message) {
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercentage = document.getElementById('progress-percentage');
+        const deletionStatus = document.getElementById('deletion-status');
+        
+        if (progressBar) {
+            const roundedPercentage = Math.min(100, Math.max(0, Math.round(percentage)));
+            progressBar.style.width = `${roundedPercentage}%`;
+            progressBar.setAttribute('aria-valuenow', roundedPercentage);
+            
+            if (progressPercentage) {
+                progressPercentage.textContent = `${roundedPercentage}%`;
+            }
+            
+            if (deletionStatus) {
+                deletionStatus.textContent = message;
+            }
+        }
+    }
+
+    async function simulateDeletionProgress() {
+        const steps = [
+            { progress: 10, message: "{% trans 'Preparing deletion...' %}", duration: 300 },
+            { progress: 25, message: "{% trans 'Deleting route photos...' %}", duration: 500 },
+            { progress: 45, message: "{% trans 'Removing route points...' %}", duration: 600 },
+            { progress: 65, message: "{% trans 'Deleting audio guides...' %}", duration: 500 },
+            { progress: 85, message: "{% trans 'Clearing cache...' %}", duration: 400 },
+            { progress: 95, message: "{% trans 'Finalizing deletion...' %}", duration: 300 },
+            { progress: 100, message: "{% trans 'Deletion complete!' %}", duration: 200 }
+        ];
+        
+        for (let i = 0; i < steps.length; i++) {
+            updateProgress(steps[i].progress, steps[i].message);
+            await new Promise(resolve => setTimeout(resolve, steps[i].duration));
+        }
+        
+        return true;
+    }
+
+    async function performDeletion() {
+        try {
+            const progressDiv = document.getElementById('deletion-progress');
+            if (progressDiv) progressDiv.style.display = 'block';
+            
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            const cancelBtn = document.getElementById('cancel-delete');
+            
+            if (confirmBtn) confirmBtn.disabled = true;
+            if (cancelBtn) cancelBtn.disabled = true;
+            
+            await simulateDeletionProgress();
+            
+            const response = await fetch(`/routes/api/routes/${routeIdToDelete}/delete/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({
+                    delete_all_data: true,
+                    clear_cache: true
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                const progressDiv = document.getElementById('deletion-progress');
+                const successDiv = document.getElementById('deletion-success');
+                const successMessage = document.getElementById('success-message');
+                const confirmBtn = document.getElementById('confirmDeleteBtn');
+                const cancelBtn = document.getElementById('cancel-delete');
+                const closeSuccessBtn = document.getElementById('close-after-success');
+                
+                if (progressDiv) progressDiv.style.display = 'none';
+                if (successDiv) {
+                    successDiv.style.display = 'block';
+                    if (successMessage) {
+                        successMessage.textContent = "{% trans 'Route has been successfully deleted.' %}";
+                    }
+                }
+                if (confirmBtn) confirmBtn.style.display = 'none';
+                if (cancelBtn) cancelBtn.style.display = 'none';
+                if (closeSuccessBtn) closeSuccessBtn.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = '/routes/my/';
+                }, 1500);
+                
+            } else {
+                throw new Error(data.error || '{% trans "Error deleting route" %}');
+            }
+            
+        } catch (error) {
+            console.error('Deletion error:', error);
+            
+            const progressDiv = document.getElementById('deletion-progress');
+            const errorDiv = document.getElementById('deletion-error');
+            const errorMessage = document.getElementById('error-message');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            const cancelBtn = document.getElementById('cancel-delete');
+            
+            if (progressDiv) progressDiv.style.display = 'none';
+            if (errorDiv) {
+                errorDiv.style.display = 'block';
+                if (errorMessage) {
+                    errorMessage.textContent = error.message || '{% trans "An error occurred during deletion" %}';
+                }
+            }
+            if (confirmBtn) confirmBtn.disabled = false;
+            if (cancelBtn) cancelBtn.disabled = false;
+        }
+    }
+
+    function getCSRFToken() {
+        const name = 'csrftoken';
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', performDeletion);
+    }
+    
+    const closeAfterSuccessBtn = document.getElementById('close-after-success');
+    if (closeAfterSuccessBtn) {
+        closeAfterSuccessBtn.addEventListener('click', function() {
+            const modal = bootstrap.Modal.getInstance(deleteRouteModal);
+            if (modal) {
+                modal.hide();
+                window.location.href = '/routes/my/';
+            }
+        });
+    }
+    
+    deleteRouteModal.addEventListener('hidden.bs.modal', function() {
+        resetModalState();
+        
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        const cancelBtn = document.getElementById('cancel-delete');
+        if (confirmBtn) confirmBtn.disabled = false;
+        if (cancelBtn) cancelBtn.disabled = false;
+    });
+    
+    deleteRouteModal.addEventListener('shown.bs.modal', function() {
+        const confirmInput = document.getElementById('confirmRouteName');
+        if (confirmInput) {
+            confirmInput.focus();
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeDeleteModal();
+    
+    document.querySelectorAll('[data-bs-target="#deleteRouteModal"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const routeId = '{{ route.id }}';
+            const routeName = document.getElementById('name').value;
+            
+            if (typeof window.setupRouteDeletion === 'function') {
+                window.setupRouteDeletion(routeId, routeName);
+            }
+        });
+    });
+});
+
+window.showDeleteModal = function(routeId, routeName) {
+    if (typeof window.setupRouteDeletion === 'function') {
+        window.setupRouteDeletion(routeId, routeName);
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('deleteRouteModal'));
+    modal.show();
+};
+</script>
