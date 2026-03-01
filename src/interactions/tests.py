@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
 
@@ -110,19 +112,15 @@ class AddRatingViewTest(TestCase):
         )
 
     def test_cannot_rate_own_route(self):
-        try:
+        with suppress(Exception):
             rating = Rating.objects.create(
                 user=self.user1, route=self.route, score=5
             )
             self.assertEqual(rating.user.username, 'author')
-        except Exception:
-            pass
 
     def test_invalid_rating_score(self):
-        try:
+        with suppress(Exception):
             Rating.objects.create(user=self.user2, route=self.route, score=10)
-        except Exception:
-            pass
 
 
 class CommentViewsTest(TestCase):
@@ -148,13 +146,11 @@ class CommentViewsTest(TestCase):
         )
 
     def test_add_comment_empty(self):
-        try:
+        with suppress(Exception):
             comment = Comment.objects.create(
                 user=self.user, route=self.route, text=''
             )
             self.assertEqual(comment.text, '')
-        except Exception:
-            pass
 
     def test_delete_comment_own(self):
         comment = Comment.objects.create(
@@ -251,18 +247,14 @@ class TestModelRelations(TestCase):
 
     def test_favorite_unique_together(self):
         Favorite.objects.create(user=self.user, route=self.route)
-        try:
+        with suppress(Exception):
             Favorite.objects.create(user=self.user, route=self.route)
-        except Exception:
-            pass
 
     def test_rating_unique_together(self):
         Rating.objects.create(user=self.user, route=self.route, score=4)
 
-        try:
+        with suppress(Exception):
             Rating.objects.create(user=self.user, route=self.route, score=5)
-        except Exception:
-            pass
 
     def test_comment_foreign_keys(self):
         comment = Comment.objects.create(

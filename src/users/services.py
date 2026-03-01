@@ -119,7 +119,6 @@ def update_friend_request_status(friend_request, status):
 
 
 def get_username_change_status(profile):
-    """Проверяет, можно ли сменить юзернейм и сколько дней осталось."""
     can_change_username = True
     username_change_days_left = None
 

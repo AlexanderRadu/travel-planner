@@ -45,7 +45,7 @@ class AudioGeneration(models.Model):
         _('Audio file'), upload_to='audio_guides/', null=True, blank=True
     )
     status = models.CharField(_('Status'), max_length=20, default='queued')
-    error_message = models.TextField(_('Error message'), blank=True, null=True)
+    error_message = models.TextField(_('Error message'), blank=True)
     processing_time = models.FloatField(
         _('Processing time (sec)'), null=True, blank=True
     )

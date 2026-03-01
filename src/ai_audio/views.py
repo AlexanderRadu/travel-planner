@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
@@ -32,7 +32,9 @@ def generate_audio(request, point_id):
         data = json.loads(request.body)
         text = (data.get('text') or point.description or '').strip()
         if not text:
-            return JsonResponse({'error': _('Text is empty')}, status=400)
+            return JsonResponse(
+                {'error': gettext('Text is empty')}, status=400
+            )
 
         voice_type = data.get('voice_type', 'alloy')
         voice = data.get('voice', 'ermil')
@@ -88,7 +90,9 @@ def generate_audio(request, point_id):
 
     except (ValueError, TypeError) as e:
         logger.error(f'Invalid parameter in audio request: {e}')
-        return JsonResponse({'error': _('Invalid parameter')}, status=400)
+        return JsonResponse(
+            {'error': gettext('Invalid parameter')}, status=400
+        )
     except Exception as e:
         logger.error(f'Audio generation error: {e}')
         return JsonResponse({'error': str(e)}, status=500)
@@ -113,8 +117,8 @@ def generate_location_description(request, point_id):
         if lat is None or lng is None:
             return JsonResponse(
                 {
-                    'error': _('Coordinates not found'),
-                    'hint': _(
+                    'error': gettext('Coordinates not found'),
+                    'hint': gettext(
                         'Ensure the point has latitude and longitude fields'
                     ),
                 },
@@ -150,7 +154,7 @@ def generate_location_description(request, point_id):
 
     except (ValueError, TypeError) as e:
         logger.error(f'Invalid coordinate or parameter: {e}')
-        return JsonResponse({'error': _('Invalid input')}, status=400)
+        return JsonResponse({'error': gettext('Invalid input')}, status=400)
     except Exception as e:
         logger.error(f'Description generation error: {e}')
         return JsonResponse({'error': str(e)}, status=500)
@@ -199,7 +203,7 @@ def generate_temp_description(request):
 
         if lat is None or lng is None:
             return JsonResponse(
-                {'error': _('Coordinates are required')}, status=400
+                {'error': gettext('Coordinates are required')}, status=400
             )
 
         gpt_service = YandexGPTService()
@@ -221,7 +225,7 @@ def generate_temp_description(request):
 
     except (ValueError, TypeError) as e:
         logger.error(f'Invalid input in temp description: {e}')
-        return JsonResponse({'error': _('Invalid input')}, status=400)
+        return JsonResponse({'error': gettext('Invalid input')}, status=400)
     except Exception as e:
         logger.error(f'Temp description generation error: {e}')
         return JsonResponse({'error': str(e)}, status=500)
@@ -235,7 +239,9 @@ def generate_temp_audio(request):
         data = json.loads(request.body)
         text = data.get('text', '').strip()
         if not text:
-            return JsonResponse({'error': _('Text is empty')}, status=400)
+            return JsonResponse(
+                {'error': gettext('Text is empty')}, status=400
+            )
 
         voice_type = data.get('voice_type', 'alloy')
         voice = data.get('voice', 'ermil')
@@ -247,7 +253,7 @@ def generate_temp_audio(request):
         format = data.get('format', 'mp3')
 
         tts = TTSService()
-        audio_content, processing_time = tts.generate_audio(
+        audio_content, _ = tts.generate_audio(
             text=text,
             language=language,
             voice_type=voice_type,
@@ -277,7 +283,9 @@ def generate_temp_audio(request):
 
     except (ValueError, TypeError) as e:
         logger.error(f'Invalid parameter in temp audio: {e}')
-        return JsonResponse({'error': _('Invalid parameter')}, status=400)
+        return JsonResponse(
+            {'error': gettext('Invalid parameter')}, status=400
+        )
     except Exception as e:
         logger.error(f'Temp audio generation error: {e}')
         return JsonResponse({'error': str(e)}, status=500)

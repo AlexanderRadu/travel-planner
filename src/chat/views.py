@@ -15,7 +15,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods, require_POST
 
 from routes.models import Route
-from routes.views import can_view_route
+from routes.services.access import can_view_route
 
 from .models import Conversation, PrivateMessage, RouteChat, RouteChatMessage
 
@@ -88,7 +88,7 @@ class ChatService:
         route = get_object_or_404(Route, id=route_id)
         if not can_view_route(user, route):
             raise PermissionDenied(_('You do not have access to this route'))
-        route_chat, f = RouteChat.objects.get_or_create(route=route)
+        route_chat = RouteChat.objects.get_or_create(route=route)[0]
         return route_chat, route
 
     @staticmethod
@@ -154,8 +154,8 @@ class JSONResponseMixin:
             raise ValidationError('Invalid content type. Use application/json')
         try:
             return json.loads(request.body)
-        except json.JSONDecodeError:
-            raise ValidationError('Invalid JSON format')
+        except json.JSONDecodeError as e:
+            raise ValidationError('Invalid JSON format') from e
 
 
 @login_required
@@ -411,7 +411,7 @@ def send_route_message(request):
                 user=request.user,
                 message=validated_content,
             )
-            participants = [route.author] + list(route.shared_with.all())
+            participants = [route.author, *list(route.shared_with.all())]
             for participant in participants:
                 cache.delete(f'chat_dashboard_{participant.id}')
 
@@ -684,9 +684,9 @@ def delete_conversation(request, conversation_id):
 @require_POST
 def mark_route_messages_as_read(request, route_id):
     try:
-        route_chat, route = ChatService.get_route_chat_with_access_check(
+        route_chat = ChatService.get_route_chat_with_access_check(
             request.user, route_id
-        )
+        )[0]
 
         with transaction.atomic():
             updated_count = (

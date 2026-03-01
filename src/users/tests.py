@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
@@ -102,8 +104,6 @@ class BasicURLTests(TestCase):
         ]
 
         for url_name, args, expected_status in urls_to_test:
-            try:
+            with suppress(Exception):
                 response = self.client.get(reverse(url_name, args=args))
                 self.assertEqual(response.status_code, expected_status)
-            except Exception:
-                pass

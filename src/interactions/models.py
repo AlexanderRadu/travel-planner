@@ -117,7 +117,6 @@ class RouteShare(models.Model):
     message = models.TextField(
         _('Message'),
         blank=True,
-        null=True,
         help_text=_('Optional message for recipient'),
     )
     sent_at = models.DateTimeField(_('Sent at'), auto_now_add=True)

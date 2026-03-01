@@ -1,4 +1,5 @@
 import json
+from contextlib import suppress
 
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
@@ -133,7 +134,7 @@ class AudioViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_generate_audio_mocked(self):
-        try:
+        with suppress(Exception):
             data = {
                 'text': 'Test text for audio generation',
                 'voice_type': 'alloy',
@@ -147,8 +148,6 @@ class AudioViewsTest(TestCase):
                 content_type='application/json',
             )
             self.assertIn(response.status_code, [200, 500])
-        except Exception:
-            pass
 
 
 class LocationDescriptionViewTest(TestCase):
@@ -220,7 +219,7 @@ class LocationDescriptionViewTest(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_generate_description_mocked(self):
-        try:
+        with suppress(Exception):
             data = {'style': 'storytelling', 'save_to_point': False}
             response = self.client.post(
                 reverse(
@@ -231,8 +230,6 @@ class LocationDescriptionViewTest(TestCase):
                 content_type='application/json',
             )
             self.assertIn(response.status_code, [200, 500])
-        except Exception:
-            pass
 
 
 class AudioStatusViewTest(TestCase):

@@ -1,6 +1,5 @@
 import json
 
-import users.services
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -9,6 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext
 
+import users.services
 from routes.models import Route
 from users.forms import UserRegistrationForm
 from users.models import Friendship, User, UserProfile
@@ -65,7 +65,9 @@ def send_message(request, user_id):
 def find_friends(request):
     search_query = request.GET.get('q', '').strip()
 
-    user_data = users.services.find_users_for_friendship(request.user, search_query)
+    user_data = users.services.find_users_for_friendship(
+        request.user, search_query
+    )
     pending_requests = users.services.get_pending_friend_requests(request.user)
 
     return render(
@@ -82,7 +84,9 @@ def find_friends(request):
 @login_required
 def send_friend_request(request, user_id):
     to_user = get_object_or_404(User, id=user_id)
-    success, message = users.services.process_friend_request(request.user, to_user)
+    success, message = users.services.process_friend_request(
+        request.user, to_user
+    )
 
     if success:
         messages.success(request, message)
@@ -155,7 +159,9 @@ def profile(request):
 
 def user_profile(request, username):
     target_user = get_object_or_404(User, username=username)
-    profile_data = users.services.get_public_profile_data(target_user, request.user)
+    profile_data = users.services.get_public_profile_data(
+        target_user, request.user
+    )
 
     context = {
         'profile_user': target_user,
