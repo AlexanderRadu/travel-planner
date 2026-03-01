@@ -54,7 +54,9 @@ class Route(models.Model):
         help_text=_('e.g. 2-3 hours, 1 day, 30 minutes'),
     )
     country = models.CharField(
-        _('Country'), max_length=100, blank=True, null=True
+        _('Country'),
+        max_length=100,
+        blank=True,
     )
     total_distance = models.FloatField(_('Total distance (km)'), default=0)
     is_active = models.BooleanField(_('Active'), default=True)
@@ -84,6 +86,9 @@ class Route(models.Model):
 
     def __str__(self):
         return f'{self.name} (ID: {self.id})'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('route_detail', kwargs={'route_id': self.id})
@@ -116,9 +121,6 @@ class Route(models.Model):
         self.qr_code.save(filename, File(buffer), save=False)
         self.save(update_fields=['qr_code'])
         return self.qr_code.url
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
 
     def get_average_rating(self):
         from django.db.models import Avg
