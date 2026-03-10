@@ -70,14 +70,9 @@ DATABASES = {
     }
 }
 
-YANDEX_API_KEY = "AQVN3h5QwSX2b3vUHfW8x_9hO7iEYdLBUEIswTwk"
-YANDEX_FOLDER_ID = "b1gqv1ek8siro4365epf"
-OPENROUTESERVICE_API_KEY = (
-    "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ij"
-    "YyMzA1OTQzOTI2NzQ1MDBiMTUwOGUxYmVhZTUwMGM4IiwiaCI6Im11"
-    "cm11cjY0In0="
-)
-
+YANDEX_API_KEY = config("YANDEX_API_KEY", default=None, cast=str)
+YANDEX_FOLDER_ID = config("YANDEX_FOLDER_ID", default=None, cast=str)
+OPENROUTESERVICE_API_KEY = config("OPENROUTESERVICE_API_KEY", default=None, cast=str)
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth."
@@ -141,16 +136,7 @@ MEDIA_ROOT = BASE_DIR /  'media'
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DOMAIN = "http://localhost:8000"
-OPENAI_API_KEY = os.getenv(
-    "OPENAI_API_KEY",
-    "sk-proj-1gob6GQWo4AlIGITCSRjAT2g-pepLniMflkljayooyZv03WVPZdV71lno4JFbakX"
-    "26yWaTp--KT3BlbkFJasRcOUq0c2rv9M6676yXlf1AivV_toIq5tSiyjEr"
-    "uX1MnN5gN2l0lWF6UCN11NdujRqnJsvA4A",
-)
-# YANDEX_TTS_API_KEY = os.getenv("YANDEX_TTS_API_KEY", "your-yandex-key-here")
-# GOOGLE_APPLICATION_CREDENTIALS = os.getenv(
-#     "GOOGLE_APPLICATION_CREDENTIALS", "path-to-google-credentials.json"
-# )
+OPENAI_API_KEY = config("OPENAI_API_KEY", default=None, cast=str)
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
