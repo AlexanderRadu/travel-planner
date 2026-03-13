@@ -1,94 +1,103 @@
-# Project: Waylines: a platform for author routes
-
-[![Lint • Tests](https://gitlab.crja72.ru/django/2025/autumn/course/projects/team-2/badges/master/pipeline.svg?key_text=Lint%20%7C%20Tests&key_width=110)](https://gitlab.crja72.ru/django/2025/autumn/course/projects/team-2/pipelines)
+# Waylines: Travel Planner
 
 
-## Development Mode Installation
+**Waylines** — это платформа для создания, поиска и планирования авторских туристических маршрутов. 
 
-### 1. Clone repository
+## 🛠 Стек технологий
+- **Backend:** Python, Django
+- **Frontend:** HTML5, CSS3, JavaScript
+- **Инфраструктура:** Docker, Docker Compose
+- **Управление зависимостями:** pip (requirements), npm (package.json)
 
+---
+
+## 🚀 Установка и запуск в режиме разработки (Локально)
+
+### 1. Клонирование репозитория
 ```bash
 git clone https://github.com/AlexanderRadu/travel-planner.git
+cd travel-planner
 ```
 
-### 2. Create virtual environment
+### 2. Настройка окружения
+Скопируйте шаблон переменных окружения и при необходимости измените их:
+```bash
+cp template.env .env
+```
 
-Linux/MacOS: 
+### 3. Создание и активация виртуального окружения
+
+**Linux / MacOS:**
 ```bash
 python3 -m venv venv
+source venv/bin/activate
 ```
 
-Windows:
+**Windows:**
 ```bash
 python -m venv venv
-```  
-
-### 3. Activate virtual environment
-
-Linux/MacOS: 
-```bash
-source venv/bin/activate
-```  
-Windows:
- ```bash
 venv\Scripts\activate
-```  
-
-### 4. Installing dependencies
-
-For production: 
-```bash
-pip install -r requirements/prod.txt
-```  
-For testing:
- ```bash
-pip install -r requirements/test.txt
-```  
-For development: 
-```bash
-pip install -r requirements/dev.txt
-``` 
-
-
-### 6. Apply database migrations
-
-All following commands with python manage.py must be executed from the directory containing manage.py (in this case, waylines)  
-```bash
-cd waylines
 ```
 
-#### Apply migrations to database
+### 4. Установка зависимостей
+Проект поддерживает несколько профилей зависимостей. Выберите нужный:
+
+- Для разработки: `pip install -r requirements/dev.txt`
+- Для тестирования: `pip install -r requirements/test.txt`
+- Для продакшена: `pip install -r requirements/prod.txt`
+
+*(Также может потребоваться установка JS-зависимостей, если используется фронтенд-сборка: `npm install`)*
+
+### 5. Подготовка базы данных
+Все команды `manage.py` выполняются из директории `src`.
 
 ```bash
+cd src
+
+# Применение миграций к базе данных
 python manage.py migrate
+
+# Сбор статичных файлов (для корректного отображения админ-панели)
+python manage.py collectstatic --noinput
+
+# (Опционально) Проверка статуса миграций
+python manage.py showmigrations
 ```
 
-#### Create a superuser (for access to the admin panel)
-
+### 6. Создание суперпользователя
+Для доступа к панели администратора необходимо создать аккаунт суперпользователя:
 ```bash
 python manage.py createsuperuser
 ```
 
-#### Collect static files (required for admin panel and styling)  
-
-```bash
-python manage.py collectstatic --noinput
-```
-
-#### Check migration status
-
-```bash
-python manage.py showmigrations
-```
-
-### 8. Running tests
-
-```bash
-python manage.py test
-```
-
-### 9. Run development server:
-
+### 7. Запуск локального сервера разработки
 ```bash
 python manage.py runserver
+```
+После этого проект будет доступен по адресу: `http://127.0.0.1:8000/`
+
+---
+
+## Запуск через Docker
+
+
+1. Убедитесь, что у вас установлен Docker и Docker Compose.
+2. Создайте файл `.env` на основе `template.env`.
+3. Запустите контейнеры:
+   ```bash
+   docker-compose up --build
+   ```
+4. Для выполнения миграций внутри контейнера используйте:
+   ```bash
+   docker-compose exec web python manage.py migrate
+   ```
+
+---
+
+## Запуск тестов
+
+Для проверки работоспособности проекта используйте команду:
+```bash
+cd src
+python manage.py test
 ```
