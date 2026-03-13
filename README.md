@@ -8,7 +8,7 @@
 ### 1. Clone repository
 
 ```bash
-git clone https://gitlab.crja72.ru/django/2025/autumn/course/projects/team-2.git
+git clone https://github.com/AlexanderRadu/travel-planner.git
 ```
 
 ### 2. Create virtual environment
