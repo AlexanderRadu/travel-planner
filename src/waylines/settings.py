@@ -1,5 +1,4 @@
 from pathlib import Path
-import os
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -63,12 +62,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "waylines.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+USE_POSTGRES = config('USE_POSTGRES', default=False, cast=bool)
+if USE_POSTGRES:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": config("POSTGRES_DB", default="waylines", cast=str),
+            "USER": config("POSTGRES_USER", default="postgres", cast=str),
+            "PASSWORD": config("POSTGRES_PASSWORD", default="postgres", cast=str),
+            "HOST": config("POSTGRES_HOST", default="localhost", cast=str),
+            "PORT": config("POSTGRES_PORT", default="5432", cast=str),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 YANDEX_API_KEY = config("YANDEX_API_KEY", default=None, cast=str)
 YANDEX_FOLDER_ID = config("YANDEX_FOLDER_ID", default=None, cast=str)

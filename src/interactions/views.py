@@ -2,16 +2,15 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ValidationError, PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from interactions.models import Comment, Rating
-from routes.models import Route
 from interactions import services
+from interactions.models import Comment
+from routes.models import Route
 
 logger = logging.getLogger(__name__)
 
@@ -21,13 +20,11 @@ def toggle_favorite(request, route_id):
     route = get_object_or_404(Route, id=route_id)
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
-    # Вся логика теперь здесь:
     result_data = services.toggle_route_favorite(request.user, route)
 
     if is_ajax:
         return JsonResponse(result_data)
 
-    # Логика редиректа - это часть представления (HTTP), а не бизнес-логики
     messages.success(request, result_data['message'])
     referer = request.META.get('HTTP_REFERER', '')
     if 'my_routes' in referer and '#favorites' in referer:

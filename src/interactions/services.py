@@ -1,11 +1,11 @@
 import logging
 
-from django.core.exceptions import ValidationError, PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.utils import timezone
 from django.utils.html import escape
 from django.utils.translation import gettext as _
 
-from interactions.models import Favorite, Rating, Comment
+from interactions.models import Comment, Favorite, Rating
 
 logger = logging.getLogger(__name__)
 
